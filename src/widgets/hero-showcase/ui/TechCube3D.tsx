@@ -169,90 +169,204 @@ export function TechCube3D() {
           ctx.fillStyle = sheenAura;
           ctx.fillRect(pad, pad, frameSize, frameSize);
 
-          // Technical dual circuit traces emerging from the 4 corners, each with a unique trajectory
+          // Unique organic root-like dual trajectories emerging from each of the 4 corners per face
           ctx.save();
-          ctx.strokeStyle = isLight ? `${item.color}90` : `${item.color}55`;
-          ctx.fillStyle = item.color;
-          ctx.lineWidth = 2;
+          ctx.lineCap = 'round';
+          ctx.lineJoin = 'round';
 
-          const drawTrace = (points: Array<[number, number]>) => {
-            if (points.length < 2) return;
-            ctx.beginPath();
-            ctx.moveTo(points[0][0], points[0][1]);
-            for (let i = 1; i < points.length; i += 1) {
-              ctx.lineTo(points[i][0], points[i][1]);
+          // Deterministic PRNG so every (faceIdx, cornerIdx, rootIdx) has a 100% unique trajectory
+          const createRng = (seedInput: number) => {
+            let state = (seedInput ^ 0x9e3779b9) >>> 0;
+            return () => {
+              state = Math.imul(state ^ (state >>> 16), 0x85ebca6b) >>> 0;
+              state = Math.imul(state ^ (state >>> 13), 0xc2b2ae35) >>> 0;
+              state = (state ^ (state >>> 16)) >>> 0;
+              return state / 4294967296;
+            };
+          };
+
+          // Strict safety check so roots never approach the circular badge (256, 190, r=93) or text block
+          const isSafeRootPoint = (
+            x: number,
+            y: number,
+            isLeft: boolean,
+            isTop: boolean
+          ) => {
+            // Stay inside the rounded frame
+            if (x < pad + 12 || x > texSize - pad - 12) return false;
+            if (y < pad + 12 || y > texSize - pad - 12) return false;
+
+            // Keep each corner's roots within its own quadrant/corridor so opposite corners don't cross
+            if (isLeft && x > 244) return false;
+            if (!isLeft && x < 268) return false;
+            if (isTop && y > 250) return false;
+            if (!isTop && y < 252) return false;
+
+            // Circular badge + outer orbital ring exclusion (radius 93 + 23px margin = 116px)
+            const distToBadge = Math.hypot(x - texSize / 2, y - (texSize / 2 - 66));
+            if (distToBadge < 116) return false;
+
+            // Title + divider + subtitle exclusion zone
+            if (x > 76 && x < 436 && y > 268 && y < 388) return false;
+
+            return true;
+          };
+
+          const drawRootSegmentChain = (
+            pts: Array<[number, number]>,
+            baseWidth: number,
+            isSubBranch: boolean
+          ) => {
+            if (pts.length < 2) return;
+            for (let i = 0; i < pts.length - 1; i += 1) {
+              const progress = i / Math.max(1, pts.length - 1);
+              ctx.beginPath();
+              ctx.moveTo(pts[i][0], pts[i][1]);
+              ctx.lineTo(pts[i + 1][0], pts[i + 1][1]);
+              ctx.lineWidth = Math.max(0.9, baseWidth * (1 - progress * 0.38));
+              ctx.strokeStyle = isSubBranch
+                ? isLight
+                  ? `${item.color}78`
+                  : `${item.color}48`
+                : isLight
+                  ? `${item.color}a8`
+                  : `${item.color}6e`;
+              ctx.stroke();
             }
-            ctx.stroke();
 
-            const last = points[points.length - 1];
+            const tip = pts[pts.length - 1];
             ctx.beginPath();
-            ctx.arc(last[0], last[1], 3, 0, Math.PI * 2);
+            ctx.arc(tip[0], tip[1], isSubBranch ? 2.1 : 3, 0, Math.PI * 2);
+            ctx.fillStyle = item.color;
             ctx.fill();
           };
 
-          const shift = (faceIdx % 3) * 6;
-          const tlX = pad + 12;
-          const tlY = pad + 12;
-          const trX = texSize - pad - 12;
-          const trY = pad + 12;
-          const blX = pad + 12;
-          const blY = texSize - pad - 12;
-          const brX = texSize - pad - 12;
-          const brY = texSize - pad - 12;
+          const corners = [
+            { cornerIdx: 0, isLeft: true, isTop: true, cx: pad + 14, cy: pad + 14 },
+            {
+              cornerIdx: 1,
+              isLeft: false,
+              isTop: true,
+              cx: texSize - pad - 14,
+              cy: pad + 14,
+            },
+            {
+              cornerIdx: 2,
+              isLeft: true,
+              isTop: false,
+              cx: pad + 14,
+              cy: texSize - pad - 14,
+            },
+            {
+              cornerIdx: 3,
+              isLeft: false,
+              isTop: false,
+              cx: texSize - pad - 14,
+              cy: texSize - pad - 14,
+            },
+          ];
 
-          // Top-Left corner: 2 lines with unique stepped + angled paths
-          drawTrace([
-            [tlX + 38, tlY + 16],
-            [tlX + 94 + shift, tlY + 16],
-            [tlX + 114 + shift, tlY + 36],
-            [tlX + 136 + shift, tlY + 36],
-          ]);
-          drawTrace([
-            [tlX + 16, tlY + 42],
-            [tlX + 16, tlY + 86 + shift],
-            [tlX + 38, tlY + 108 + shift],
-          ]);
+          corners.forEach(({ cornerIdx, isLeft, isTop, cx, cy }) => {
+            const dirX = isLeft ? 1 : -1;
+            const dirY = isTop ? 1 : -1;
 
-          // Top-Right corner: 2 lines with unique jogged trajectory
-          drawTrace([
-            [trX - 36, trY + 18],
-            [trX - 72 - shift, trY + 18],
-            [trX - 92 - shift, trY + 38],
-          ]);
-          drawTrace([
-            [trX - 18, trY + 40],
-            [trX - 18, trY + 70],
-            [trX - 36, trY + 88],
-            [trX - 36, trY + 120 + shift],
-          ]);
+            // 2 distinct primary roots per corner (0 = horizontal-corridor root, 1 = vertical-corridor root)
+            for (let rootIdx = 0; rootIdx < 2; rootIdx += 1) {
+              const rng = createRng(
+                (faceIdx + 1) * 7919 + (cornerIdx + 1) * 104729 + (rootIdx + 1) * 15485863
+              );
 
-          // Bottom-Left corner: 2 lines with asymmetric dogleg trajectory
-          drawTrace([
-            [blX + 42, blY - 18],
-            [blX + 78 + shift, blY - 18],
-            [blX + 102 + shift, blY - 42],
-          ]);
-          drawTrace([
-            [blX + 18, blY - 38],
-            [blX + 18, blY - 66],
-            [blX + 36, blY - 84],
-            [blX + 36, blY - 112 - shift],
-            [blX + 52, blY - 128 - shift],
-          ]);
+              const startAlong = Math.round(34 + rng() * 14);
+              const startPerp = Math.round(12 + rng() * 8);
 
-          // Bottom-Right corner: 2 lines with stepped horizontal & long vertical trace
-          drawTrace([
-            [brX - 38, brY - 16],
-            [brX - 66, brY - 16],
-            [brX - 84, brY - 34],
-            [brX - 116 - shift, brY - 34],
-            [brX - 132 - shift, brY - 50],
-          ]);
-          drawTrace([
-            [brX - 16, brY - 44],
-            [brX - 16, brY - 98 - shift],
-            [brX - 38, brY - 120 - shift],
-          ]);
+              const startX =
+                rootIdx === 0
+                  ? cx + dirX * startAlong
+                  : cx + dirX * startPerp;
+              const startY =
+                rootIdx === 0
+                  ? cy + dirY * startPerp
+                  : cy + dirY * startAlong;
+
+              const mainPts: Array<[number, number]> = [[startX, startY]];
+              const subBranches: Array<Array<[number, number]>> = [];
+
+              // Base angle aimed along the open corridor (0 = horizontal edge, 1 = vertical edge)
+              let currentAngle =
+                rootIdx === 0
+                  ? isLeft
+                    ? 0.08 + rng() * 0.16
+                    : Math.PI - (0.08 + rng() * 0.16)
+                  : isTop
+                    ? Math.PI / 2 - dirX * (0.08 + rng() * 0.16)
+                    : -Math.PI / 2 + dirX * (0.08 + rng() * 0.16);
+
+              const numSteps = 4 + Math.floor(rng() * 2); // 4 to 5 segments for longer reach
+
+              for (let step = 0; step < numSteps; step += 1) {
+                const prev = mainPts[mainPts.length - 1];
+                const segLen = 30 + rng() * 18;
+
+                // Try organic root bends that stay strictly inside the safe corridor
+                let placed = false;
+                const turnCandidates = [
+                  (rng() - 0.42) * 0.68,
+                  (rng() - 0.5) * 0.45,
+                  0,
+                  -0.28 * dirY * dirX,
+                  0.28 * dirY * dirX,
+                ];
+
+                for (const deltaAngle of turnCandidates) {
+                  const candidateAngle = currentAngle + deltaAngle;
+                  const nx = Math.round(prev[0] + Math.cos(candidateAngle) * segLen);
+                  const ny = Math.round(prev[1] + Math.sin(candidateAngle) * segLen);
+
+                  if (isSafeRootPoint(nx, ny, isLeft, isTop)) {
+                    mainPts.push([nx, ny]);
+                    currentAngle = candidateAngle;
+                    placed = true;
+
+                    // Spawn rootlet sub-branches on intermediate nodes for a true tree-root look
+                    if (step >= 1 && step <= 3 && rng() > 0.22) {
+                      const forkSign = step % 2 === 0 ? 1 : -1;
+                      const forkAngle =
+                        currentAngle + forkSign * (0.42 + rng() * 0.36);
+                      const forkLen1 = 18 + rng() * 14;
+                      const fx1 = Math.round(prev[0] + Math.cos(forkAngle) * forkLen1);
+                      const fy1 = Math.round(prev[1] + Math.sin(forkAngle) * forkLen1);
+
+                      if (isSafeRootPoint(fx1, fy1, isLeft, isTop)) {
+                        const branchPts: Array<[number, number]> = [
+                          [prev[0], prev[1]],
+                          [fx1, fy1],
+                        ];
+                        const forkAngle2 =
+                          forkAngle + (rng() - 0.5) * 0.52;
+                        const forkLen2 = 14 + rng() * 12;
+                        const fx2 = Math.round(fx1 + Math.cos(forkAngle2) * forkLen2);
+                        const fy2 = Math.round(fy1 + Math.sin(forkAngle2) * forkLen2);
+
+                        if (isSafeRootPoint(fx2, fy2, isLeft, isTop)) {
+                          branchPts.push([fx2, fy2]);
+                        }
+                        subBranches.push(branchPts);
+                      }
+                    }
+
+                    break;
+                  }
+                }
+
+                if (!placed) break;
+              }
+
+              drawRootSegmentChain(mainPts, 2.35, false);
+              subBranches.forEach((branch) =>
+                drawRootSegmentChain(branch, 1.45, true)
+              );
+            }
+          });
 
           ctx.restore();
 

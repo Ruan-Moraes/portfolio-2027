@@ -50,14 +50,11 @@ export function SidebarNav() {
         <button
           type="button"
           onClick={() => scrollToSection('home')}
-          className="group flex flex-col items-center gap-1 focus:outline-none"
+          className="group flex flex-col items-center focus:outline-none"
         >
           <div className="flex h-11 w-11 items-center justify-center rounded-2xl border border-[var(--ui-accent)]/50 bg-[var(--ui-accent)]/10 font-mono text-lg font-black text-[var(--ui-accent)] shadow-[0_0_20px_-4px_var(--ui-accent-glow)] transition-transform duration-300 group-hover:scale-105">
             {DEVELOPER_PROFILE.initials}
           </div>
-          <span className="font-mono text-[10px] tracking-widest text-[var(--ui-text-muted)] uppercase">
-            2027
-          </span>
         </button>
 
         {/* Section Icons */}
