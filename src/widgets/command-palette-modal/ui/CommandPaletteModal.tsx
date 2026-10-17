@@ -16,6 +16,7 @@ import {
 import { useTranslations } from 'next-intl';
 import { DEVELOPER_PROFILE } from '@/entities/developer-profile';
 import { useCommandPalette } from '@/features/open-command-palette';
+import { usePortfolioLocale } from '@/features/switch-language';
 import { useThemePreferences } from '@/features/switch-theme';
 import {
   ACCENT_COLORS,
@@ -27,7 +28,6 @@ import {
   type PortfolioSectionId,
   type SupportedLocale,
 } from '@/shared/config';
-import { usePathname, useRouter } from '@/shared/i18n';
 
 const GROUP_CLASS =
   'mb-5 last:mb-0 [&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:pb-2.5 [&_[cmdk-group-heading]]:font-mono [&_[cmdk-group-heading]]:text-[11px] [&_[cmdk-group-heading]]:font-semibold [&_[cmdk-group-heading]]:tracking-widest [&_[cmdk-group-heading]]:text-[var(--ui-text-muted)] [&_[cmdk-group-heading]]:uppercase [&_[cmdk-group-items]]:flex [&_[cmdk-group-items]]:flex-col [&_[cmdk-group-items]]:gap-1.5';
@@ -41,12 +41,11 @@ const ICON_BOX_CLASS =
 export function CommandPaletteModal() {
   const { isOpen, closePalette } = useCommandPalette();
   const { mode, toggleMode, setAccent } = useThemePreferences();
+  const { setLocale } = usePortfolioLocale();
   const tNav = useTranslations('nav');
   const tCommon = useTranslations('common');
   const tTheme = useTranslations('theme');
   const tCmd = useTranslations('commandPalette');
-  const router = useRouter();
-  const pathname = usePathname();
 
   if (!isOpen) return null;
 
@@ -57,7 +56,7 @@ export function CommandPaletteModal() {
 
   const switchLocale = (locale: SupportedLocale) => {
     closePalette();
-    router.replace(pathname, { locale, scroll: false });
+    setLocale(locale);
   };
 
   return (

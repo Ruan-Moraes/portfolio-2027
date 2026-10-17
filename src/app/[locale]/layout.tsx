@@ -1,11 +1,11 @@
 import type { Metadata } from 'next';
 import { Inter, JetBrains_Mono, La_Belle_Aurore } from 'next/font/google';
 import { notFound } from 'next/navigation';
-import { NextIntlClientProvider, hasLocale } from 'next-intl';
-import { getMessages, getTranslations, setRequestLocale } from 'next-intl/server';
+import { hasLocale } from 'next-intl';
+import { getTranslations, setRequestLocale } from 'next-intl/server';
 import type { ReactNode } from 'react';
 import { DEVELOPER_PROFILE } from '@/entities/developer-profile';
-import { SUPPORTED_LOCALES } from '@/shared/config';
+import { SUPPORTED_LOCALES, type SupportedLocale } from '@/shared/config';
 import { routing } from '@/shared/i18n';
 import { AppProviders } from '../providers/AppProviders';
 import '../styles/globals.css';
@@ -77,7 +77,6 @@ export default async function LocaleLayout({
   }
 
   setRequestLocale(locale);
-  const messages = await getMessages();
 
   return (
     <html
@@ -86,9 +85,9 @@ export default async function LocaleLayout({
       className={`${fontSans.variable} ${fontMono.variable} ${fontScript.variable}`}
     >
       <body className="antialiased">
-        <NextIntlClientProvider locale={locale} messages={messages}>
-          <AppProviders>{children}</AppProviders>
-        </NextIntlClientProvider>
+        <AppProviders initialLocale={locale as SupportedLocale}>
+          {children}
+        </AppProviders>
       </body>
     </html>
   );

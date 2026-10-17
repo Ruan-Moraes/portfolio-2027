@@ -1,8 +1,8 @@
 'use client';
 
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 import { SKILLS_DATA, type SkillCategoryKey } from '@/entities/skill';
-import { cn } from '@/shared/lib';
+import { cn, useElementVisibility } from '@/shared/lib';
 
 interface SpherePoint {
   name: string;
@@ -17,14 +17,20 @@ interface InteractiveSkillSphereProps {
   selectedCategory: SkillCategoryKey | 'all';
 }
 
+const RADIUS_PX = 138;
+
 export function InteractiveSkillSphere({
   selectedCategory,
 }: InteractiveSkillSphereProps) {
   const containerRef = useRef<HTMLDivElement | null>(null);
-  const [rotation, setRotation] = useState({ x: 0, y: 0 });
+  const itemRefs = useRef<Array<HTMLSpanElement | null>>([]);
+  const isVisible = useElementVisibility(containerRef, { rootMargin: '100px' });
+  const isVisibleRef = useRef(isVisible);
+  const selectedCategoryRef = useRef(selectedCategory);
   const speedRef = useRef({ vx: 0.0045, vy: 0.0065 });
+  const resumeLoopRef = useRef<(() => void) | null>(null);
 
-  // Distribute skills evenly on a 3D Fibonacci Sphere
+  // Distribute skills evenly on a 3D Fibonacci Sphere once
   const basePoints = useMemo<SpherePoint[]>(() => {
     const count = SKILLS_DATA.length;
     const goldenAngle = Math.PI * (3 - Math.sqrt(5));
@@ -45,21 +51,52 @@ export function InteractiveSkillSphere({
     });
   }, []);
 
-  const [projected, setProjected] = useState<SpherePoint[]>(basePoints);
+  const pointsRef = useRef<SpherePoint[]>(
+    basePoints.map((pt) => ({ ...pt }))
+  );
+
+  // Synchronize category filter and visibility without triggering 60fps React re-renders
+  useEffect(() => {
+    selectedCategoryRef.current = selectedCategory;
+    const pts = pointsRef.current;
+    for (let i = 0; i < pts.length; i += 1) {
+      const el = itemRefs.current[i];
+      if (!el) continue;
+      const point = pts[i];
+      const baseOpacity = Math.max(0.22, Math.min(1, (point.z + 1.35) / 2.1));
+      const isMatched =
+        selectedCategory === 'all' || point.category === selectedCategory;
+      el.style.opacity = (isMatched ? baseOpacity : baseOpacity * 0.25).toFixed(3);
+    }
+  }, [selectedCategory]);
+
+  useEffect(() => {
+    isVisibleRef.current = isVisible;
+    if (isVisible) {
+      resumeLoopRef.current?.();
+    }
+  }, [isVisible]);
 
   useEffect(() => {
     let frameId = 0;
-    let currentPoints = [...basePoints];
+    let isRunning = false;
+    const pts = pointsRef.current;
 
     const animate = () => {
-      const { vx, vy } = speedRef.current;
+      if (!isVisibleRef.current) {
+        isRunning = false;
+        return;
+      }
 
+      const { vx, vy } = speedRef.current;
       const cosX = Math.cos(vx);
       const sinX = Math.sin(vx);
       const cosY = Math.cos(vy);
       const sinY = Math.sin(vy);
+      const activeCat = selectedCategoryRef.current;
 
-      currentPoints = currentPoints.map((pt) => {
+      for (let i = 0; i < pts.length; i += 1) {
+        const pt = pts[i];
         // Rotate around X
         const y1 = pt.y * cosX - pt.z * sinX;
         const z1 = pt.y * sinX + pt.z * cosX;
@@ -67,29 +104,53 @@ export function InteractiveSkillSphere({
         const x2 = pt.x * cosY + z1 * sinY;
         const z2 = -pt.x * sinY + z1 * cosY;
 
-        return {
-          ...pt,
-          x: x2,
-          y: y1,
-          z: z2,
-        };
-      });
+        pt.x = x2;
+        pt.y = y1;
+        pt.z = z2;
 
-      setProjected(currentPoints);
-      setRotation((prev) => ({ x: prev.x + vx, y: prev.y + vy }));
+        const el = itemRefs.current[i];
+        if (!el) continue;
+
+        const scale = (z2 + 2) / 3;
+        const baseOpacity = Math.max(0.22, Math.min(1, (z2 + 1.35) / 2.1));
+        const isMatched = activeCat === 'all' || pt.category === activeCat;
+
+        el.style.transform = `translate3d(${(x2 * RADIUS_PX).toFixed(1)}px, ${(
+          y1 * RADIUS_PX
+        ).toFixed(1)}px, 0) scale(${scale.toFixed(2)})`;
+        el.style.opacity = (
+          isMatched ? baseOpacity : baseOpacity * 0.25
+        ).toFixed(3);
+        el.style.zIndex = String(Math.round(scale * 100));
+      }
+
       frameId = window.requestAnimationFrame(animate);
     };
 
-    frameId = window.requestAnimationFrame(animate);
-    return () => window.cancelAnimationFrame(frameId);
-  }, [basePoints]);
+    const startLoop = () => {
+      if (!isRunning && isVisibleRef.current) {
+        isRunning = true;
+        frameId = window.requestAnimationFrame(animate);
+      }
+    };
+
+    resumeLoopRef.current = startLoop;
+    startLoop();
+
+    return () => {
+      resumeLoopRef.current = null;
+      window.cancelAnimationFrame(frameId);
+    };
+  }, []);
 
   const handleMouseMove = (event: React.MouseEvent<HTMLDivElement>) => {
     const rect = containerRef.current?.getBoundingClientRect();
     if (!rect) return;
 
-    const relX = (event.clientX - (rect.left + rect.width / 2)) / (rect.width / 2);
-    const relY = (event.clientY - (rect.top + rect.height / 2)) / (rect.height / 2);
+    const relX =
+      (event.clientX - (rect.left + rect.width / 2)) / (rect.width / 2);
+    const relY =
+      (event.clientY - (rect.top + rect.height / 2)) / (rect.height / 2);
 
     speedRef.current = {
       vx: -relY * 0.018,
@@ -101,14 +162,11 @@ export function InteractiveSkillSphere({
     speedRef.current = { vx: 0.0045, vy: 0.0065 };
   };
 
-  const radiusPx = 138;
-
   return (
     <div
       ref={containerRef}
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
-      data-rotation={rotation.x.toFixed(2)}
       className="relative flex h-[340px] w-full items-center justify-center overflow-hidden rounded-2xl select-none sm:h-[380px]"
     >
       <div
@@ -117,7 +175,7 @@ export function InteractiveSkillSphere({
       />
 
       <div className="relative h-0 w-0">
-        {projected.map((point) => {
+        {basePoints.map((point, index) => {
           const scale = (point.z + 2) / 3;
           const opacity = Math.max(0.22, Math.min(1, (point.z + 1.35) / 2.1));
           const isMatchedCategory =
@@ -126,9 +184,12 @@ export function InteractiveSkillSphere({
           return (
             <span
               key={point.name}
+              ref={(el) => {
+                itemRefs.current[index] = el;
+              }}
               style={{
-                transform: `translate3d(${(point.x * radiusPx).toFixed(1)}px, ${(
-                  point.y * radiusPx
+                transform: `translate3d(${(point.x * RADIUS_PX).toFixed(1)}px, ${(
+                  point.y * RADIUS_PX
                 ).toFixed(1)}px, 0) scale(${scale.toFixed(2)})`,
                 opacity: Number(
                   (isMatchedCategory ? opacity : opacity * 0.25).toFixed(3)
@@ -136,7 +197,7 @@ export function InteractiveSkillSphere({
                 zIndex: Math.round(scale * 100),
               }}
               className={cn(
-                'absolute top-0 left-0 -translate-x-1/2 -translate-y-1/2 rounded-full px-2.5 py-0.5 font-mono text-xs whitespace-nowrap transition-colors duration-200',
+                'absolute top-0 left-0 -translate-x-1/2 -translate-y-1/2 rounded-full px-2.5 py-0.5 font-mono text-xs whitespace-nowrap transition-colors duration-200 will-change-transform',
                 point.highlight && isMatchedCategory
                   ? 'border border-[var(--ui-accent)]/50 bg-[var(--ui-accent)]/15 font-bold text-[var(--ui-accent)] shadow-[0_0_12px_-2px_var(--ui-accent-glow)]'
                   : 'text-[var(--ui-text-primary)]'

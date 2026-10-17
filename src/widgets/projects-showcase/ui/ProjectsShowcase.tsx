@@ -1,15 +1,7 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
-import {
-  CheckCircle2,
-  ExternalLink,
-  GitFork,
-  GitBranch,
-  Lock,
-  Search,
-  Star,
-} from 'lucide-react';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { Search } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import {
   FEATURED_PROJECTS,
@@ -18,31 +10,43 @@ import {
   type GitHubRepositoryItem,
   type ProjectCategoryFilter,
 } from '@/entities/project';
-import { cn } from '@/shared/lib';
-import { Badge, GlassCard, SectionHeading } from '@/shared/ui';
+import { cn, useElementVisibility } from '@/shared/lib';
+import { SectionHeading } from '@/shared/ui';
+import { FeaturedProjectCard } from './FeaturedProjectCard';
+import { GitHubRepoCard } from './GitHubRepoCard';
 
 export function ProjectsShowcase() {
   const t = useTranslations('projects');
-  const tCommon = useTranslations('common');
+  const sectionRef = useRef<HTMLElement | null>(null);
+  const isNearViewport = useElementVisibility(sectionRef, {
+    rootMargin: '320px',
+  });
 
   const [activeTab, setActiveTab] = useState<'featured' | 'github'>('featured');
   const [categoryFilter, setCategoryFilter] =
     useState<ProjectCategoryFilter>('all');
   const [repos, setRepos] =
     useState<GitHubRepositoryItem[]>(FALLBACK_GITHUB_REPOS);
+  const [hasLoadedRemoteRepos, setHasLoadedRemoteRepos] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
 
+  // Lazy-fetch live GitHub repos only when section approaches viewport or user opens GitHub tab
   useEffect(() => {
+    if (hasLoadedRemoteRepos || (!isNearViewport && activeTab !== 'github')) {
+      return;
+    }
+
     let mounted = true;
     fetchGitHubReposClient().then((data) => {
       if (mounted) {
         setRepos(data);
+        setHasLoadedRemoteRepos(true);
       }
     });
     return () => {
       mounted = false;
     };
-  }, []);
+  }, [isNearViewport, activeTab, hasLoadedRemoteRepos]);
 
   const filteredFeatured = useMemo(() => {
     if (categoryFilter === 'all') return FEATURED_PROJECTS;
@@ -71,8 +75,10 @@ export function ProjectsShowcase() {
     { id: 'corporate', label: t('filters.corporate') },
   ];
 
+  const liveDemoLabel = t('githubSection.liveDemo');
+
   return (
-    <section id="projects" className="scroll-mt-20 py-20">
+    <section ref={sectionRef} id="projects" className="scroll-mt-20 py-20">
       <SectionHeading
         tag={t('tag')}
         title={t('title')}
@@ -132,120 +138,9 @@ export function ProjectsShowcase() {
       {/* TAB 1: Featured Case Studies */}
       {activeTab === 'featured' ? (
         <div className="grid gap-6 lg:grid-cols-2">
-          {filteredFeatured.map((project) => {
-            const features = t.raw(
-              `items.${project.id}.features`
-            ) as string[];
-
-            return (
-              <GlassCard
-                key={project.id}
-                interactive
-                className="flex flex-col justify-between overflow-hidden p-6 sm:p-8"
-              >
-                <div>
-                  <div className="flex flex-wrap items-center justify-between gap-2">
-                    <div className="flex flex-wrap items-center gap-2">
-                      <Badge variant="accent">
-                        {t(`items.${project.id}.category`)}
-                      </Badge>
-                      <span className="font-mono text-xs text-[var(--ui-text-muted)]">
-                        {t(`items.${project.id}.year`)}
-                      </span>
-                    </div>
-
-                    <Badge variant="default">
-                      {t(`items.${project.id}.status`)}
-                    </Badge>
-                  </div>
-
-                  <h3 className="mt-4 text-2xl font-bold text-[var(--ui-text-primary)]">
-                    {t(`items.${project.id}.title`)}
-                  </h3>
-                  <p className="mt-0.5 text-xs font-semibold text-[var(--ui-accent)] sm:text-sm">
-                    {t(`items.${project.id}.subtitle`)} •{' '}
-                    <span className="text-[var(--ui-text-muted)]">
-                      {t(`items.${project.id}.company`)}
-                    </span>
-                  </p>
-
-                  <p className="mt-4 text-sm leading-relaxed text-[var(--ui-text-secondary)]">
-                    {t(`items.${project.id}.description`)}
-                  </p>
-
-                  <div className="mt-4 rounded-xl border border-[var(--ui-border)] bg-[var(--ui-surface-elevated)]/60 p-3">
-                    <span className="font-mono text-[11px] font-bold tracking-wider text-[var(--ui-accent)] uppercase">
-                      {t('architectureLabel')}{' '}
-                    </span>
-                    <span className="font-mono text-xs text-[var(--ui-text-primary)]">
-                      {t(`items.${project.id}.architecture`)}
-                    </span>
-                  </div>
-
-                  <div className="mt-5">
-                    <h4 className="mb-2.5 font-mono text-xs font-bold tracking-wider text-[var(--ui-text-primary)] uppercase">
-                      {t('keyFeatures')}
-                    </h4>
-                    <ul className="space-y-2">
-                      {Array.isArray(features) &&
-                        features.map((feat, idx) => (
-                          <li
-                            key={idx}
-                            className="flex items-start gap-2 text-xs leading-relaxed text-[var(--ui-text-secondary)] sm:text-sm"
-                          >
-                            <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-[var(--ui-accent)]" />
-                            <span>{feat}</span>
-                          </li>
-                        ))}
-                    </ul>
-                  </div>
-                </div>
-
-                <div className="mt-6 space-y-4 border-t border-[var(--ui-border)] pt-5">
-                  <div className="flex flex-wrap gap-1.5">
-                    {project.technologies.map((tech) => (
-                      <Badge key={tech} variant="default">
-                        {tech}
-                      </Badge>
-                    ))}
-                  </div>
-
-                  <div className="flex flex-wrap items-center gap-3 pt-1">
-                    {project.githubUrl && (
-                      <a
-                        href={project.githubUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center gap-2 rounded-xl border border-[var(--ui-accent)]/50 bg-[var(--ui-accent)]/12 px-4 py-2 text-xs font-bold text-[var(--ui-accent)] transition-all hover:bg-[var(--ui-accent)] hover:text-white"
-                      >
-                        <GitBranch className="h-3.5 w-3.5" />
-                        <span>{tCommon('viewCode')}</span>
-                      </a>
-                    )}
-
-                    {project.secondaryGithubUrl && (
-                      <a
-                        href={project.secondaryGithubUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center gap-2 rounded-xl border border-[var(--ui-border)] bg-[var(--ui-surface-elevated)] px-4 py-2 text-xs font-semibold text-[var(--ui-text-primary)] transition-all hover:border-[var(--ui-accent)]/50"
-                      >
-                        <ExternalLink className="h-3.5 w-3.5 text-[var(--ui-accent)]" />
-                        <span>UI Repo</span>
-                      </a>
-                    )}
-
-                    {project.isPrivate && (
-                      <span className="inline-flex items-center gap-2 rounded-xl border border-amber-500/40 bg-amber-500/10 px-3.5 py-2 text-xs font-semibold text-amber-300">
-                        <Lock className="h-3.5 w-3.5" />
-                        <span>{tCommon('privateProject')}</span>
-                      </span>
-                    )}
-                  </div>
-                </div>
-              </GlassCard>
-            );
-          })}
+          {filteredFeatured.map((project) => (
+            <FeaturedProjectCard key={project.id} project={project} />
+          ))}
         </div>
       ) : (
         /* TAB 2: Live GitHub API Repositories */
@@ -269,61 +164,11 @@ export function ProjectsShowcase() {
 
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {filteredRepos.map((repo) => (
-              <GlassCard
+              <GitHubRepoCard
                 key={repo.id}
-                interactive
-                className="flex flex-col justify-between p-5"
-              >
-                <div>
-                  <div className="flex items-start justify-between gap-2">
-                    <h3 className="font-mono text-base font-bold text-[var(--ui-text-primary)]">
-                      {repo.name}
-                    </h3>
-                    {repo.language && (
-                      <Badge variant="accent">{repo.language}</Badge>
-                    )}
-                  </div>
-
-                  <p className="mt-2.5 line-clamp-3 text-xs leading-relaxed text-[var(--ui-text-secondary)] sm:text-sm">
-                    {repo.description || '—'}
-                  </p>
-                </div>
-
-                <div className="mt-5 flex items-center justify-between border-t border-[var(--ui-border)] pt-4">
-                  <div className="flex items-center gap-3 font-mono text-xs text-[var(--ui-text-muted)]">
-                    <span className="inline-flex items-center gap-1">
-                      <Star className="h-3.5 w-3.5 text-[var(--ui-accent)]" />
-                      {repo.stargazersCount}
-                    </span>
-                    <span className="inline-flex items-center gap-1">
-                      <GitFork className="h-3.5 w-3.5" />
-                      {repo.forksCount}
-                    </span>
-                  </div>
-
-                  <div className="flex items-center gap-2">
-                    {repo.homepage && (
-                      <a
-                        href={repo.homepage}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="rounded-lg border border-[var(--ui-border)] px-2.5 py-1 text-xs font-medium text-[var(--ui-text-secondary)] transition-colors hover:border-[var(--ui-accent)] hover:text-[var(--ui-accent)]"
-                      >
-                        {t('githubSection.liveDemo')}
-                      </a>
-                    )}
-                    <a
-                      href={repo.htmlUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1 rounded-lg bg-[var(--ui-accent)]/15 px-2.5 py-1 text-xs font-bold text-[var(--ui-accent)] transition-colors hover:bg-[var(--ui-accent)] hover:text-white"
-                    >
-                      <span>GitHub</span>
-                      <ExternalLink className="h-3 w-3" />
-                    </a>
-                  </div>
-                </div>
-              </GlassCard>
+                repo={repo}
+                liveDemoLabel={liveDemoLabel}
+              />
             ))}
           </div>
         </div>

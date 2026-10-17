@@ -1,12 +1,37 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { DEVELOPER_PROFILE } from '@/entities/developer-profile';
 
 export function BeloHorizonteMap() {
   const mapContainerRef = useRef<HTMLDivElement | null>(null);
+  const [shouldLoadMap, setShouldLoadMap] = useState(false);
+
+  // Lazy-observe so Leaflet and CartoDB tiles only load when user approaches the contact section
+  useEffect(() => {
+    const el = mapContainerRef.current;
+    if (!el || typeof IntersectionObserver === 'undefined') {
+      setShouldLoadMap(true);
+      return;
+    }
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0]?.isIntersecting) {
+          setShouldLoadMap(true);
+          observer.disconnect();
+        }
+      },
+      { rootMargin: '280px' }
+    );
+
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
 
   useEffect(() => {
+    if (!shouldLoadMap) return;
+
     let isCancelled = false;
     let mapInstance: import('leaflet').Map | null = null;
 
@@ -23,7 +48,6 @@ export function BeloHorizonteMap() {
         attributionControl: false,
       });
 
-      // CartoDB Dark Matter tile layer (matches spatial cyberpunk aesthetic)
       L.tileLayer(
         'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',
         {
@@ -53,7 +77,7 @@ export function BeloHorizonteMap() {
         mapInstance.remove();
       }
     };
-  }, []);
+  }, [shouldLoadMap]);
 
   return (
     <div className="relative h-72 w-full overflow-hidden rounded-2xl border border-[var(--ui-border)] sm:h-80">

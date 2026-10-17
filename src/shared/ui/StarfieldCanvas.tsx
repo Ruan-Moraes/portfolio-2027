@@ -71,11 +71,18 @@ export function StarfieldCanvas() {
           .trim() || '#00ff7f';
     };
 
+    let isPageVisible = document.visibilityState === 'visible';
+    let isRunning = false;
+
     const render = () => {
+      isRunning = false;
       ctx.clearRect(0, 0, width, height);
 
       const offsetX = (mouseX - width / 2) * 0.012;
       const offsetY = (mouseY - height / 2) * 0.012;
+
+      const lightFillPrefix = 'rgba(51, 65, 85, ';
+      const darkFillPrefix = 'rgba(226, 232, 240, ';
 
       for (let i = 0; i < stars.length; i++) {
         const star = stars[i];
@@ -93,21 +100,35 @@ export function StarfieldCanvas() {
         if (i % 9 === 0) {
           ctx.fillStyle = accentColor;
         } else if (isLight) {
-          ctx.fillStyle = `rgba(51, 65, 85, ${(star.opacity * 0.72).toFixed(2)})`;
+          ctx.fillStyle = `${lightFillPrefix}${(star.opacity * 0.72).toFixed(2)})`;
         } else {
-          ctx.fillStyle = `rgba(226, 232, 240, ${star.opacity.toFixed(2)})`;
+          ctx.fillStyle = `${darkFillPrefix}${star.opacity.toFixed(2)})`;
         }
         ctx.fill();
       }
 
-      if (!prefersReducedMotion) {
+      if (!prefersReducedMotion && isPageVisible) {
+        isRunning = true;
         animationFrameId = window.requestAnimationFrame(render);
       }
     };
 
+    const handleVisibilityChange = () => {
+      isPageVisible = document.visibilityState === 'visible';
+      if (isPageVisible && !prefersReducedMotion && !isRunning) {
+        isRunning = true;
+        animationFrameId = window.requestAnimationFrame(render);
+      } else if (!isPageVisible && isRunning) {
+        window.cancelAnimationFrame(animationFrameId);
+        isRunning = false;
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
     const observer = new MutationObserver(() => {
       syncThemeTokens();
-      if (prefersReducedMotion) {
+      if (prefersReducedMotion || !isPageVisible) {
         render();
       }
     });
@@ -121,6 +142,7 @@ export function StarfieldCanvas() {
     return () => {
       observer.disconnect();
       window.cancelAnimationFrame(animationFrameId);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
       window.removeEventListener('mousemove', handleMouseMove);
       window.removeEventListener('resize', handleResize);
     };

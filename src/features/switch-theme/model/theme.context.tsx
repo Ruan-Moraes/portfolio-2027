@@ -6,6 +6,7 @@ import {
   useContext,
   useEffect,
   useMemo,
+  useRef,
   useState,
   type ReactNode,
 } from 'react';
@@ -72,18 +73,23 @@ function applyThemeAttributes(mode: ThemeMode, accent: AccentColor) {
 export function ThemePreferencesProvider({ children }: { children: ReactNode }) {
   const [mode, setModeState] = useState<ThemeMode>('dark');
   const [accent, setAccentState] = useState<AccentColor>('green');
+  const prefsRef = useRef<{ mode: ThemeMode; accent: AccentColor }>({
+    mode: 'dark',
+    accent: 'green',
+  });
 
-  // Synchronize from localStorage on mount and lock <html> attributes across Next.js [locale] route transitions
+  // Synchronize from localStorage on mount and keep <html> attributes locked in memory
   useEffect(() => {
     const initial = readStoredPreferences();
+    prefsRef.current = initial;
     setModeState(initial.mode);
     setAccentState(initial.accent);
     applyThemeAttributes(initial.mode, initial.accent);
 
     const root = document.documentElement;
     const observer = new MutationObserver(() => {
-      const current = readStoredPreferences();
-      applyThemeAttributes(current.mode, current.accent);
+      const { mode: activeMode, accent: activeAccent } = prefsRef.current;
+      applyThemeAttributes(activeMode, activeAccent);
     });
     observer.observe(root, {
       attributes: true,
@@ -94,25 +100,26 @@ export function ThemePreferencesProvider({ children }: { children: ReactNode }) 
   }, []);
 
   const setMode = useCallback((nextMode: ThemeMode) => {
-    const current = readStoredPreferences();
+    prefsRef.current = { ...prefsRef.current, mode: nextMode };
     setStorageItem(STORAGE_MODE_KEY, nextMode);
     setModeState(nextMode);
-    applyThemeAttributes(nextMode, current.accent);
+    applyThemeAttributes(nextMode, prefsRef.current.accent);
   }, []);
 
   const toggleMode = useCallback(() => {
-    const current = readStoredPreferences();
-    const nextMode: ThemeMode = current.mode === 'dark' ? 'light' : 'dark';
+    const nextMode: ThemeMode =
+      prefsRef.current.mode === 'dark' ? 'light' : 'dark';
+    prefsRef.current = { ...prefsRef.current, mode: nextMode };
     setStorageItem(STORAGE_MODE_KEY, nextMode);
     setModeState(nextMode);
-    applyThemeAttributes(nextMode, current.accent);
+    applyThemeAttributes(nextMode, prefsRef.current.accent);
   }, []);
 
   const setAccent = useCallback((nextAccent: AccentColor) => {
-    const current = readStoredPreferences();
+    prefsRef.current = { ...prefsRef.current, accent: nextAccent };
     setStorageItem(STORAGE_ACCENT_KEY, nextAccent);
     setAccentState(nextAccent);
-    applyThemeAttributes(current.mode, nextAccent);
+    applyThemeAttributes(prefsRef.current.mode, nextAccent);
   }, []);
 
   const value = useMemo(

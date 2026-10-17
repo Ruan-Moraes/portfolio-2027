@@ -6,17 +6,16 @@ import {
   SUPPORTED_LOCALES,
   type SupportedLocale,
 } from '@/shared/config';
-import { usePathname, useRouter } from '@/shared/i18n';
 import { cn } from '@/shared/lib';
+import { usePortfolioLocale } from '../model/locale.context';
 
 export function LanguageSwitcher() {
   const currentLocale = useLocale() as SupportedLocale;
-  const router = useRouter();
-  const pathname = usePathname();
+  const { setLocale } = usePortfolioLocale();
 
   const handleSelectLocale = (nextLocale: SupportedLocale) => {
     if (nextLocale === currentLocale) return;
-    router.replace(pathname, { locale: nextLocale, scroll: false });
+    setLocale(nextLocale);
   };
 
   return (
