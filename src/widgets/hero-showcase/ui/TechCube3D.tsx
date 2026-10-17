@@ -37,38 +37,6 @@ export function TechCube3D() {
 
     const texSize = 512;
 
-    // Subtle procedural micro-texture bump map for tactile anodized surface feel (zero glare)
-    const createBumpTexture = () => {
-      const bumpCanvas = document.createElement('canvas');
-      bumpCanvas.width = texSize;
-      bumpCanvas.height = texSize;
-      const bCtx = bumpCanvas.getContext('2d');
-      if (bCtx) {
-        bCtx.fillStyle = '#808080';
-        bCtx.fillRect(0, 0, texSize, texSize);
-
-        // Fine micro-grid relief
-        bCtx.strokeStyle = '#969696';
-        bCtx.lineWidth = 1;
-        const step = 16;
-        for (let i = 0; i <= texSize; i += step) {
-          bCtx.beginPath();
-          bCtx.moveTo(i, 0);
-          bCtx.lineTo(i, texSize);
-          bCtx.stroke();
-          bCtx.beginPath();
-          bCtx.moveTo(0, i);
-          bCtx.lineTo(texSize, i);
-          bCtx.stroke();
-        }
-      }
-      const bumpTex = new THREE.CanvasTexture(bumpCanvas);
-      bumpTex.anisotropy = 4;
-      return bumpTex;
-    };
-
-    const sharedBumpMap = createBumpTexture();
-
     const buildMaterials = () => {
       return CUBE_FACES_TECH.map((item) => {
         const canvas = document.createElement('canvas');
@@ -81,168 +49,57 @@ export function TechCube3D() {
           const frameSize = texSize - pad * 2;
           const frameRadius = 62;
 
-          // 1. OUTER RIM / BEVEL TEXTURE (outside the content border):
-          // Deep metallic chassis base + 45° diagonal carbon/brushed hatch texture
-          ctx.fillStyle = '#0c1528';
+          // 1. Non-content outer area (bevels & corners): slightly lighter slate-navy tone
+          ctx.fillStyle = '#16243d';
           ctx.fillRect(0, 0, texSize, texSize);
 
-          ctx.save();
-          ctx.strokeStyle = 'rgba(148, 163, 184, 0.13)';
-          ctx.lineWidth = 1.5;
-          const hatchStep = 10;
-          for (let i = -texSize; i < texSize * 2; i += hatchStep) {
-            ctx.beginPath();
-            ctx.moveTo(i, 0);
-            ctx.lineTo(i + texSize, texSize);
-            ctx.stroke();
-          }
-          ctx.restore();
-
-          // 2. CLIP INSIDE THE CONTENT CONTAINER (right near the face limit)
+          // 2. Content container area (close to the face limit): slightly deeper midnight tone
           ctx.save();
           ctx.beginPath();
           ctx.roundRect(pad, pad, frameSize, frameSize, frameRadius);
+          ctx.fillStyle = '#0d1527';
+          ctx.fill();
           ctx.clip();
 
-          // Base fill inside the face container
-          ctx.fillStyle = '#111c35';
-          ctx.fillRect(pad, pad, frameSize, frameSize);
-
-          // 3. NON-CONTENT AREA TEXTURE (Hexagonal/Isometric Dot-Matrix + Engineering Grid + Circuit Traces in empty zones)
-          const gridStep = 28;
-          ctx.strokeStyle = 'rgba(148, 163, 184, 0.07)';
-          ctx.lineWidth = 1;
-          for (let i = gridStep; i < texSize; i += gridStep) {
-            ctx.beginPath();
-            ctx.moveTo(i, pad);
-            ctx.lineTo(i, texSize - pad);
-            ctx.stroke();
-
-            ctx.beginPath();
-            ctx.moveTo(pad, i);
-            ctx.lineTo(texSize - pad, i);
-            ctx.stroke();
-          }
-
-          // Dense staggered micro-dot matrix across the empty peripheral areas
-          const dotSpacing = 18;
-          for (let y = pad + 14; y < texSize - pad - 10; y += dotSpacing) {
-            const offsetX =
-              Math.floor((y - pad) / dotSpacing) % 2 === 0 ? 0 : dotSpacing / 2;
-            for (
-              let x = pad + 14 + offsetX;
-              x < texSize - pad - 10;
-              x += dotSpacing
-            ) {
-              // Calculate distance from the central content zone so non-content areas have stronger texture
-              const dx = x - texSize / 2;
-              const dy = y - (texSize / 2 + 10);
-              const dist = Math.hypot(dx, dy);
-              if (dist > 135) {
-                ctx.fillStyle = `${item.color}42`;
-                ctx.beginPath();
-                ctx.arc(x, y, 1.6, 0, Math.PI * 2);
-                ctx.fill();
-              } else {
-                ctx.fillStyle = 'rgba(148, 163, 184, 0.08)';
-                ctx.fillRect(x - 0.75, y - 0.75, 1.5, 1.5);
-              }
-            }
-          }
-
-          // Diagonal micro-stripes in top & bottom non-content zones (y < 96 and y > 406)
-          ctx.save();
-          ctx.strokeStyle = `${item.color}1f`;
-          ctx.lineWidth = 1.5;
-          for (let i = -texSize; i < texSize * 2; i += 12) {
-            // Top empty zone stripe band
-            ctx.beginPath();
-            ctx.moveTo(i, pad);
-            ctx.lineTo(i + 72, pad + 72);
-            ctx.stroke();
-
-            // Bottom empty zone stripe band
-            ctx.beginPath();
-            ctx.moveTo(i, texSize - pad - 76);
-            ctx.lineTo(i + 76, texSize - pad);
-            ctx.stroke();
-          }
-          ctx.restore();
-
-          // Technical PCB / HUD circuit traces in the 4 non-content corners
-          ctx.save();
-          ctx.strokeStyle = `${item.color}55`;
-          ctx.fillStyle = item.color;
-          ctx.lineWidth = 2;
-
-          const drawCornerCircuit = (cx: number, cy: number, sx: number, sy: number) => {
-            ctx.beginPath();
-            ctx.moveTo(cx + sx * 42, cy + sy * 18);
-            ctx.lineTo(cx + sx * 92, cy + sy * 18);
-            ctx.lineTo(cx + sx * 112, cy + sy * 38);
-            ctx.stroke();
-
-            ctx.beginPath();
-            ctx.arc(cx + sx * 112, cy + sy * 38, 3, 0, Math.PI * 2);
-            ctx.fill();
-
-            ctx.beginPath();
-            ctx.moveTo(cx + sx * 18, cy + sy * 42);
-            ctx.lineTo(cx + sx * 18, cy + sy * 92);
-            ctx.lineTo(cx + sx * 38, cy + sy * 112);
-            ctx.stroke();
-
-            ctx.beginPath();
-            ctx.arc(cx + sx * 38, cy + sy * 112, 3, 0, Math.PI * 2);
-            ctx.fill();
-          };
-
-          drawCornerCircuit(pad + 12, pad + 12, 1, 1);
-          drawCornerCircuit(texSize - pad - 12, pad + 12, -1, 1);
-          drawCornerCircuit(pad + 12, texSize - pad - 12, 1, -1);
-          drawCornerCircuit(texSize - pad - 12, texSize - pad - 12, -1, -1);
-          ctx.restore();
-
-          // 4. Vibrant multi-layered radial color infusion around the center content
-          const primaryAura = ctx.createRadialGradient(
+          // 3. Soft radial ambient aura in the center of the content container
+          const aura = ctx.createRadialGradient(
             texSize / 2,
-            texSize / 2 - 36,
-            12,
+            texSize / 2 - 24,
+            10,
             texSize / 2,
             texSize / 2,
-            230
+            215
           );
-          primaryAura.addColorStop(0, `${item.color}44`);
-          primaryAura.addColorStop(0.48, `${item.color}1e`);
-          primaryAura.addColorStop(0.82, `${item.color}0a`);
-          primaryAura.addColorStop(1, 'rgba(17, 28, 53, 0)');
-          ctx.fillStyle = primaryAura;
+          aura.addColorStop(0, `${item.color}30`);
+          aura.addColorStop(0.55, `${item.color}10`);
+          aura.addColorStop(1, 'rgba(13, 21, 39, 0)');
+          ctx.fillStyle = aura;
           ctx.fillRect(pad, pad, frameSize, frameSize);
 
-          ctx.restore(); // End clip for inner container
+          ctx.restore();
 
-          // 5. Harmonious content container border positioned right at the face limit (pad = 8)
+          // 4. Harmonious content container border right at the face limit
           const borderGrad = ctx.createLinearGradient(
             pad,
             pad,
             texSize - pad,
             texSize - pad
           );
-          borderGrad.addColorStop(0, `${item.color}b3`);
-          borderGrad.addColorStop(0.5, 'rgba(148, 163, 184, 0.42)');
-          borderGrad.addColorStop(1, `${item.color}88`);
+          borderGrad.addColorStop(0, `${item.color}99`);
+          borderGrad.addColorStop(0.5, 'rgba(148, 163, 184, 0.32)');
+          borderGrad.addColorStop(1, `${item.color}70`);
 
           ctx.save();
           ctx.beginPath();
           ctx.roundRect(pad, pad, frameSize, frameSize, frameRadius);
           ctx.strokeStyle = borderGrad;
-          ctx.lineWidth = 4;
+          ctx.lineWidth = 3.5;
           ctx.shadowColor = item.color;
-          ctx.shadowBlur = 12;
+          ctx.shadowBlur = 10;
           ctx.stroke();
           ctx.restore();
 
-          // 6. Layered circular tech emblem behind the symbol
+          // 5. Subtle circular tech emblem behind the symbol
           const badgeRadius = 82;
           const badgeY = texSize / 2 - 66;
           const badgeGrad = ctx.createRadialGradient(
@@ -253,31 +110,20 @@ export function TechCube3D() {
             badgeY,
             badgeRadius
           );
-          badgeGrad.addColorStop(0, `${item.color}36`);
-          badgeGrad.addColorStop(0.7, `${item.color}1a`);
-          badgeGrad.addColorStop(1, `${item.color}0a`);
+          badgeGrad.addColorStop(0, `${item.color}28`);
+          badgeGrad.addColorStop(0.7, `${item.color}14`);
+          badgeGrad.addColorStop(1, `${item.color}06`);
 
           ctx.beginPath();
           ctx.arc(texSize / 2, badgeY, badgeRadius, 0, Math.PI * 2);
           ctx.fillStyle = badgeGrad;
           ctx.fill();
 
-          // Crisp concentric ring around the badge
           ctx.beginPath();
           ctx.arc(texSize / 2, badgeY, badgeRadius, 0, Math.PI * 2);
-          ctx.strokeStyle = `${item.color}50`;
-          ctx.lineWidth = 1.75;
+          ctx.strokeStyle = `${item.color}38`;
+          ctx.lineWidth = 1.5;
           ctx.stroke();
-
-          // Outer dashed orbital ring for technical detail
-          ctx.save();
-          ctx.beginPath();
-          ctx.setLineDash([6, 8]);
-          ctx.arc(texSize / 2, badgeY, badgeRadius + 11, 0, Math.PI * 2);
-          ctx.strokeStyle = `${item.color}30`;
-          ctx.lineWidth = 1.25;
-          ctx.stroke();
-          ctx.restore();
 
           // 6. Tech Symbol with soft neon glow
           ctx.save();
@@ -302,7 +148,7 @@ export function TechCube3D() {
           ctx.fillText(item.name, texSize / 2, texSize / 2 + 48, safeTextWidth);
 
           // 8. Subtle glowing accent divider bar between title and subtitle
-          const barWidth = 64;
+          const barWidth = 60;
           const barY = texSize / 2 + 76;
           const barGrad = ctx.createLinearGradient(
             texSize / 2 - barWidth,
@@ -317,7 +163,7 @@ export function TechCube3D() {
           ctx.fillRect(texSize / 2 - barWidth, barY - 1.5, barWidth * 2, 3);
 
           // 9. Tech Subtitle (auto-fitted so it never overflows the safe zone)
-          ctx.fillStyle = '#dbeafe';
+          ctx.fillStyle = '#cbd5e1';
           let subtitleFontPx = 19;
           ctx.font = `600 ${subtitleFontPx}px ui-monospace, SFMono-Regular, Menlo, monospace`;
           while (
@@ -334,11 +180,9 @@ export function TechCube3D() {
         texture.colorSpace = THREE.SRGBColorSpace;
         texture.anisotropy = 4;
 
-        // Matte Lambert material with subtle micro-bump texture — rich 3D depth with zero glare
+        // Matte Lambert material — natural 3D depth shading across faces & curved corners
         return new THREE.MeshLambertMaterial({
           map: texture,
-          bumpMap: sharedBumpMap,
-          bumpScale: 0.008,
         });
       });
     };
@@ -413,7 +257,6 @@ export function TechCube3D() {
       observer.disconnect();
       window.cancelAnimationFrame(frameId);
       geometry.dispose();
-      sharedBumpMap.dispose();
       materials.forEach((mat) => {
         mat.map?.dispose();
         mat.dispose();
