@@ -45,38 +45,82 @@ export function TechCube3D() {
         const ctx = canvas.getContext('2d');
 
         if (ctx) {
-          // Single unified surface across the entire cube face and rounded corners (no nested container, no borders)
+          // 1. Single unified surface across the entire cube face and rounded corners (0 outer borders, 0 background seams)
           ctx.fillStyle = '#0d1527';
           ctx.fillRect(0, 0, texSize, texSize);
 
-          // Content strictly centered inside a 320px safe zone
-          const safeTextWidth = 320;
+          // 2. Soft radial ambient aura in the center that fades to 0% before reaching the rounded bevels
+          const aura = ctx.createRadialGradient(
+            texSize / 2,
+            texSize / 2 - 20,
+            10,
+            texSize / 2,
+            texSize / 2,
+            195
+          );
+          aura.addColorStop(0, `${item.color}26`);
+          aura.addColorStop(0.55, `${item.color}0c`);
+          aura.addColorStop(1, 'rgba(13, 21, 39, 0)');
+          ctx.fillStyle = aura;
+          ctx.fillRect(0, 0, texSize, texSize);
 
-          // 1. Tech Symbol
+          // 3. Subtle circular tech emblem behind the symbol
+          const badgeRadius = 64;
+          const badgeY = texSize / 2 - 58;
+          ctx.beginPath();
+          ctx.arc(texSize / 2, badgeY, badgeRadius, 0, Math.PI * 2);
+          ctx.fillStyle = `${item.color}14`;
+          ctx.fill();
+
+          // 4. Tech Symbol with soft neon glow
+          ctx.save();
+          ctx.shadowColor = item.color;
+          ctx.shadowBlur = 18;
           ctx.fillStyle = item.color;
           ctx.font =
-            '900 88px ui-monospace, SFMono-Regular, Menlo, Monaco, monospace';
+            '900 68px ui-monospace, SFMono-Regular, Menlo, Monaco, monospace';
           ctx.textAlign = 'center';
           ctx.textBaseline = 'middle';
-          ctx.fillText(item.symbol, texSize / 2, texSize / 2 - 48);
+          ctx.fillText(item.symbol, texSize / 2, badgeY + 2);
+          ctx.restore();
 
-          // 2. Tech Name
+          //Content strictly centered inside a 320px safe zone
+          const safeTextWidth = 320;
+
+          // 5. Tech Name
           ctx.fillStyle = '#f8fafc';
-          ctx.font = '700 34px system-ui, -apple-system, sans-serif';
-          ctx.fillText(item.name, texSize / 2, texSize / 2 + 28, safeTextWidth);
+          ctx.font = '800 34px system-ui, -apple-system, sans-serif';
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+          ctx.fillText(item.name, texSize / 2, texSize / 2 + 40, safeTextWidth);
 
-          // 3. Tech Subtitle (auto-fitted so it never overflows the safe zone)
-          ctx.fillStyle = '#94a3b8';
-          let subtitleFontPx = 18;
-          ctx.font = `500 ${subtitleFontPx}px ui-monospace, SFMono-Regular, Menlo, monospace`;
+          // 6. Subtle glowing accent divider bar between title and subtitle
+          const barWidth = 56;
+          const barY = texSize / 2 + 68;
+          const barGrad = ctx.createLinearGradient(
+            texSize / 2 - barWidth,
+            barY,
+            texSize / 2 + barWidth,
+            barY
+          );
+          barGrad.addColorStop(0, 'rgba(255,255,255,0)');
+          barGrad.addColorStop(0.5, item.color);
+          barGrad.addColorStop(1, 'rgba(255,255,255,0)');
+          ctx.fillStyle = barGrad;
+          ctx.fillRect(texSize / 2 - barWidth, barY - 1.5, barWidth * 2, 3);
+
+          // 7. Tech Subtitle (auto-fitted so it never overflows the safe zone)
+          ctx.fillStyle = '#cbd5e1';
+          let subtitleFontPx = 19;
+          ctx.font = `600 ${subtitleFontPx}px ui-monospace, SFMono-Regular, Menlo, monospace`;
           while (
             ctx.measureText(item.subtitle).width > safeTextWidth &&
             subtitleFontPx > 12
           ) {
             subtitleFontPx -= 1;
-            ctx.font = `500 ${subtitleFontPx}px ui-monospace, SFMono-Regular, Menlo, monospace`;
+            ctx.font = `600 ${subtitleFontPx}px ui-monospace, SFMono-Regular, Menlo, monospace`;
           }
-          ctx.fillText(item.subtitle, texSize / 2, texSize / 2 + 74);
+          ctx.fillText(item.subtitle, texSize / 2, texSize / 2 + 98);
         }
 
         const texture = new THREE.CanvasTexture(canvas);
