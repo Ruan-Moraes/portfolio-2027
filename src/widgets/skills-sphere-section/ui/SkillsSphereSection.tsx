@@ -36,7 +36,7 @@ export function SkillsSphereSection() {
           className={cn(
             'cursor-pointer rounded-xl px-3.5 py-2 text-xs font-semibold transition-all',
             selectedCategory === 'all'
-              ? 'bg-[var(--ui-accent)] text-slate-950 shadow-[0_0_16px_-4px_var(--ui-accent-glow)]'
+              ? 'bg-[var(--ui-accent)] text-white shadow-[0_0_16px_-4px_var(--ui-accent-glow)]'
               : 'border border-[var(--ui-border)] bg-[var(--ui-surface)]/80 text-[var(--ui-text-secondary)] hover:border-[var(--ui-accent)]/50 hover:text-[var(--ui-text-primary)]'
           )}
         >
@@ -57,7 +57,7 @@ export function SkillsSphereSection() {
               className={cn(
                 'cursor-pointer rounded-xl px-3.5 py-2 text-xs font-semibold transition-all',
                 isSelected
-                  ? 'bg-[var(--ui-accent)] text-slate-950 shadow-[0_0_16px_-4px_var(--ui-accent-glow)]'
+                  ? 'bg-[var(--ui-accent)] text-white shadow-[0_0_16px_-4px_var(--ui-accent-glow)]'
                   : 'border border-[var(--ui-border)] bg-[var(--ui-surface)]/80 text-[var(--ui-text-secondary)] hover:border-[var(--ui-accent)]/50 hover:text-[var(--ui-text-primary)]'
               )}
             >

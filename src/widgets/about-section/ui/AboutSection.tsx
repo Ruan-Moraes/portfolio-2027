@@ -46,7 +46,7 @@ export function AboutSection() {
 
       <div className="grid gap-8 lg:grid-cols-12">
         {/* Profile Card with Photo */}
-        <GlassCard className="flex flex-col justify-between p-6 sm:p-8 lg:col-span-5">
+        <GlassCard className="flex flex-col gap-6 p-6 sm:p-8 lg:col-span-5">
           <div className="flex items-center gap-4">
             <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-2xl border-2 border-[var(--ui-accent)] shadow-[0_0_20px_-4px_var(--ui-accent-glow)]">
               <Image
@@ -72,7 +72,7 @@ export function AboutSection() {
             </div>
           </div>
 
-          <div className="mt-6 space-y-4 text-sm leading-relaxed text-[var(--ui-text-secondary)] sm:text-base">
+          <div className="space-y-4 text-sm leading-relaxed text-[var(--ui-text-secondary)] sm:text-base">
             <h4 className="font-mono text-xs font-bold tracking-wider text-[var(--ui-accent)] uppercase">
               {t('profileTitle')}
             </h4>

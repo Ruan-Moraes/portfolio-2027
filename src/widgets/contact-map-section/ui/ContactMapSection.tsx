@@ -76,7 +76,7 @@ export function ContactMapSection() {
               <button
                 type="button"
                 onClick={handleCopyEmail}
-                className="inline-flex shrink-0 cursor-pointer items-center gap-1 rounded-lg bg-[var(--ui-accent)]/15 px-2.5 py-1 text-xs font-semibold text-[var(--ui-accent)] transition-colors hover:bg-[var(--ui-accent)] hover:text-slate-950"
+                className="inline-flex shrink-0 cursor-pointer items-center gap-1 rounded-lg bg-[var(--ui-accent)]/15 px-2.5 py-1 text-xs font-semibold text-[var(--ui-accent)] transition-colors hover:bg-[var(--ui-accent)] hover:text-white"
               >
                 {copiedEmail ? (
                   <>

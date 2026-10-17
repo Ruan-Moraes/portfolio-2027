@@ -125,7 +125,7 @@ export function SidebarNav() {
               className={cn(
                 'flex h-10 w-10 items-center justify-center rounded-xl transition-all',
                 isActive
-                  ? 'bg-[var(--ui-accent)] text-slate-950 shadow-sm'
+                  ? 'bg-[var(--ui-accent)] text-white shadow-sm'
                   : 'text-[var(--ui-text-muted)] hover:text-[var(--ui-text-primary)]'
               )}
             >

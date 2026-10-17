@@ -50,7 +50,7 @@ export function CertificatesVault() {
                 className={cn(
                   'cursor-pointer rounded-xl px-4 py-2 text-xs font-bold transition-all',
                   isSelected
-                    ? 'bg-[var(--ui-accent)] text-slate-950 shadow-sm'
+                    ? 'bg-[var(--ui-accent)] text-white shadow-sm'
                     : 'border border-[var(--ui-border)] bg-[var(--ui-surface)]/80 text-[var(--ui-text-secondary)] hover:border-[var(--ui-accent)]/50'
                 )}
               >

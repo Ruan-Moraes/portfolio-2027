@@ -38,7 +38,7 @@ export function LanguageSwitcher() {
             className={cn(
               'flex h-full cursor-pointer items-center justify-center rounded-lg px-2.5 text-xs font-semibold transition-all duration-200',
               isActive
-                ? 'bg-[var(--ui-accent)] text-slate-950 shadow-sm'
+                ? 'bg-[var(--ui-accent)] text-white shadow-sm'
                 : 'text-[var(--ui-text-secondary)] hover:text-[var(--ui-text-primary)]'
             )}
           >

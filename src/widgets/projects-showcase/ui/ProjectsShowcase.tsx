@@ -88,7 +88,7 @@ export function ProjectsShowcase() {
             className={cn(
               'cursor-pointer rounded-xl px-4 py-2 text-xs font-bold transition-all sm:text-sm',
               activeTab === 'featured'
-                ? 'bg-[var(--ui-accent)] text-slate-950 shadow-sm'
+                ? 'bg-[var(--ui-accent)] text-white shadow-sm'
                 : 'text-[var(--ui-text-secondary)] hover:text-[var(--ui-text-primary)]'
             )}
           >
@@ -100,7 +100,7 @@ export function ProjectsShowcase() {
             className={cn(
               'cursor-pointer rounded-xl px-4 py-2 text-xs font-bold transition-all sm:text-sm',
               activeTab === 'github'
-                ? 'bg-[var(--ui-accent)] text-slate-950 shadow-sm'
+                ? 'bg-[var(--ui-accent)] text-white shadow-sm'
                 : 'text-[var(--ui-text-secondary)] hover:text-[var(--ui-text-primary)]'
             )}
           >
@@ -216,7 +216,7 @@ export function ProjectsShowcase() {
                         href={project.githubUrl}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-flex items-center gap-2 rounded-xl border border-[var(--ui-accent)]/50 bg-[var(--ui-accent)]/12 px-4 py-2 text-xs font-bold text-[var(--ui-accent)] transition-all hover:bg-[var(--ui-accent)] hover:text-slate-950"
+                        className="inline-flex items-center gap-2 rounded-xl border border-[var(--ui-accent)]/50 bg-[var(--ui-accent)]/12 px-4 py-2 text-xs font-bold text-[var(--ui-accent)] transition-all hover:bg-[var(--ui-accent)] hover:text-white"
                       >
                         <GitBranch className="h-3.5 w-3.5" />
                         <span>{tCommon('viewCode')}</span>
@@ -316,7 +316,7 @@ export function ProjectsShowcase() {
                       href={repo.htmlUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1 rounded-lg bg-[var(--ui-accent)]/15 px-2.5 py-1 text-xs font-bold text-[var(--ui-accent)] transition-colors hover:bg-[var(--ui-accent)] hover:text-slate-950"
+                      className="inline-flex items-center gap-1 rounded-lg bg-[var(--ui-accent)]/15 px-2.5 py-1 text-xs font-bold text-[var(--ui-accent)] transition-colors hover:bg-[var(--ui-accent)] hover:text-white"
                     >
                       <span>GitHub</span>
                       <ExternalLink className="h-3 w-3" />

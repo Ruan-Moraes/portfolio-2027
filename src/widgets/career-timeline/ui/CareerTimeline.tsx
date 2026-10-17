@@ -52,7 +52,7 @@ export function CareerTimeline() {
               className={cn(
                 'cursor-pointer rounded-xl px-4 py-2 text-xs font-semibold transition-all sm:text-sm',
                 isActive
-                  ? 'bg-[var(--ui-accent)] text-slate-950 shadow-[0_0_16px_-4px_var(--ui-accent-glow)]'
+                  ? 'bg-[var(--ui-accent)] text-white shadow-[0_0_16px_-4px_var(--ui-accent-glow)]'
                   : 'border border-[var(--ui-border)] bg-[var(--ui-surface)]/80 text-[var(--ui-text-secondary)] hover:border-[var(--ui-accent)]/50 hover:text-[var(--ui-text-primary)]'
               )}
             >
@@ -63,7 +63,7 @@ export function CareerTimeline() {
       </div>
 
       {/* Vertical Timeline */}
-      <div className="relative space-y-6 before:absolute before:top-4 before:bottom-4 before:left-5 before:w-px before:bg-gradient-to-b before:from-[var(--ui-accent)] before:via-[var(--ui-border)] before:to-transparent sm:before:left-6">
+      <div className="relative space-y-6 before:absolute before:top-4 before:bottom-4 before:left-5 before:z-0 before:w-px before:bg-gradient-to-b before:from-[var(--ui-accent)] before:via-[var(--ui-border)] before:to-transparent sm:before:left-6">
         {filteredEntries.map((entry) => {
           const Icon = TYPE_ICONS[entry.type];
           const achievements = t.raw(`entries.${entry.id}.achievements`) as string[];
@@ -73,13 +73,20 @@ export function CareerTimeline() {
               {/* Timeline Node Icon */}
               <div
                 className={cn(
-                  'absolute top-6 left-0 flex h-10 w-10 items-center justify-center rounded-2xl border sm:h-12 sm:w-12',
+                  'absolute top-6 left-0 z-10 flex h-10 w-10 items-center justify-center overflow-hidden rounded-2xl border bg-[var(--ui-surface)] sm:h-12 sm:w-12',
                   entry.isCurrent
-                    ? 'border-[var(--ui-accent)] bg-[var(--ui-accent)]/15 text-[var(--ui-accent)] shadow-[0_0_20px_-4px_var(--ui-accent-glow)]'
-                    : 'border-[var(--ui-border)] bg-[var(--ui-surface)] text-[var(--ui-text-secondary)]'
+                    ? 'border-[var(--ui-accent)] text-[var(--ui-accent)] shadow-[0_0_20px_-4px_var(--ui-accent-glow)]'
+                    : 'border-[var(--ui-border)] text-[var(--ui-text-secondary)]'
                 )}
               >
-                <Icon className="h-5 w-5" />
+                <div
+                  className={cn(
+                    'flex h-full w-full items-center justify-center',
+                    entry.isCurrent && 'bg-[var(--ui-accent)]/15'
+                  )}
+                >
+                  <Icon className="h-5 w-5" />
+                </div>
               </div>
 
               <GlassCard interactive className="p-6 sm:p-8">

@@ -14,7 +14,7 @@ import { StarfieldCanvas } from '@/shared/ui';
 
 export function PortfolioHomeView() {
   return (
-    <div className="relative min-h-screen bg-[var(--ui-bg)] text-[var(--ui-text-primary)] selection:bg-[var(--ui-accent)] selection:text-slate-950">
+    <div className="relative min-h-screen bg-[var(--ui-bg)] text-[var(--ui-text-primary)] selection:bg-[var(--ui-accent)] selection:text-white">
       <StarfieldCanvas />
       <SidebarNav />
       <TopUtilityBar />
