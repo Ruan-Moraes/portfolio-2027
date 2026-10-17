@@ -49,25 +49,36 @@ export function TechCube3D() {
         const ctx = canvas.getContext('2d');
 
         if (ctx) {
-          // Matte deep-space dark surface (including rounded bevel corners)
-          ctx.fillStyle = '#070e1e';
+          // Outer bevel/chamfer surface (slightly lighter slate so the rounded 3D edges/corners stand out from the space background)
+          const bevelGrad = ctx.createLinearGradient(0, 0, texSize, texSize);
+          bevelGrad.addColorStop(0, '#132038');
+          bevelGrad.addColorStop(0.5, '#0b1426');
+          bevelGrad.addColorStop(1, '#132038');
+          ctx.fillStyle = bevelGrad;
           ctx.fillRect(0, 0, texSize, texSize);
 
-          // Border sits right along the rounded bevel boundary (bevel is ~48px on 512px texture)
+          // Subtle outer edge line right at the start of the 3D bevel curvature
+          ctx.beginPath();
+          ctx.roundRect(14, 14, texSize - 28, texSize - 28, 72);
+          ctx.lineWidth = 2;
+          ctx.strokeStyle = 'rgba(148, 163, 184, 0.22)';
+          ctx.stroke();
+
+          // Main face border sitting on the flat face boundary
           const pad = 52;
-          const radius = 52;
+          const radius = 50;
           const frameSize = texSize - pad * 2; // 408px
 
-          // Subtle inner surface fill
+          // Deep inner face fill
           const panelGrad = ctx.createLinearGradient(
             pad,
             pad,
             pad + frameSize,
             pad + frameSize
           );
-          panelGrad.addColorStop(0, '#0d162c');
-          panelGrad.addColorStop(0.5, '#060b18');
-          panelGrad.addColorStop(1, '#0d162c');
+          panelGrad.addColorStop(0, '#091122');
+          panelGrad.addColorStop(0.5, '#040812');
+          panelGrad.addColorStop(1, '#091122');
 
           ctx.beginPath();
           ctx.roundRect(pad, pad, frameSize, frameSize, radius);
@@ -77,11 +88,11 @@ export function TechCube3D() {
           // Consistent border color matching the portfolio's active accent (--ui-accent)
           ctx.lineWidth = 4;
           ctx.strokeStyle = themeAccent;
-          ctx.globalAlpha = 0.6;
+          ctx.globalAlpha = 0.72;
           ctx.stroke();
           ctx.globalAlpha = 1;
 
-          // Content strictly centered inside a 320px safe zone so text never touches the border
+          // Content strictly centered inside a 310px safe zone so text never touches the border
           const safeTextWidth = 310;
 
           // 1. Tech Symbol
@@ -115,7 +126,7 @@ export function TechCube3D() {
         texture.colorSpace = THREE.SRGBColorSpace;
         texture.anisotropy = 4;
 
-        // MeshLambertMaterial = pure matte surface (0 specular glare/reflections when spinning)
+        // Matte Lambert material — natural 3D depth shading across faces & curved corners without mirror/specular glare
         return new THREE.MeshLambertMaterial({
           map: texture,
         });
@@ -125,18 +136,22 @@ export function TechCube3D() {
     let materials = buildMaterials();
 
     // True 3D RoundedBoxGeometry (smooth curved corners and edges with 0 gaps)
-    const geometry = new RoundedBoxGeometry(2.15, 2.15, 2.15, 8, 0.24);
+    const geometry = new RoundedBoxGeometry(2.15, 2.15, 2.15, 8, 0.26);
     const cubeMesh = new THREE.Mesh(geometry, materials);
     cubeMesh.rotation.set(-0.35, 0.55, 0);
     scene.add(cubeMesh);
 
-    // Soft uniform lighting without specular glare
-    const ambientLight = new THREE.AmbientLight(0xffffff, 2.4);
+    // Balanced 3-point matte lighting so front, side, top, and curved bevels have clear 3D volume
+    const ambientLight = new THREE.AmbientLight(0xffffff, 1.05);
     scene.add(ambientLight);
 
-    const softFrontLight = new THREE.DirectionalLight(0xffffff, 0.55);
-    softFrontLight.position.set(2, 3, 6);
-    scene.add(softFrontLight);
+    const keyLight = new THREE.DirectionalLight(0xffffff, 1.65);
+    keyLight.position.set(4, 6, 5);
+    scene.add(keyLight);
+
+    const fillLight = new THREE.DirectionalLight(0x94a3b8, 0.55);
+    fillLight.position.set(-5, -3, 2);
+    scene.add(fillLight);
 
     // Rebuild textures if user switches theme accent color
     const observer = new MutationObserver(() => {
