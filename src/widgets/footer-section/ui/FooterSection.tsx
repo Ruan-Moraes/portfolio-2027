@@ -9,9 +9,9 @@ export function FooterSection() {
 
   return (
     <footer className="mt-12 border-t border-[var(--ui-border)] py-10 pb-24 lg:pb-10">
-      <div className="mb-6 flex flex-col gap-1">
-        <CodeTag tag="body" closing />
-        <CodeTag tag="html" closing className="-ml-3" />
+      <div className="mb-6 flex flex-col leading-tight">
+        <CodeTag tag="body" closing className="ml-4 sm:ml-6" />
+        <CodeTag tag="html" closing />
       </div>
 
       <div className="flex flex-col items-start justify-between gap-4 text-xs text-[var(--ui-text-muted)] sm:flex-row sm:items-center">

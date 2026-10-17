@@ -59,17 +59,19 @@ export function HeroShowcase() {
           </div>
 
           <div className="space-y-2">
-            <CodeTag tag="h1" />
-            <p className="font-mono text-sm font-semibold tracking-wider text-[var(--ui-accent)] uppercase sm:text-base">
-              {t('greeting')}
-            </p>
-            <h1 className="text-4xl font-black tracking-tight text-[var(--ui-text-primary)] sm:text-6xl lg:text-7xl">
-              <AnimatedLetters text={t('name')} />
-            </h1>
-            <p className="text-xl font-bold text-[var(--ui-text-secondary)] sm:text-3xl">
-              <AnimatedLetters text={t('role')} delayOffset={12} />
-            </p>
-            <CodeTag tag="h1" closing />
+            <CodeTag tag="h1" className="ml-8 sm:ml-10" />
+            <div className="pl-12 sm:pl-14 space-y-2">
+              <p className="font-mono text-sm font-semibold tracking-wider text-[var(--ui-accent)] uppercase sm:text-base">
+                {t('greeting')}
+              </p>
+              <h1 className="text-4xl font-black tracking-tight text-[var(--ui-text-primary)] sm:text-6xl lg:text-7xl">
+                <AnimatedLetters text={t('name')} />
+              </h1>
+              <p className="text-xl font-bold text-[var(--ui-text-secondary)] sm:text-3xl">
+                <AnimatedLetters text={t('role')} delayOffset={12} />
+              </p>
+            </div>
+            <CodeTag tag="h1" closing className="ml-8 sm:ml-10" />
           </div>
 
           <p className="font-mono text-xs font-semibold tracking-wide text-[var(--ui-accent)] sm:text-sm">
