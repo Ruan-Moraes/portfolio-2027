@@ -130,7 +130,9 @@ export function InteractiveSkillSphere({
                 transform: `translate3d(${(point.x * radiusPx).toFixed(1)}px, ${(
                   point.y * radiusPx
                 ).toFixed(1)}px, 0) scale(${scale.toFixed(2)})`,
-                opacity: isMatchedCategory ? opacity : opacity * 0.25,
+                opacity: Number(
+                  (isMatchedCategory ? opacity : opacity * 0.25).toFixed(3)
+                ),
                 zIndex: Math.round(scale * 100),
               }}
               className={cn(
