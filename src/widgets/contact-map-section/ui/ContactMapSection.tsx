@@ -66,32 +66,26 @@ export function ContactMapSection() {
           </GlassCard>
 
           <GlassCard className="space-y-2.5 p-5">
-            {/* Top Bar: Email + Copy Action */}
-            <div className="flex h-12 items-center justify-between rounded-xl border border-[var(--ui-border)] bg-[var(--ui-surface-elevated)]/60 px-3.5">
-              <div className="flex items-center gap-2.5 overflow-hidden">
+            {/* Top Bar: Full-width clickable Email Copy Button */}
+            <button
+              type="button"
+              onClick={handleCopyEmail}
+              title={copiedEmail ? tCommon('copied') : tCommon('copyEmail')}
+              aria-label={copiedEmail ? tCommon('copied') : tCommon('copyEmail')}
+              className="group flex h-12 w-full cursor-pointer items-center justify-between gap-3 rounded-xl border border-[var(--ui-border)] bg-[var(--ui-surface-elevated)]/60 px-3.5 text-left transition-colors hover:border-[var(--ui-accent)]"
+            >
+              <div className="flex min-w-0 items-center gap-2.5">
                 <Mail className="h-4 w-4 shrink-0 text-[var(--ui-accent)]" />
-                <span className="truncate font-mono text-xs text-[var(--ui-text-primary)]">
-                  {DEVELOPER_PROFILE.email}
+                <span className="truncate font-mono text-xs font-semibold text-[var(--ui-text-primary)] transition-colors group-hover:text-[var(--ui-accent)]">
+                  {copiedEmail ? tCommon('copied') : DEVELOPER_PROFILE.email}
                 </span>
               </div>
-              <button
-                type="button"
-                onClick={handleCopyEmail}
-                className="inline-flex h-8 shrink-0 cursor-pointer items-center gap-1.5 rounded-lg bg-[var(--ui-accent)]/15 px-3 text-xs font-semibold text-[var(--ui-accent)] transition-colors hover:bg-[var(--ui-accent)] hover:text-white"
-              >
-                {copiedEmail ? (
-                  <>
-                    <Check className="h-3.5 w-3.5" />
-                    <span>{tCommon('copied')}</span>
-                  </>
-                ) : (
-                  <>
-                    <Copy className="h-3.5 w-3.5" />
-                    <span>{tCommon('copyEmail')}</span>
-                  </>
-                )}
-              </button>
-            </div>
+              {copiedEmail ? (
+                <Check className="h-4 w-4 shrink-0 text-[var(--ui-accent)]" />
+              ) : (
+                <Copy className="h-3.5 w-3.5 shrink-0 text-[var(--ui-accent)] transition-transform group-hover:scale-110" />
+              )}
+            </button>
 
             {/* Two-Column Standardized Channels: Left (WhatsApp + Phone) | Right (LinkedIn + GitHub) */}
             <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2">
