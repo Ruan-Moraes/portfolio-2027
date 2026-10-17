@@ -93,7 +93,7 @@ export function ThemePreferencesProvider({ children }: { children: ReactNode }) 
     });
     observer.observe(root, {
       attributes: true,
-      attributeFilter: ['lang', 'data-theme', 'data-accent', 'class'],
+      attributeFilter: ['lang', 'class'],
     });
 
     return () => observer.disconnect();

@@ -31,17 +31,14 @@ export function createCubeBumpTexture(): THREE.CanvasTexture {
     bCtx.strokeStyle = '#969696';
     bCtx.lineWidth = 1;
     const step = 16;
+    bCtx.beginPath();
     for (let i = 0; i <= TEX_SIZE; i += step) {
-      bCtx.beginPath();
       bCtx.moveTo(i, 0);
       bCtx.lineTo(i, TEX_SIZE);
-      bCtx.stroke();
-
-      bCtx.beginPath();
       bCtx.moveTo(0, i);
       bCtx.lineTo(TEX_SIZE, i);
-      bCtx.stroke();
     }
+    bCtx.stroke();
     bCtx.restore();
   }
 
@@ -78,23 +75,20 @@ export function buildCubeMaterials(
       ctx.fill();
       ctx.clip();
 
-      // Tactile architectural tech grid + micro-dots inside the content container
+      // Tactile architectural tech grid + micro-dots inside the content container (single batched stroke)
       const gridStep = 32;
       ctx.strokeStyle = isLight
         ? 'rgba(15, 23, 42, 0.075)'
         : 'rgba(148, 163, 184, 0.055)';
       ctx.lineWidth = 1;
+      ctx.beginPath();
       for (let i = gridStep; i < TEX_SIZE; i += gridStep) {
-        ctx.beginPath();
         ctx.moveTo(i, 0);
         ctx.lineTo(i, TEX_SIZE);
-        ctx.stroke();
-
-        ctx.beginPath();
         ctx.moveTo(0, i);
         ctx.lineTo(TEX_SIZE, i);
-        ctx.stroke();
       }
+      ctx.stroke();
 
       // Micro intersection nodes inside the face
       ctx.fillStyle = isLight ? `${item.color}55` : `${item.color}2e`;

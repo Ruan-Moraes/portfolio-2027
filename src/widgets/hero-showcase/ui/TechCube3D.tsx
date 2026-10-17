@@ -53,11 +53,29 @@ export function TechCube3D() {
     const sharedBumpMap = createCubeBumpTexture();
     const isInitialLight =
       document.documentElement.getAttribute('data-theme') === 'light';
-    let materials = buildCubeMaterials(sharedBumpMap, isInitialLight);
+
+    const materialCache: {
+      dark: THREE.MeshLambertMaterial[] | null;
+      light: THREE.MeshLambertMaterial[] | null;
+    } = {
+      dark: isInitialLight ? null : buildCubeMaterials(sharedBumpMap, false),
+      light: isInitialLight ? buildCubeMaterials(sharedBumpMap, true) : null,
+    };
+
+    const getOrCreateMaterials = (isLight: boolean) => {
+      const key = isLight ? 'light' : 'dark';
+      if (!materialCache[key]) {
+        materialCache[key] = buildCubeMaterials(sharedBumpMap, isLight);
+      }
+      return materialCache[key];
+    };
 
     // 2. True 3D RoundedBoxGeometry
     const geometry = new RoundedBoxGeometry(2.15, 2.15, 2.15, 8, 0.26);
-    const cubeMesh = new THREE.Mesh(geometry, materials);
+    const cubeMesh = new THREE.Mesh(
+      geometry,
+      getOrCreateMaterials(isInitialLight)
+    );
     cubeMesh.rotation.set(-0.35, 0.55, 0);
     scene.add(cubeMesh);
 
@@ -82,7 +100,7 @@ export function TechCube3D() {
     fillLight.position.set(-5, -3, 2);
     scene.add(fillLight);
 
-    // 4. Rebuild textures only when data-theme actually changes
+    // 4. Swap cached textures when data-theme changes (builds alternate set at most once)
     let currentThemeAttr =
       document.documentElement.getAttribute('data-theme') || 'dark';
     const observer = new MutationObserver(() => {
@@ -96,13 +114,7 @@ export function TechCube3D() {
       keyLight.intensity = isLightNow ? 1.25 : 1.65;
       fillLight.intensity = isLightNow ? 0.75 : 0.55;
 
-      const nextMaterials = buildCubeMaterials(sharedBumpMap, isLightNow);
-      cubeMesh.material = nextMaterials;
-      materials.forEach((mat) => {
-        mat.map?.dispose();
-        mat.dispose();
-      });
-      materials = nextMaterials;
+      cubeMesh.material = getOrCreateMaterials(isLightNow);
       renderer.render(scene, camera);
     });
     observer.observe(document.documentElement, {
@@ -160,9 +172,11 @@ export function TechCube3D() {
       window.cancelAnimationFrame(frameId);
       geometry.dispose();
       sharedBumpMap.dispose();
-      materials.forEach((mat) => {
-        mat.map?.dispose();
-        mat.dispose();
+      [materialCache.dark, materialCache.light].forEach((set) => {
+        set?.forEach((mat) => {
+          mat.map?.dispose();
+          mat.dispose();
+        });
       });
       renderer.dispose();
     };

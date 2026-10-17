@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import {
   Check,
   Copy,
@@ -20,12 +20,27 @@ export function ContactMapSection() {
   const t = useTranslations('contact');
   const tCommon = useTranslations('common');
   const [copiedEmail, setCopiedEmail] = useState(false);
+  const copyTimerRef = useRef<number | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (copyTimerRef.current !== null) {
+        window.clearTimeout(copyTimerRef.current);
+      }
+    };
+  }, []);
 
   const handleCopyEmail = async () => {
     try {
       await navigator.clipboard.writeText(DEVELOPER_PROFILE.email);
       setCopiedEmail(true);
-      window.setTimeout(() => setCopiedEmail(false), 2500);
+      if (copyTimerRef.current !== null) {
+        window.clearTimeout(copyTimerRef.current);
+      }
+      copyTimerRef.current = window.setTimeout(() => {
+        setCopiedEmail(false);
+        copyTimerRef.current = null;
+      }, 2500);
     } catch {
       // Ignore clipboard failure
     }

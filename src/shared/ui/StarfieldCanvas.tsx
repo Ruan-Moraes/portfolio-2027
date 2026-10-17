@@ -7,7 +7,6 @@ interface Star {
   y: number;
   z: number;
   size: number;
-  bucket: 0 | 1 | 2 | 3; // 0 = accent, 1..3 = opacity tiers for batched path drawing
   speed: number;
 }
 
@@ -24,6 +23,7 @@ export function StarfieldCanvas() {
     if (!ctx) return;
 
     let animationFrameId = 0;
+    let resizeRafId = 0;
     let width = (canvas.width = window.innerWidth);
     let height = (canvas.height = window.innerHeight);
 
@@ -32,14 +32,18 @@ export function StarfieldCanvas() {
     ).matches;
 
     const starCount = Math.min(130, Math.floor((width * height) / 12000));
-    const stars: Star[] = Array.from({ length: starCount }, (_, i) => ({
-      x: Math.random() * width,
-      y: Math.random() * height,
-      z: Math.random() * 1.8 + 0.5,
-      size: Math.random() * 1.6 + 0.5,
-      bucket: i % 9 === 0 ? 0 : ((1 + (i % 3)) as 1 | 2 | 3),
-      speed: (Math.random() * 0.55 + 0.14) * (prefersReducedMotion ? 0 : 1),
-    }));
+    const starsByBucket: [Star[], Star[], Star[], Star[]] = [[], [], [], []];
+
+    for (let i = 0; i < starCount; i += 1) {
+      const bucketIdx = i % 9 === 0 ? 0 : ((1 + (i % 3)) as 1 | 2 | 3);
+      starsByBucket[bucketIdx].push({
+        x: Math.random() * width,
+        y: Math.random() * height,
+        z: Math.random() * 1.8 + 0.5,
+        size: Math.random() * 1.6 + 0.5,
+        speed: (Math.random() * 0.55 + 0.14) * (prefersReducedMotion ? 0 : 1),
+      });
+    }
 
     let mouseX = width / 2;
     let mouseY = height / 2;
@@ -50,9 +54,13 @@ export function StarfieldCanvas() {
     };
 
     const handleResize = () => {
-      if (!canvas) return;
-      width = canvas.width = window.innerWidth;
-      height = canvas.height = window.innerHeight;
+      if (resizeRafId) return;
+      resizeRafId = window.requestAnimationFrame(() => {
+        resizeRafId = 0;
+        if (!canvas) return;
+        width = canvas.width = window.innerWidth;
+        height = canvas.height = window.innerHeight;
+      });
     };
 
     window.addEventListener('mousemove', handleMouseMove, { passive: true });
@@ -61,16 +69,14 @@ export function StarfieldCanvas() {
     let isLight =
       document.documentElement.getAttribute('data-theme') === 'light';
     let accentColor =
-      getComputedStyle(document.documentElement)
-        .getPropertyValue('--ui-accent')
-        .trim() || '#00ff7f';
+      document.documentElement.style.getPropertyValue('--ui-accent').trim() ||
+      '#00ff7f';
 
     const syncThemeTokens = () => {
       isLight = document.documentElement.getAttribute('data-theme') === 'light';
       accentColor =
-        getComputedStyle(document.documentElement)
-          .getPropertyValue('--ui-accent')
-          .trim() || '#00ff7f';
+        document.documentElement.style.getPropertyValue('--ui-accent').trim() ||
+        '#00ff7f';
     };
 
     let isPageVisible = document.visibilityState === 'visible';
@@ -90,12 +96,14 @@ export function StarfieldCanvas() {
         isLight ? 'rgba(51, 65, 85, 0.66)' : 'rgba(226, 232, 240, 0.85)',
       ];
 
-      // Batch all stars into 4 draw calls per frame instead of 130+ individual ctx.fill() calls
+      // Pre-partitioned buckets: iterates strictly N stars total (instead of 4 * N)
       for (let b = 0; b < 4; b += 1) {
+        const bucket = starsByBucket[b];
+        if (bucket.length === 0) continue;
+
         ctx.beginPath();
-        for (let i = 0; i < stars.length; i += 1) {
-          const star = stars[i];
-          if (star.bucket !== b) continue;
+        for (let i = 0; i < bucket.length; i += 1) {
+          const star = bucket[i];
 
           star.y -= star.speed;
           if (star.y < 0) {
@@ -161,6 +169,9 @@ export function StarfieldCanvas() {
     return () => {
       observer.disconnect();
       window.cancelAnimationFrame(animationFrameId);
+      if (resizeRafId) {
+        window.cancelAnimationFrame(resizeRafId);
+      }
       document.removeEventListener('visibilitychange', handleVisibilityChange);
       window.removeEventListener('mousemove', handleMouseMove);
       window.removeEventListener('resize', handleResize);

@@ -1,12 +1,13 @@
 'use client';
 
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useDeferredValue, useEffect, useMemo, useRef, useState } from 'react';
 import { Search } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import {
   FEATURED_PROJECTS,
   FALLBACK_GITHUB_REPOS,
   fetchGitHubReposClient,
+  type FeaturedProjectMetadata,
   type GitHubRepositoryItem,
   type ProjectCategoryFilter,
 } from '@/entities/project';
@@ -14,6 +15,31 @@ import { cn, useElementVisibility } from '@/shared/lib';
 import { SectionHeading } from '@/shared/ui';
 import { FeaturedProjectCard } from './FeaturedProjectCard';
 import { GitHubRepoCard } from './GitHubRepoCard';
+
+const PROJECT_CATEGORIES: ProjectCategoryFilter[] = [
+  'all',
+  'fullstack',
+  'backend',
+  'frontend',
+  'mobile',
+  'corporate',
+];
+
+const FEATURED_BY_CATEGORY: Record<
+  ProjectCategoryFilter,
+  FeaturedProjectMetadata[]
+> = PROJECT_CATEGORIES.reduce(
+  (acc, category) => {
+    acc[category] =
+      category === 'all'
+        ? FEATURED_PROJECTS
+        : FEATURED_PROJECTS.filter((project) =>
+            project.filterTags.includes(category)
+          );
+    return acc;
+  },
+  {} as Record<ProjectCategoryFilter, FeaturedProjectMetadata[]>
+);
 
 export function ProjectsShowcase() {
   const t = useTranslations('projects');
@@ -29,6 +55,7 @@ export function ProjectsShowcase() {
     useState<GitHubRepositoryItem[]>(FALLBACK_GITHUB_REPOS);
   const [hasLoadedRemoteRepos, setHasLoadedRemoteRepos] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const deferredSearchQuery = useDeferredValue(searchQuery);
 
   // Lazy-fetch live GitHub repos only when section approaches viewport or user opens GitHub tab
   useEffect(() => {
@@ -48,23 +75,26 @@ export function ProjectsShowcase() {
     };
   }, [isNearViewport, activeTab, hasLoadedRemoteRepos]);
 
-  const filteredFeatured = useMemo(() => {
-    if (categoryFilter === 'all') return FEATURED_PROJECTS;
-    return FEATURED_PROJECTS.filter((project) =>
-      project.filterTags.includes(categoryFilter)
-    );
-  }, [categoryFilter]);
+  const filteredFeatured = FEATURED_BY_CATEGORY[categoryFilter];
+
+  // Pre-normalize lowercase search strings once per repo dataset load
+  const indexedRepos = useMemo(
+    () =>
+      repos.map((repo) => ({
+        repo,
+        searchBlob:
+          `${repo.name} ${repo.description ?? ''} ${repo.language ?? ''}`.toLowerCase(),
+      })),
+    [repos]
+  );
 
   const filteredRepos = useMemo(() => {
-    const query = searchQuery.trim().toLowerCase();
+    const query = deferredSearchQuery.trim().toLowerCase();
     if (!query) return repos;
-    return repos.filter(
-      (repo) =>
-        repo.name.toLowerCase().includes(query) ||
-        (repo.description && repo.description.toLowerCase().includes(query)) ||
-        (repo.language && repo.language.toLowerCase().includes(query))
-    );
-  }, [repos, searchQuery]);
+    return indexedRepos
+      .filter((entry) => entry.searchBlob.includes(query))
+      .map((entry) => entry.repo);
+  }, [repos, indexedRepos, deferredSearchQuery]);
 
   const categoryButtons: { id: ProjectCategoryFilter; label: string }[] = [
     { id: 'all', label: t('filters.all') },

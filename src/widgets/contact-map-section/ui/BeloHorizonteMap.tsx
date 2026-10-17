@@ -1,10 +1,10 @@
 'use client';
 
 import 'leaflet/dist/leaflet.css';
-import { useEffect, useRef, useState } from 'react';
+import { memo, useEffect, useRef, useState } from 'react';
 import { DEVELOPER_PROFILE } from '@/entities/developer-profile';
 
-export function BeloHorizonteMap() {
+function BeloHorizonteMapComponent() {
   const mapContainerRef = useRef<HTMLDivElement | null>(null);
   const [shouldLoadMap, setShouldLoadMap] = useState(false);
 
@@ -86,3 +86,6 @@ export function BeloHorizonteMap() {
     </div>
   );
 }
+
+export const BeloHorizonteMap = memo(BeloHorizonteMapComponent);
+

@@ -1,30 +1,31 @@
 'use client';
 
-import { useState, type FormEvent } from 'react';
+import { memo, useState, type FormEvent } from 'react';
 import { CheckCircle2, AlertCircle, Send } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { DEVELOPER_PROFILE } from '@/entities/developer-profile';
 import { Button } from '@/shared/ui';
 import { contactMessageSchema } from '../model/contact.schema';
 
-export function ContactForm() {
+const INPUT_CLASSES =
+  'w-full rounded-xl border border-[var(--ui-border)] bg-[var(--ui-surface-elevated)]/70 px-4 py-3 text-sm text-[var(--ui-text-primary)] placeholder:text-[var(--ui-text-muted)] transition-colors focus:border-[var(--ui-accent)] focus:outline-none';
+
+function ContactFormComponent() {
   const t = useTranslations('contact.form');
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [subject, setSubject] = useState('');
-  const [message, setMessage] = useState('');
-  const [status, setStatus] = useState<'idle' | 'submitting' | 'success' | 'error'>(
-    'idle'
-  );
+  const [status, setStatus] = useState<
+    'idle' | 'submitting' | 'success' | 'error'
+  >('idle');
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    const form = event.currentTarget;
+    const formData = new FormData(form);
 
     const parsed = contactMessageSchema.safeParse({
-      name,
-      email,
-      subject,
-      message,
+      name: String(formData.get('name') ?? ''),
+      email: String(formData.get('email') ?? ''),
+      subject: String(formData.get('subject') ?? ''),
+      message: String(formData.get('message') ?? ''),
     });
 
     if (!parsed.success) {
@@ -49,10 +50,7 @@ export function ContactForm() {
 
         if (res.ok) {
           setStatus('success');
-          setName('');
-          setEmail('');
-          setSubject('');
-          setMessage('');
+          form.reset();
           return;
         }
       } catch {
@@ -76,14 +74,8 @@ export function ContactForm() {
     }
 
     setStatus('success');
-    setName('');
-    setEmail('');
-    setSubject('');
-    setMessage('');
+    form.reset();
   };
-
-  const inputClasses =
-    'w-full rounded-xl border border-[var(--ui-border)] bg-[var(--ui-surface-elevated)]/70 px-4 py-3 text-sm text-[var(--ui-text-primary)] placeholder:text-[var(--ui-text-muted)] transition-colors focus:border-[var(--ui-accent)] focus:outline-none';
 
   return (
     <form
@@ -101,11 +93,11 @@ export function ContactForm() {
           </label>
           <input
             id="contact-name"
+            name="name"
             type="text"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
+            defaultValue=""
             placeholder={t('namePlaceholder')}
-            className={inputClasses}
+            className={INPUT_CLASSES}
             required
           />
         </div>
@@ -119,11 +111,11 @@ export function ContactForm() {
           </label>
           <input
             id="contact-email"
+            name="email"
             type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            defaultValue=""
             placeholder={t('emailPlaceholder')}
-            className={inputClasses}
+            className={INPUT_CLASSES}
             required
           />
         </div>
@@ -138,11 +130,11 @@ export function ContactForm() {
         </label>
         <input
           id="contact-subject"
+          name="subject"
           type="text"
-          value={subject}
-          onChange={(e) => setSubject(e.target.value)}
+          defaultValue=""
           placeholder={t('subjectPlaceholder')}
-          className={inputClasses}
+          className={INPUT_CLASSES}
           required
         />
       </div>
@@ -156,11 +148,11 @@ export function ContactForm() {
         </label>
         <textarea
           id="contact-message"
+          name="message"
           rows={5}
-          value={message}
-          onChange={(e) => setMessage(e.target.value)}
+          defaultValue=""
           placeholder={t('messagePlaceholder')}
-          className={`${inputClasses} min-h-[8.5rem] flex-1 resize-none`}
+          className={`${INPUT_CLASSES} min-h-[8.5rem] flex-1 resize-none`}
           required
         />
       </div>
@@ -199,3 +191,6 @@ export function ContactForm() {
     </form>
   );
 }
+
+export const ContactForm = memo(ContactFormComponent);
+
