@@ -169,7 +169,7 @@ export function TechCube3D() {
           ctx.fillStyle = sheenAura;
           ctx.fillRect(pad, pad, frameSize, frameSize);
 
-          // Technical dual circuit traces emerging from the 4 corners inside the content container
+          // Technical single circuit trace emerging from each of the 4 corners inside the content container
           ctx.save();
           ctx.strokeStyle = isLight ? `${item.color}90` : `${item.color}55`;
           ctx.fillStyle = item.color;
@@ -182,23 +182,13 @@ export function TechCube3D() {
             sy: number
           ) => {
             ctx.beginPath();
-            ctx.moveTo(cx + sx * 42, cy + sy * 18);
-            ctx.lineTo(cx + sx * 92, cy + sy * 18);
-            ctx.lineTo(cx + sx * 112, cy + sy * 38);
+            ctx.moveTo(cx + sx * 28, cy + sy * 22);
+            ctx.lineTo(cx + sx * 86, cy + sy * 22);
+            ctx.lineTo(cx + sx * 106, cy + sy * 42);
             ctx.stroke();
 
             ctx.beginPath();
-            ctx.arc(cx + sx * 112, cy + sy * 38, 3, 0, Math.PI * 2);
-            ctx.fill();
-
-            ctx.beginPath();
-            ctx.moveTo(cx + sx * 18, cy + sy * 42);
-            ctx.lineTo(cx + sx * 18, cy + sy * 92);
-            ctx.lineTo(cx + sx * 38, cy + sy * 112);
-            ctx.stroke();
-
-            ctx.beginPath();
-            ctx.arc(cx + sx * 38, cy + sy * 112, 3, 0, Math.PI * 2);
+            ctx.arc(cx + sx * 106, cy + sy * 42, 3, 0, Math.PI * 2);
             ctx.fill();
           };
 
@@ -210,7 +200,7 @@ export function TechCube3D() {
 
           ctx.restore(); // End clip for inner content container
 
-          // 3. Harmonious content container border right at the face limit (pad = 8)
+          // 3. Harmonious single content container border right at the face limit (pad = 8)
           const borderGrad = ctx.createLinearGradient(
             pad,
             pad,
@@ -231,23 +221,6 @@ export function TechCube3D() {
           ctx.lineWidth = 3.5;
           ctx.shadowColor = item.color;
           ctx.shadowBlur = isLight ? 8 : 12;
-          ctx.stroke();
-          ctx.restore();
-
-          // Subtle inner hairline frame for hardware depth
-          ctx.save();
-          ctx.beginPath();
-          ctx.roundRect(
-            pad + 10,
-            pad + 10,
-            frameSize - 20,
-            frameSize - 20,
-            frameRadius - 8
-          );
-          ctx.strokeStyle = isLight
-            ? 'rgba(15, 23, 42, 0.06)'
-            : 'rgba(255, 255, 255, 0.05)';
-          ctx.lineWidth = 1;
           ctx.stroke();
           ctx.restore();
 
