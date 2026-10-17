@@ -81,6 +81,9 @@ export function TechCube3D() {
     const sharedBumpMap = createBumpTexture();
 
     const buildMaterials = () => {
+      const isLight =
+        document.documentElement.getAttribute('data-theme') === 'light';
+
       return CUBE_FACES_TECH.map((item) => {
         const canvas = document.createElement('canvas');
         canvas.width = texSize;
@@ -92,21 +95,23 @@ export function TechCube3D() {
           const frameSize = texSize - pad * 2;
           const frameRadius = 62;
 
-          // 1. Area outside the border (no content): clean solid background with a slightly lighter slate-indigo tone
-          ctx.fillStyle = '#182642';
+          // 1. Area outside the border (no content): clean solid background with a slightly shifted tone
+          ctx.fillStyle = isLight ? '#e2e8f0' : '#182642';
           ctx.fillRect(0, 0, texSize, texSize);
 
-          // 2. Content area (strictly inside the border at pad = 8): rich deep slate-indigo base + textures
+          // 2. Content area (strictly inside the border at pad = 8): base + textures
           ctx.save();
           ctx.beginPath();
           ctx.roundRect(pad, pad, frameSize, frameSize, frameRadius);
-          ctx.fillStyle = '#111c35';
+          ctx.fillStyle = isLight ? '#ffffff' : '#111c35';
           ctx.fill();
           ctx.clip();
 
           // Tactile architectural tech grid + micro-dots inside the content container
           const gridStep = 32;
-          ctx.strokeStyle = 'rgba(148, 163, 184, 0.055)';
+          ctx.strokeStyle = isLight
+            ? 'rgba(15, 23, 42, 0.075)'
+            : 'rgba(148, 163, 184, 0.055)';
           ctx.lineWidth = 1;
           for (let i = gridStep; i < texSize; i += gridStep) {
             ctx.beginPath();
@@ -121,7 +126,7 @@ export function TechCube3D() {
           }
 
           // Micro intersection nodes inside the face
-          ctx.fillStyle = `${item.color}2e`;
+          ctx.fillStyle = isLight ? `${item.color}55` : `${item.color}2e`;
           for (let x = gridStep; x <= texSize - gridStep; x += gridStep) {
             for (let y = gridStep; y <= texSize - gridStep; y += gridStep) {
               ctx.fillRect(x - 1, y - 1, 2, 2);
@@ -137,10 +142,13 @@ export function TechCube3D() {
             texSize / 2,
             225
           );
-          primaryAura.addColorStop(0, `${item.color}42`);
-          primaryAura.addColorStop(0.45, `${item.color}1c`);
-          primaryAura.addColorStop(0.78, `${item.color}08`);
-          primaryAura.addColorStop(1, 'rgba(17, 28, 53, 0)');
+          primaryAura.addColorStop(0, isLight ? `${item.color}2e` : `${item.color}42`);
+          primaryAura.addColorStop(0.45, isLight ? `${item.color}14` : `${item.color}1c`);
+          primaryAura.addColorStop(0.78, isLight ? `${item.color}06` : `${item.color}08`);
+          primaryAura.addColorStop(
+            1,
+            isLight ? 'rgba(255, 255, 255, 0)' : 'rgba(17, 28, 53, 0)'
+          );
           ctx.fillStyle = primaryAura;
           ctx.fillRect(pad, pad, frameSize, frameSize);
 
@@ -153,14 +161,17 @@ export function TechCube3D() {
             120,
             180
           );
-          sheenAura.addColorStop(0, 'rgba(255, 255, 255, 0.05)');
+          sheenAura.addColorStop(
+            0,
+            isLight ? 'rgba(255, 255, 255, 0.8)' : 'rgba(255, 255, 255, 0.05)'
+          );
           sheenAura.addColorStop(1, 'rgba(255, 255, 255, 0)');
           ctx.fillStyle = sheenAura;
           ctx.fillRect(pad, pad, frameSize, frameSize);
 
           // Technical dual circuit traces emerging from the 4 corners inside the content container
           ctx.save();
-          ctx.strokeStyle = `${item.color}55`;
+          ctx.strokeStyle = isLight ? `${item.color}90` : `${item.color}55`;
           ctx.fillStyle = item.color;
           ctx.lineWidth = 2;
 
@@ -206,9 +217,12 @@ export function TechCube3D() {
             texSize - pad,
             texSize - pad
           );
-          borderGrad.addColorStop(0, `${item.color}99`);
-          borderGrad.addColorStop(0.5, 'rgba(148, 163, 184, 0.34)');
-          borderGrad.addColorStop(1, `${item.color}75`);
+          borderGrad.addColorStop(0, isLight ? `${item.color}cc` : `${item.color}99`);
+          borderGrad.addColorStop(
+            0.5,
+            isLight ? 'rgba(100, 116, 139, 0.42)' : 'rgba(148, 163, 184, 0.34)'
+          );
+          borderGrad.addColorStop(1, isLight ? `${item.color}99` : `${item.color}75`);
 
           ctx.save();
           ctx.beginPath();
@@ -216,7 +230,7 @@ export function TechCube3D() {
           ctx.strokeStyle = borderGrad;
           ctx.lineWidth = 3.5;
           ctx.shadowColor = item.color;
-          ctx.shadowBlur = 12;
+          ctx.shadowBlur = isLight ? 8 : 12;
           ctx.stroke();
           ctx.restore();
 
@@ -230,7 +244,9 @@ export function TechCube3D() {
             frameSize - 20,
             frameRadius - 8
           );
-          ctx.strokeStyle = 'rgba(255, 255, 255, 0.05)';
+          ctx.strokeStyle = isLight
+            ? 'rgba(15, 23, 42, 0.06)'
+            : 'rgba(255, 255, 255, 0.05)';
           ctx.lineWidth = 1;
           ctx.stroke();
           ctx.restore();
@@ -246,8 +262,8 @@ export function TechCube3D() {
             badgeY,
             badgeRadius
           );
-          badgeGrad.addColorStop(0, `${item.color}32`);
-          badgeGrad.addColorStop(0.7, `${item.color}18`);
+          badgeGrad.addColorStop(0, isLight ? `${item.color}2e` : `${item.color}32`);
+          badgeGrad.addColorStop(0.7, isLight ? `${item.color}16` : `${item.color}18`);
           badgeGrad.addColorStop(1, `${item.color}08`);
 
           ctx.beginPath();
@@ -258,7 +274,7 @@ export function TechCube3D() {
           // Crisp concentric ring around the badge
           ctx.beginPath();
           ctx.arc(texSize / 2, badgeY, badgeRadius, 0, Math.PI * 2);
-          ctx.strokeStyle = `${item.color}48`;
+          ctx.strokeStyle = isLight ? `${item.color}66` : `${item.color}48`;
           ctx.lineWidth = 1.75;
           ctx.stroke();
 
@@ -267,7 +283,7 @@ export function TechCube3D() {
           ctx.beginPath();
           ctx.setLineDash([6, 8]);
           ctx.arc(texSize / 2, badgeY, badgeRadius + 11, 0, Math.PI * 2);
-          ctx.strokeStyle = `${item.color}28`;
+          ctx.strokeStyle = isLight ? `${item.color}42` : `${item.color}28`;
           ctx.lineWidth = 1.25;
           ctx.stroke();
           ctx.restore();
@@ -275,7 +291,7 @@ export function TechCube3D() {
           // 5. Tech Symbol with soft neon glow
           ctx.save();
           ctx.shadowColor = item.color;
-          ctx.shadowBlur = 18;
+          ctx.shadowBlur = isLight ? 10 : 18;
           ctx.fillStyle = item.color;
           ctx.font =
             '900 62px ui-monospace, SFMono-Regular, Menlo, Monaco, monospace';
@@ -288,7 +304,7 @@ export function TechCube3D() {
           const safeTextWidth = 320;
 
           // 6. Tech Name
-          ctx.fillStyle = '#f8fafc';
+          ctx.fillStyle = isLight ? '#0f172a' : '#f8fafc';
           ctx.font = '800 34px system-ui, -apple-system, sans-serif';
           ctx.textAlign = 'center';
           ctx.textBaseline = 'middle';
@@ -310,7 +326,7 @@ export function TechCube3D() {
           ctx.fillRect(texSize / 2 - barWidth, barY - 1.5, barWidth * 2, 3);
 
           // 8. Tech Subtitle (auto-fitted so it never overflows the safe zone)
-          ctx.fillStyle = '#dbeafe';
+          ctx.fillStyle = isLight ? '#334155' : '#dbeafe';
           let subtitleFontPx = 19;
           ctx.font = `600 ${subtitleFontPx}px ui-monospace, SFMono-Regular, Menlo, monospace`;
           while (
@@ -331,7 +347,7 @@ export function TechCube3D() {
         return new THREE.MeshLambertMaterial({
           map: texture,
           bumpMap: sharedBumpMap,
-          bumpScale: 0.008,
+          bumpScale: isLight ? 0.003 : 0.008,
         });
       });
     };
@@ -344,20 +360,37 @@ export function TechCube3D() {
     cubeMesh.rotation.set(-0.35, 0.55, 0);
     scene.add(cubeMesh);
 
-    // Balanced 3-point matte lighting so front, side, top, and curved bevels have clear 3D volume
-    const ambientLight = new THREE.AmbientLight(0xffffff, 1.05);
+    // Balanced 3-point matte lighting adapted to theme (Three.js BRDF_Lambert divides by Math.PI)
+    const isInitialLight =
+      document.documentElement.getAttribute('data-theme') === 'light';
+    const ambientLight = new THREE.AmbientLight(
+      0xffffff,
+      isInitialLight ? 2.25 : 1.05
+    );
     scene.add(ambientLight);
 
-    const keyLight = new THREE.DirectionalLight(0xffffff, 1.65);
+    const keyLight = new THREE.DirectionalLight(
+      0xffffff,
+      isInitialLight ? 1.25 : 1.65
+    );
     keyLight.position.set(4, 6, 5);
     scene.add(keyLight);
 
-    const fillLight = new THREE.DirectionalLight(0x94a3b8, 0.55);
+    const fillLight = new THREE.DirectionalLight(
+      0x94a3b8,
+      isInitialLight ? 0.75 : 0.55
+    );
     fillLight.position.set(-5, -3, 2);
     scene.add(fillLight);
 
-    // Rebuild textures if user switches theme accent color
+    // Rebuild textures and rebalance lighting if user switches theme mode or accent color
     const observer = new MutationObserver(() => {
+      const isLightNow =
+        document.documentElement.getAttribute('data-theme') === 'light';
+      ambientLight.intensity = isLightNow ? 2.25 : 1.05;
+      keyLight.intensity = isLightNow ? 1.25 : 1.65;
+      fillLight.intensity = isLightNow ? 0.75 : 0.55;
+
       const nextMaterials = buildMaterials();
       cubeMesh.material = nextMaterials;
       materials.forEach((mat) => {

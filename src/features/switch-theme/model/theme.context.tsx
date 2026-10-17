@@ -31,56 +31,89 @@ const STORAGE_ACCENT_KEY = 'portfolio_2027_theme_accent';
 
 const ThemeContext = createContext<ThemeContextValue | null>(null);
 
+function readStoredPreferences(): { mode: ThemeMode; accent: AccentColor } {
+  if (typeof window === 'undefined') {
+    return { mode: 'dark', accent: 'green' };
+  }
+
+  const params = new URLSearchParams(window.location.search);
+  const queryTheme = params.get('theme') as ThemeMode | null;
+  if (queryTheme && THEME_MODES.includes(queryTheme)) {
+    setStorageItem(STORAGE_MODE_KEY, queryTheme);
+  }
+
+  const savedMode = getStorageItem<ThemeMode>(STORAGE_MODE_KEY, 'dark');
+  const savedAccent = getStorageItem<AccentColor>(STORAGE_ACCENT_KEY, 'green');
+
+  return {
+    mode: THEME_MODES.includes(savedMode) ? savedMode : 'dark',
+    accent: ACCENT_COLORS.includes(savedAccent) ? savedAccent : 'green',
+  };
+}
+
 function applyThemeAttributes(mode: ThemeMode, accent: AccentColor) {
   if (typeof document === 'undefined') return;
   const root = document.documentElement;
-  root.setAttribute('data-theme', mode);
-  root.setAttribute('data-accent', accent);
+  if (root.getAttribute('data-theme') !== mode) {
+    root.setAttribute('data-theme', mode);
+  }
+  if (root.getAttribute('data-accent') !== accent) {
+    root.setAttribute('data-accent', accent);
+  }
 
   const hexConfig = ACCENT_HEX_MAP[accent];
-  root.style.setProperty('--ui-accent', hexConfig.primary);
-  root.style.setProperty('--ui-accent-secondary', hexConfig.secondary);
-  root.style.setProperty('--ui-accent-glow', hexConfig.glow);
+  if (root.style.getPropertyValue('--ui-accent') !== hexConfig.primary) {
+    root.style.setProperty('--ui-accent', hexConfig.primary);
+    root.style.setProperty('--ui-accent-secondary', hexConfig.secondary);
+    root.style.setProperty('--ui-accent-glow', hexConfig.glow);
+  }
 }
 
 export function ThemePreferencesProvider({ children }: { children: ReactNode }) {
   const [mode, setModeState] = useState<ThemeMode>('dark');
   const [accent, setAccentState] = useState<AccentColor>('green');
 
+  // Synchronize from localStorage on mount and lock <html> attributes across Next.js [locale] route transitions
   useEffect(() => {
-    const savedMode = getStorageItem<ThemeMode>(STORAGE_MODE_KEY, 'dark');
-    const savedAccent = getStorageItem<AccentColor>(STORAGE_ACCENT_KEY, 'green');
-    const validMode = THEME_MODES.includes(savedMode) ? savedMode : 'dark';
-    const validAccent = ACCENT_COLORS.includes(savedAccent)
-      ? savedAccent
-      : 'green';
+    const initial = readStoredPreferences();
+    setModeState(initial.mode);
+    setAccentState(initial.accent);
+    applyThemeAttributes(initial.mode, initial.accent);
 
-    setModeState(validMode);
-    setAccentState(validAccent);
-    applyThemeAttributes(validMode, validAccent);
+    const root = document.documentElement;
+    const observer = new MutationObserver(() => {
+      const current = readStoredPreferences();
+      applyThemeAttributes(current.mode, current.accent);
+    });
+    observer.observe(root, {
+      attributes: true,
+      attributeFilter: ['lang', 'data-theme', 'data-accent', 'class'],
+    });
+
+    return () => observer.disconnect();
   }, []);
 
-  const setMode = useCallback(
-    (nextMode: ThemeMode) => {
-      setModeState(nextMode);
-      setStorageItem(STORAGE_MODE_KEY, nextMode);
-      applyThemeAttributes(nextMode, accent);
-    },
-    [accent]
-  );
+  const setMode = useCallback((nextMode: ThemeMode) => {
+    const current = readStoredPreferences();
+    setStorageItem(STORAGE_MODE_KEY, nextMode);
+    setModeState(nextMode);
+    applyThemeAttributes(nextMode, current.accent);
+  }, []);
 
   const toggleMode = useCallback(() => {
-    setMode(mode === 'dark' ? 'light' : 'dark');
-  }, [mode, setMode]);
+    const current = readStoredPreferences();
+    const nextMode: ThemeMode = current.mode === 'dark' ? 'light' : 'dark';
+    setStorageItem(STORAGE_MODE_KEY, nextMode);
+    setModeState(nextMode);
+    applyThemeAttributes(nextMode, current.accent);
+  }, []);
 
-  const setAccent = useCallback(
-    (nextAccent: AccentColor) => {
-      setAccentState(nextAccent);
-      setStorageItem(STORAGE_ACCENT_KEY, nextAccent);
-      applyThemeAttributes(mode, nextAccent);
-    },
-    [mode]
-  );
+  const setAccent = useCallback((nextAccent: AccentColor) => {
+    const current = readStoredPreferences();
+    setStorageItem(STORAGE_ACCENT_KEY, nextAccent);
+    setAccentState(nextAccent);
+    applyThemeAttributes(current.mode, nextAccent);
+  }, []);
 
   const value = useMemo(
     () => ({ mode, accent, setMode, toggleMode, setAccent }),

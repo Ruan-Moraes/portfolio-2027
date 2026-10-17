@@ -82,8 +82,6 @@ export default async function LocaleLayout({
   return (
     <html
       lang={locale}
-      data-theme="dark"
-      data-accent="green"
       suppressHydrationWarning
       className={`${fontSans.variable} ${fontMono.variable} ${fontScript.variable}`}
     >

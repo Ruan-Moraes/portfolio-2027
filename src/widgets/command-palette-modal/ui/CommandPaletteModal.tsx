@@ -33,10 +33,10 @@ const GROUP_CLASS =
   'mb-5 last:mb-0 [&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:pb-2.5 [&_[cmdk-group-heading]]:font-mono [&_[cmdk-group-heading]]:text-[11px] [&_[cmdk-group-heading]]:font-semibold [&_[cmdk-group-heading]]:tracking-widest [&_[cmdk-group-heading]]:text-[var(--ui-text-muted)] [&_[cmdk-group-heading]]:uppercase [&_[cmdk-group-items]]:flex [&_[cmdk-group-items]]:flex-col [&_[cmdk-group-items]]:gap-1.5';
 
 const ITEM_CLASS =
-  'group flex cursor-pointer items-center justify-between gap-3.5 rounded-2xl border border-transparent bg-[var(--ui-surface)]/45 px-3.5 py-2.5 text-sm font-medium text-[var(--ui-text-secondary)] transition-all aria-selected:border-[var(--ui-accent)]/35 aria-selected:bg-[var(--ui-accent)]/12 aria-selected:text-[var(--ui-text-primary)]';
+  'group flex cursor-pointer items-center justify-between gap-3.5 rounded-2xl border border-[var(--ui-border)] bg-[var(--ui-surface-elevated)] px-3.5 py-2.5 text-sm font-medium text-[var(--ui-text-secondary)] transition-all aria-selected:border-[var(--ui-accent)] aria-selected:bg-[var(--ui-accent)]/15 aria-selected:text-[var(--ui-text-primary)]';
 
 const ICON_BOX_CLASS =
-  'flex h-8 w-8 shrink-0 items-center justify-center rounded-xl border border-[var(--ui-border)] bg-[var(--ui-bg-elevated)] text-[var(--ui-text-muted)] transition-colors group-aria-selected:border-[var(--ui-accent)]/40 group-aria-selected:bg-[var(--ui-accent)]/15 group-aria-selected:text-[var(--ui-accent)]';
+  'flex h-8 w-8 shrink-0 items-center justify-center rounded-xl border border-[var(--ui-border)] bg-[var(--ui-surface)] text-[var(--ui-text-muted)] transition-colors group-aria-selected:border-[var(--ui-accent)] group-aria-selected:bg-[var(--ui-accent)]/20 group-aria-selected:text-[var(--ui-text-primary)]';
 
 export function CommandPaletteModal() {
   const { isOpen, closePalette } = useCommandPalette();
@@ -65,17 +65,19 @@ export function CommandPaletteModal() {
       role="dialog"
       aria-modal="true"
       aria-label="Command Palette"
-      className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/80 p-4 backdrop-blur-md sm:p-6"
+      className={`fixed inset-0 z-50 flex items-center justify-center p-4 backdrop-blur-md sm:p-6 ${
+        mode === 'light' ? 'bg-slate-900/35' : 'bg-slate-950/80'
+      }`}
       onClick={closePalette}
     >
       <div
-        className="w-full max-w-2xl overflow-hidden rounded-3xl border border-[var(--ui-border-strong)] bg-[var(--ui-bg-elevated)]/95 shadow-[0_24px_80px_rgba(0,0,0,0.7)] ring-1 ring-white/5 backdrop-blur-2xl"
+        className="w-full max-w-2xl overflow-hidden rounded-3xl border border-[var(--ui-border-strong)] bg-[var(--ui-surface)] text-[var(--ui-text-primary)] shadow-2xl"
         onClick={(e) => e.stopPropagation()}
       >
-        <Command className="w-full">
+        <Command className="w-full bg-[var(--ui-surface)] text-[var(--ui-text-primary)]">
           {/* Search Header */}
-          <div className="flex items-center gap-3.5 border-b border-[var(--ui-border)] bg-[var(--ui-surface)]/40 px-5 py-4">
-            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-[var(--ui-accent)]/30 bg-[var(--ui-accent)]/10 text-[var(--ui-accent)]">
+          <div className="flex items-center gap-3.5 border-b border-[var(--ui-border)] bg-[var(--ui-surface-elevated)] px-5 py-4">
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-[var(--ui-accent)] bg-[var(--ui-accent)]/15 text-[var(--ui-text-primary)]">
               <Search className="h-4 w-4" />
             </div>
 
@@ -86,14 +88,14 @@ export function CommandPaletteModal() {
             />
 
             <div className="flex shrink-0 items-center gap-2">
-              <kbd className="hidden rounded-lg border border-[var(--ui-border)] bg-[var(--ui-bg-elevated)] px-2 py-1 font-mono text-[10px] font-semibold text-[var(--ui-text-muted)] sm:inline-block">
+              <kbd className="hidden rounded-lg border border-[var(--ui-border)] bg-[var(--ui-surface)] px-2 py-1 font-mono text-[10px] font-semibold text-[var(--ui-text-muted)] sm:inline-block">
                 ESC
               </kbd>
               <button
                 type="button"
                 onClick={closePalette}
                 aria-label={tCommon('close')}
-                className="flex h-9 w-9 cursor-pointer items-center justify-center rounded-xl border border-[var(--ui-border)] bg-[var(--ui-bg-elevated)] text-[var(--ui-text-muted)] transition-colors hover:border-[var(--ui-accent)]/40 hover:text-[var(--ui-text-primary)]"
+                className="flex h-9 w-9 cursor-pointer items-center justify-center rounded-xl border border-[var(--ui-border)] bg-[var(--ui-surface)] text-[var(--ui-text-muted)] transition-colors hover:border-[var(--ui-accent)] hover:text-[var(--ui-text-primary)]"
               >
                 <X className="h-4 w-4" />
               </button>
