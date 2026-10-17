@@ -1,0 +1,48 @@
+{
+  "name": "portfolio-2027",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Portfólio criativo e interativo de Ruan Moraes Santos Barbosa — Desenvolvedor de Software Full Stack (Next.js + FSD + i18n)",
+  "author": "Ruan Moraes Santos Barbosa <ruanmoraessantosbarbosa@gmail.com>",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "type-check": "tsc --noEmit",
+    "lint:fsd": "steiger ./src",
+    "test": "vitest run --pool=forks",
+    "test:watch": "vitest --pool=forks"
+  },
+  "dependencies": {
+    "clsx": "^2.1.1",
+    "cmdk": "^1.1.1",
+    "leaflet": "^1.9.4",
+    "lucide-react": "^0.511.0",
+    "motion": "^12.12.1",
+    "next": "^15.3.2",
+    "next-intl": "^4.1.0",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0",
+    "react-leaflet": "^5.0.0",
+    "tailwind-merge": "^3.3.0",
+    "zod": "^3.25.7"
+  },
+  "devDependencies": {
+    "@feature-sliced/steiger-plugin": "^0.5.2",
+    "@tailwindcss/postcss": "^4.1.7",
+    "@testing-library/dom": "^10.4.0",
+    "@testing-library/jest-dom": "6.9.1",
+    "@testing-library/react": "^16.3.0",
+    "@types/leaflet": "^1.9.19",
+    "@types/node": "^22.15.21",
+    "@types/react": "^19.1.5",
+    "@types/react-dom": "^19.1.5",
+    "@vitejs/plugin-react": "^4.5.0",
+    "jsdom": "^26.1.0",
+    "postcss": "^8.5.3",
+    "steiger": "^0.5.2",
+    "tailwindcss": "^4.1.7",
+    "typescript": "^5.8.3",
+    "vitest": "^3.1.4"
+  }
+}

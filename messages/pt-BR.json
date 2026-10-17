@@ -1,0 +1,376 @@
+{
+  "seo": {
+    "title": "Ruan Moraes | Desenvolvedor de Software Full Stack — Java, Spring Boot, .NET, Next.js & React Native",
+    "description": "Portfólio interativo de Ruan Moraes Santos Barbosa. Desenvolvedor de Software Full Stack na CAPYS especializado em Java, Spring Boot, C#, .NET, React, Next.js, React Native, SQL e Microsoft Azure.",
+    "keywords": "Ruan Moraes, Desenvolvedor Full Stack, Software Engineer, Java, Spring Boot, C#, .NET, React, Next.js, React Native, TypeScript, Clean Architecture, Feature-Sliced Design, Belo Horizonte"
+  },
+  "common": {
+    "portfolio": "Portfólio 2027",
+    "downloadCV": "Baixar Currículo (PDF)",
+    "viewProject": "Demo / Live",
+    "viewCode": "Código Fonte",
+    "viewCaseStudy": "Arquitetura & Detalhes",
+    "privateProject": "Projeto Corporativo Privado",
+    "verifyCredential": "Verificar Credencial",
+    "commandPaletteHint": "Comandos",
+    "musicLabel": "música",
+    "musicPlaying": "Tocando synth ambiente",
+    "musicPaused": "Tocar synth ambiente",
+    "loading": "Carregando...",
+    "error": "Ocorreu um erro ao carregar os dados",
+    "retry": "Tentar novamente",
+    "close": "Fechar",
+    "copied": "Copiado para a área de transferência!",
+    "copyEmail": "Copiar E-mail",
+    "openWhatsApp": "Chamar no WhatsApp",
+    "locationValue": "Belo Horizonte, MG — Brasil",
+    "availableStatus": "Atuando na CAPYS • Aberto a conexões & projetos"
+  },
+  "nav": {
+    "home": "Início",
+    "about": "Sobre & Jornada",
+    "skills": "Stack & Esfera 3D",
+    "career": "Experiência & Formação",
+    "projects": "Projetos & GitHub",
+    "certificates": "Certificados",
+    "services": "Especialidades",
+    "contact": "Contato & Mapa"
+  },
+  "hero": {
+    "greeting": "Olá, eu sou",
+    "name": "Ruan Moraes",
+    "role": "Engenheiro de Software Full Stack",
+    "stackLine": "Java • Spring Boot • C# / .NET • React & Next.js • React Native",
+    "summary": "Desenvolvedor de Software Full Stack com mais de 2 anos de experiência no desenvolvimento, manutenção e sustentação de aplicações web e mobile. Atuando na CAPYS em sistemas CRM, portais web, apps Android/iOS, otimização de consultas SQL Server e pipelines CI/CD no Microsoft Azure.",
+    "ctaProjects": "Explorar Projetos",
+    "ctaContact": "Entrar em Contato",
+    "cubeCaption": "Cubo 3D Interativo — Passe o mouse para inspecionar os pilares da stack",
+    "metrics": {
+      "experience": "+2 Anos",
+      "experienceLabel": "Experiência Full Stack",
+      "production": "Web & Mobile",
+      "productionLabel": "Apps Android, iOS & CRM",
+      "architecture": "Clean & FSD",
+      "architectureLabel": "Arquitetura & Testes",
+      "languages": "3 Idiomas",
+      "languagesLabel": "PT-BR, EN-US & ES-ES"
+    }
+  },
+  "about": {
+    "tag": "sobre-mim",
+    "title": "Sobre Mim & Trajetória",
+    "subtitle": "Da curiosidade por hardware aos 8 anos até a engenharia de sistemas críticos em produção",
+    "profileTitle": "Resumo Profissional",
+    "profileP1": "Sou Desenvolvedor de Software Full Stack em Belo Horizonte (MG), graduando em Engenharia de Software pela Uninter (conclusão em 2027) e desenvolvedor em tempo integral na CAPYS.",
+    "profileP2": "Atuo ponta a ponta com Java (Spring Boot, Spring Security, Data JPA), C# (.NET / ASP.NET Core / EF Core), TypeScript, React, Next.js e React Native (Expo e Ionic). Tenho forte foco em diagnóstico de causa raiz, otimização de planos de execução em SQL Server, bancos poliglotas (PostgreSQL, MongoDB, Redis), mensageria (RabbitMQ, Kafka) e arquitetura limpa (Clean Architecture, Hexagonal e Feature-Sliced Design).",
+    "journeyTitle": "Minha História com Tecnologia",
+    "journeyP1": "Minha jornada começou cedo, aos 8 anos, tentando entender como os computadores funcionavam por dentro enquanto explorava jogos e servidores. Aos 12 anos, escrevi minhas primeiras linhas de código em Python com o professor Gustavo Guanabara.",
+    "journeyP2": "Influenciado por amigos, mergulhei no universo de hardware e montei meu próprio computador peça por peça (um Xeon E5-2650v2 com uma GTX 1660Ti). Essa base de baixo nível despertou minha paixão definitiva pela Engenharia de Software e pela criação de sistemas escaláveis e bem arquitetados.",
+    "highlights": {
+      "cleanCode": {
+        "title": "Clean Code & FSD",
+        "description": "Código modular com alta coesão, baixo acoplamento e fronteiras arquiteturais auditáveis."
+      },
+      "sqlTuning": {
+        "title": "Performance & SQL Tuning",
+        "description": "Análise de planos de execução, revisão de joins, índices e procedures em bancos relacionais e NoSQL."
+      },
+      "mobileWeb": {
+        "title": "Entrega Web & Mobile",
+        "description": "Do backend e APIs REST/Webhooks até a publicação de aplicativos nas lojas Android e iOS."
+      },
+      "devops": {
+        "title": "CI/CD, Docker & Testes",
+        "description": "Pipelines automatizados no Microsoft Azure, ambientes Docker Compose e testes com JUnit, Testcontainers e Vitest."
+      }
+    }
+  },
+  "skills": {
+    "tag": "competencias",
+    "title": "Stack & Competências Técnicas",
+    "subtitle": "Interaja com a esfera 3D ou filtre pelas 10 categorias do currículo",
+    "sphereHint": "Arraste ou mova o cursor sobre a esfera 3D para rotacionar as tecnologias",
+    "allCategories": "Todas as Áreas",
+    "categories": {
+      "languages": "Linguagens",
+      "backend": "Backend",
+      "frontend": "Frontend",
+      "mobile": "Mobile",
+      "apis": "APIs & Integrações",
+      "databases": "Bancos & Cache",
+      "messaging": "Mensageria",
+      "testing": "Testes & Qualidade",
+      "devops": "DevOps & Cloud",
+      "architecture": "Arquitetura & IA"
+    }
+  },
+  "career": {
+    "tag": "carreira",
+    "title": "Experiência, Formação & Marcos",
+    "subtitle": "Minha atuação profissional na CAPYS, graduação acadêmica e evolução técnica",
+    "tabs": {
+      "all": "Linha Completa",
+      "work": "Experiência Profissional",
+      "education": "Formação Acadêmica",
+      "milestone": "Marcos Pessoais"
+    },
+    "currentBadge": "Atual",
+    "entries": {
+      "capys": {
+        "role": "Desenvolvedor de Software Full Stack",
+        "organization": "CAPYS",
+        "period": "Abril de 2025 – Atual",
+        "location": "Belo Horizonte, MG • Tempo integral • Presencial",
+        "summary": "Atuação no desenvolvimento, evolução e sustentação de sistemas CRM, portais web, aplicações internas e aplicativos móveis para empresas do setor imobiliário.",
+        "achievements": [
+          "Desenvolvimento e manutenção de sistemas CRM, portais web, aplicações internas e aplicativos móveis para o setor imobiliário.",
+          "Implementação e evolução de funcionalidades no backend e frontend, alinhando regras de negócio complexas e integrações entre sistemas.",
+          "Investigação e correção de bugs em aplicações web e mobile, desde a análise da causa raiz até a validação e publicação em produção.",
+          "Otimização de consultas, procedures e rotinas em SQL Server via análise de planos de execução, revisão de filtros, joins, índices e estatísticas.",
+          "Desenvolvimento, manutenção e publicação de aplicativos Android e iOS utilizando React Native, Expo, Ionic, AngularJS e SQLite.",
+          "Desenvolvimento de interfaces web com React e TypeScript, além de APIs REST, integrações, Webhooks e cache distribuído com Redis.",
+          "Atuação em pipelines de CI/CD no Microsoft Azure e suporte técnico aos times de N1 e N2 na resolução de incidentes críticos em produção."
+        ]
+      },
+      "uninter": {
+        "role": "Bacharelado em Engenharia de Software",
+        "organization": "Centro Universitário Internacional Uninter",
+        "period": "2024 – Conclusão prevista: 2027",
+        "location": "Ensino Superior • Engenharia de Software",
+        "summary": "Formação acadêmica focada em arquitetura de software, engenharia de requisitos, estruturas de dados, bancos de dados, qualidade e testes de software.",
+        "achievements": [
+          "Aprofundamento em Arquitetura Limpa, Arquitetura Hexagonal, DDD, SOLID e Design Patterns aplicados a sistemas reais.",
+          "Estudo prático de complexidade de algoritmos (Big O Notation), modelagem relacional (BCNF) e sistemas distribuídos."
+        ]
+      },
+      "pcBuild": {
+        "role": "Arquitetura de Hardware & Montagem do Primeiro PC",
+        "organization": "Marco Pessoal",
+        "period": "2022",
+        "location": "Belo Horizonte, MG",
+        "summary": "Montagem completa do próprio computador com processador Xeon E5-2650v2 e GPU GTX 1660Ti, consolidando conhecimentos de arquitetura de computadores e sistemas operacionais Linux/Windows.",
+        "achievements": [
+          "Diagnóstico de hardware, otimização de sistema e transição definitiva para o desenvolvimento de software profissional."
+        ]
+      },
+      "firstCode": {
+        "role": "Início na Programação com Python",
+        "organization": "Primeiras Linhas de Código",
+        "period": "2018 (12 anos)",
+        "location": "Estudos Autodidatas",
+        "summary": "Primeiro contato prático com lógica de programação e algoritmos em Python através dos cursos do professor Gustavo Guanabara.",
+        "achievements": [
+          "Desenvolvimento dos primeiros scripts de automação e resolução de desafios de lógica."
+        ]
+      },
+      "firstContact": {
+        "role": "Primeiro Contato com Computadores",
+        "organization": "Despertar Tecnológico",
+        "period": "2014 (8 anos)",
+        "location": "Infância",
+        "summary": "Início da curiosidade sobre como jogos digitais, redes e computadores funcionam nos bastidores.",
+        "achievements": [
+          "Exploração de configurações de sistema, modificações de jogos e funcionamento da internet."
+        ]
+      }
+    }
+  },
+  "projects": {
+    "tag": "projetos",
+    "title": "Vitrine de Projetos & Engenharia",
+    "subtitle": "Estudos de caso completos de arquitetura (públicos e corporativos) + integração em tempo real com a API do GitHub",
+    "tabs": {
+      "featured": "Projetos em Destaque (Case Studies)",
+      "github": "Repositórios GitHub (Live API)"
+    },
+    "filters": {
+      "all": "Todos",
+      "fullstack": "Full Stack",
+      "backend": "Backend & Dados",
+      "frontend": "Frontend & DevTools",
+      "mobile": "Mobile",
+      "corporate": "Corporativo (CAPYS)"
+    },
+    "keyFeatures": "Destaques de Engenharia:",
+    "architectureLabel": "Arquitetura:",
+    "githubSection": {
+      "searchPlaceholder": "Buscar repositório por nome, descrição ou linguagem...",
+      "totalRepos": "{count} repositórios públicos encontrados no GitHub",
+      "stars": "estrelas",
+      "forks": "forks",
+      "updatedAt": "Atualizado em",
+      "openRepo": "Abrir no GitHub",
+      "liveDemo": "Acessar Deploy"
+    },
+    "items": {
+      "mangaReader": {
+        "title": "Manga Reader (Toonlira)",
+        "subtitle": "Plataforma Poliglota Web & Mobile para Leitura de Mangás",
+        "category": "Full Stack & Mobile",
+        "year": "2025 – 2026",
+        "status": "Em Evolução",
+        "company": "Projeto Autoral Principal",
+        "architecture": "Clean Architecture (Backend) + Feature-Sliced Design (Web & Mobile) + Persistência Poliglota",
+        "description": "Ecossistema completo de leitura e gerenciamento de mangás, manhwas e manhuas com catálogo, avaliações, comentários, fórum, grupos, assinaturas, loja e 3 microsserviços auxiliares de reconciliação e ranking.",
+        "features": [
+          "Monorepo com API principal e 3 jobs em Java + Spring Boot, frontend React + TypeScript e app mobile React Native + Expo.",
+          "Persistência poliglota utilizando PostgreSQL 17, MongoDB 8, Redis 7, Neo4j 5 e mensageria assíncrona com RabbitMQ 4.",
+          "Internacionalização completa em Português, Inglês e Espanhol tanto na web quanto no mobile e nas mensagens de domínio da API.",
+          "Suíte rigorosa de testes automatizados com JUnit 5, Mockito, Testcontainers, Vitest, Testing Library e MSW."
+        ]
+      },
+      "dbmind": {
+        "title": "DBMind",
+        "subtitle": "Auditor de Banco de Dados Assistido por IA",
+        "category": "Backend & Dados",
+        "year": "2026",
+        "status": "Concluído",
+        "company": "Projeto Autoral",
+        "architecture": "Clean Architecture + Spec-Driven Development (SDD) + FSD + TDD",
+        "description": "Plataforma inteligente para auditoria de bancos relacionais (PostgreSQL e SQL Server), análise automatizada de planos de execução, detecção de gargalos de índices e recomendações de otimização assistidas por IA.",
+        "features": [
+          "Motor em Java e Spring Boot para inspeção de metadados, planos de execução e estatísticas em PostgreSQL e SQL Server.",
+          "Processamento assíncrono de auditorias pesadas via RabbitMQ e cache de diagnósticos em Redis.",
+          "Interface analítica modular construída sob Feature-Sliced Design (FSD) com relatórios acionáveis de tuning SQL."
+        ]
+      },
+      "debugInsight": {
+        "title": "DebugInsight",
+        "subtitle": "Extensão Avançada para Chrome & Firefox DevTools",
+        "category": "Frontend & DevTools",
+        "year": "2026",
+        "status": "Concluído",
+        "company": "Projeto Autoral",
+        "architecture": "Manifest V3 Multi-Entry + Motor de Correlação + Zustand",
+        "description": "Extensão de navegador para inspeção profunda de aplicações web: captura inteligente de console, análise de rede (4xx/5xx e rotas lentas/duplicadas), árvore de localStorage, métricas Web Vitals/TTFB e correlação automática de erros.",
+        "features": [
+          "Motor de correlação automática entre logs de console, falhas de rede (fetch/XHR) e mutações de DOM/memória em tempo real.",
+          "Classificação automática de severidade de performance (TTFB, DNS, DOMContentLoaded) e gráfico dos recursos mais pesados.",
+          "Exportação completa de relatórios de diagnóstico em JSON e CSV, com suporte a 3 idiomas (PT, EN, ES)."
+        ]
+      },
+      "capysCrm": {
+        "title": "Ecossistema CRM & Apps Mobile Imobiliários",
+        "subtitle": "Portais Web, APIs, SQL Server Tuning e Apps Android/iOS",
+        "category": "Corporativo (CAPYS)",
+        "year": "2025 – Atual",
+        "status": "Em Produção",
+        "company": "CAPYS",
+        "architecture": "C# / .NET + React & TypeScript + React Native / Expo / Ionic + SQL Server + Redis + Azure CI/CD",
+        "description": "Desenvolvimento, sustentação e evolução de sistemas corporativos de missão crítica para construtoras e incorporadoras do setor imobiliário brasileiro.",
+        "features": [
+          "Otimização de procedures e consultas complexas em SQL Server reduzindo tempo de resposta por meio de análise de planos de execução e índices.",
+          "Ciclo completo de publicação e sustentação de aplicativos móveis nas lojas Google Play (Android) e App Store (iOS) com sincronização SQLite.",
+          "Implementação de integrações distribuídas via APIs REST, Webhooks, cache em Redis e deploys automatizados no Microsoft Azure."
+        ]
+      },
+      "studentManagement": {
+        "title": "Student Management Platform",
+        "subtitle": "API & Interface para Gestão Acadêmica de Alunos",
+        "category": "Full Stack",
+        "year": "2024 – 2025",
+        "status": "Concluído",
+        "company": "Projeto Acadêmico / Pessoal",
+        "architecture": "API RESTful Backend + Frontend React + TypeScript + Tailwind CSS",
+        "description": "Sistema full stack desacoplado para gerenciamento de turmas, notas, frequência e desempenho acadêmico por professores.",
+        "features": [
+          "Arquitetura separada em dois repositórios dedicados (student_management_api e student-management-ui).",
+          "Interface responsiva tipada com TypeScript e Tailwind CSS consumindo contratos REST padronizados."
+        ]
+      },
+      "translateApi": {
+        "title": "Translate API & Serverless Proxy",
+        "subtitle": "Microsserviço de Tradução Neural Offline/Online",
+        "category": "Backend & Dados",
+        "year": "2024",
+        "status": "Concluído",
+        "company": "Projeto Autoral",
+        "architecture": "Python + FastAPI + Argos Translate + Serverless Functions",
+        "description": "API de tradução automática construída com FastAPI e Argos Translate para processar traduções entre Português e Inglês sem dependência de cotas pagas externas.",
+        "features": [
+          "Endpoints de baixa latência documentados automaticamente via OpenAPI/Swagger.",
+          "Integração com proxy serverless na Netlify para alimentar aplicações frontend com segurança de CORS."
+        ]
+      }
+    }
+  },
+  "certificates": {
+    "tag": "certificados",
+    "title": "Licenças & Certificados",
+    "subtitle": "13 certificações verificadas em Engenharia de Software, Java, TypeScript, React e Arquitetura Front/Back",
+    "filterAll": "Todos ({count})",
+    "conclusionLabel": "Conclusão:",
+    "platformLabel": "Instituição:",
+    "linkedinNote": "Sincronizado com o histórico de qualificações e credenciais verificáveis do LinkedIn (linkedin.com/in/ruan-dev)."
+  },
+  "services": {
+    "tag": "especialidades",
+    "title": "Como Posso Gerar Valor",
+    "subtitle": "Soluções completas de engenharia de software do banco de dados à interface mobile/web",
+    "items": {
+      "fullstack": {
+        "title": "Desenvolvimento Web & Mobile Full Stack",
+        "description": "Construção de aplicações web modernas (React, Next.js, TypeScript) e aplicativos móveis nativos/híbridos (React Native, Expo, Ionic) publicados para Android e iOS."
+      },
+      "backend": {
+        "title": "APIs Escaláveis & Arquitetura Backend",
+        "description": "Desenvolvimento de microsserviços e monolitos modulares com Java (Spring Boot) e C# (.NET Core), autenticação segura (JWT/Keycloak), Webhooks, WebSockets e mensageria (RabbitMQ/Kafka)."
+      },
+      "database": {
+        "title": "Engenharia & Otimização de Banco de Dados",
+        "description": "Modelagem relacional em BCNF, migrações versionadas (Flyway/Mongock), cache com Redis e otimização avançada de queries, joins, índices e planos de execução em SQL Server, PostgreSQL e MongoDB."
+      },
+      "maintenance": {
+        "title": "Sustentação, Diagnóstico & CI/CD",
+        "description": "Investigação de bugs complexos em produção, refatoração de código legado aplicando Clean Code/FSD, testes automatizados (JUnit/Testcontainers/Vitest) e pipelines no Microsoft Azure e Docker."
+      }
+    }
+  },
+  "contact": {
+    "tag": "contato",
+    "title": "Vamos Conversar?",
+    "subtitle": "Disponível para discutir oportunidades, arquitetura de projetos ou conexões técnicas em Belo Horizonte ou remotamente",
+    "form": {
+      "name": "Seu Nome",
+      "namePlaceholder": "Ex.: Ana Silva",
+      "email": "Seu E-mail",
+      "emailPlaceholder": "ana@empresa.com",
+      "subject": "Assunto",
+      "subjectPlaceholder": "Oportunidade Full Stack / Projeto / Networking",
+      "message": "Mensagem",
+      "messagePlaceholder": "Conte um pouco sobre o desafio, vaga ou projeto...",
+      "submit": "Enviar Mensagem",
+      "sending": "Enviando...",
+      "success": "Mensagem preparada/enviada com sucesso! Responderei o mais rápido possível.",
+      "validationError": "Por favor, preencha todos os campos corretamente (mínimo de 10 caracteres na mensagem)."
+    },
+    "map": {
+      "badge": "Base Operacional",
+      "city": "Belo Horizonte, Minas Gerais — Brasil",
+      "workMode": "Atuação Presencial & Remota Global (UTC-3)"
+    }
+  },
+  "theme": {
+    "modeLabel": "Modo de Aparência",
+    "dark": "Dark Espacial",
+    "light": "Light Clean",
+    "accentLabel": "Cor de Destaque (Neon)",
+    "accents": {
+      "green": "Cyber Green (#00ff7f)",
+      "purple": "Quantum Purple (#a855f7)",
+      "blue": "Hyper Blue (#38bdf8)",
+      "orange": "Solar Orange (#fb923c)",
+      "red": "Crimson Laser (#f43f5e)"
+    }
+  },
+  "commandPalette": {
+    "placeholder": "Digite um comando ou busque uma seção, idioma ou tema...",
+    "empty": "Nenhum comando encontrado.",
+    "groups": {
+      "navigation": "Navegar para Seção",
+      "actions": "Ações Rápidas do Recrutador",
+      "language": "Trocar Idioma (i18n)",
+      "theme": "Trocar Cor de Destaque & Tema"
+    }
+  }
+}

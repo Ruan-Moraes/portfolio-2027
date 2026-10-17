@@ -1,0 +1,24 @@
+'use client';
+
+import { AmbientSoundbar } from '@/features/play-ambient-sound';
+import { CommandPaletteTrigger } from '@/features/open-command-palette';
+import { LanguageSwitcher } from '@/features/switch-language';
+import { ThemeQuickControls } from '@/features/switch-theme';
+import { CodeTag } from '@/shared/ui';
+
+export function TopUtilityBar() {
+  return (
+    <header className="sticky top-0 z-30 flex items-center justify-between px-4 py-3 sm:px-8 lg:pl-28">
+      <div className="flex items-center gap-3">
+        <CodeTag tag="body" />
+      </div>
+
+      <div className="flex flex-wrap items-center gap-2">
+        <AmbientSoundbar />
+        <CommandPaletteTrigger />
+        <LanguageSwitcher />
+        <ThemeQuickControls />
+      </div>
+    </header>
+  );
+}

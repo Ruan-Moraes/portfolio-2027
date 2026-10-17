@@ -1,0 +1,63 @@
+'use client';
+
+import { useEffect, useRef } from 'react';
+import { DEVELOPER_PROFILE } from '@/entities/developer-profile';
+
+export function BeloHorizonteMap() {
+  const mapContainerRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    let isCancelled = false;
+    let mapInstance: import('leaflet').Map | null = null;
+
+    async function initMap() {
+      const L = await import('leaflet');
+      if (isCancelled || !mapContainerRef.current) return;
+
+      const [lat, lng] = DEVELOPER_PROFILE.location.coordinates;
+
+      mapInstance = L.map(mapContainerRef.current, {
+        center: [lat, lng],
+        zoom: 12,
+        zoomControl: false,
+        attributionControl: false,
+      });
+
+      // CartoDB Dark Matter tile layer (matches spatial cyberpunk aesthetic)
+      L.tileLayer(
+        'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',
+        {
+          maxZoom: 18,
+        }
+      ).addTo(mapInstance);
+
+      const pulseIcon = L.divIcon({
+        className: 'custom-bh-marker',
+        html: `<div style="width:18px;height:18px;border-radius:9999px;background:var(--ui-accent, #00ff7f);box-shadow:0 0 20px 6px var(--ui-accent, #00ff7f);border:3px solid #020617;"></div>`,
+        iconSize: [18, 18],
+        iconAnchor: [9, 9],
+      });
+
+      L.marker([lat, lng], { icon: pulseIcon })
+        .addTo(mapInstance)
+        .bindPopup(
+          `<div style="font-family:monospace;font-size:12px;color:#0f172a;"><strong>${DEVELOPER_PROFILE.shortName}</strong><br/>Belo Horizonte, MG — Brasil</div>`
+        );
+    }
+
+    void initMap();
+
+    return () => {
+      isCancelled = true;
+      if (mapInstance) {
+        mapInstance.remove();
+      }
+    };
+  }, []);
+
+  return (
+    <div className="relative h-72 w-full overflow-hidden rounded-2xl border border-[var(--ui-border)] sm:h-80">
+      <div ref={mapContainerRef} className="h-full w-full bg-slate-950" />
+    </div>
+  );
+}

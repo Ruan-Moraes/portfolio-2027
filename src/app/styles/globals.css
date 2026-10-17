@@ -1,0 +1,153 @@
+@import 'tailwindcss';
+@import 'leaflet/dist/leaflet.css';
+
+:root,
+[data-theme='dark'] {
+  --ui-bg: #030712;
+  --ui-surface: #0b1120;
+  --ui-surface-elevated: #111827;
+  --ui-border: rgba(148, 163, 184, 0.16);
+  --ui-text-primary: #f8fafc;
+  --ui-text-secondary: #cbd5e1;
+  --ui-text-muted: #64748b;
+  --ui-accent: #00ff7f;
+  --ui-accent-secondary: #10b981;
+  --ui-accent-glow: rgba(0, 255, 127, 0.28);
+}
+
+[data-theme='light'] {
+  --ui-bg: #f8fafc;
+  --ui-surface: #ffffff;
+  --ui-surface-elevated: #f1f5f9;
+  --ui-border: rgba(15, 23, 42, 0.12);
+  --ui-text-primary: #0f172a;
+  --ui-text-secondary: #334155;
+  --ui-text-muted: #64748b;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: var(--ui-bg);
+  color: var(--ui-text-primary);
+  font-family: var(--font-sans), system-ui, -apple-system, sans-serif;
+  overflow-x: hidden;
+}
+
+.font-script {
+  font-family: var(--font-script), cursive;
+}
+
+/* Rubber-band letter animation (metal-oopa homage) */
+@keyframes rubberBand {
+  0% {
+    transform: scale3d(1, 1, 1);
+  }
+  30% {
+    transform: scale3d(1.25, 0.75, 1);
+  }
+  40% {
+    transform: scale3d(0.75, 1.25, 1);
+  }
+  50% {
+    transform: scale3d(1.15, 0.85, 1);
+  }
+  65% {
+    transform: scale3d(0.95, 1.05, 1);
+  }
+  75% {
+    transform: scale3d(1.05, 0.95, 1);
+  }
+  100% {
+    transform: scale3d(1, 1, 1);
+  }
+}
+
+.animate-rubber-band {
+  animation: rubberBand 0.85s both;
+}
+
+/* Soundbar wave animation */
+@keyframes soundWave {
+  0%,
+  100% {
+    transform: scaleY(0.35);
+  }
+  50% {
+    transform: scaleY(1);
+  }
+}
+
+.animate-sound-wave {
+  animation: soundWave 0.9s ease-in-out infinite;
+  transform-origin: bottom;
+}
+
+/* 3D Rotating Tech Cube (metal-oopa cubespinner evolution) */
+.cube-scene {
+  perspective: 900px;
+}
+
+.cube-spinner {
+  position: relative;
+  width: 200px;
+  height: 200px;
+  margin: 0 auto;
+  transform-style: preserve-3d;
+  transform-origin: 100px 100px 0;
+  animation: spinCube3D 16s ease-in-out infinite;
+}
+
+.cube-spinner:hover {
+  animation-play-state: paused;
+}
+
+.cube-face {
+  position: absolute;
+  width: 200px;
+  height: 200px;
+  backface-visibility: visible;
+}
+
+.cube-face-1 {
+  transform: translateZ(100px);
+}
+.cube-face-2 {
+  transform: rotateY(90deg) translateZ(100px);
+}
+.cube-face-3 {
+  transform: rotateY(90deg) rotateX(90deg) translateZ(100px);
+}
+.cube-face-4 {
+  transform: rotateY(180deg) rotateZ(90deg) translateZ(100px);
+}
+.cube-face-5 {
+  transform: rotateY(-90deg) rotateZ(90deg) translateZ(100px);
+}
+.cube-face-6 {
+  transform: rotateX(-90deg) translateZ(100px);
+}
+
+@keyframes spinCube3D {
+  0%,
+  100% {
+    transform: rotateX(0deg) rotateY(0deg) rotateZ(0deg);
+  }
+  16% {
+    transform: rotateY(-90deg);
+  }
+  33% {
+    transform: rotateY(-90deg) rotateZ(90deg);
+  }
+  50% {
+    transform: rotateY(-180deg) rotateZ(90deg);
+  }
+  66% {
+    transform: rotateY(-270deg) rotateX(90deg);
+  }
+  83% {
+    transform: rotateX(90deg);
+  }
+}
