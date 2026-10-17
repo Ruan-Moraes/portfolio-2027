@@ -1,7 +1,15 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
-import * as THREE from 'three';
+import {
+  AmbientLight,
+  DirectionalLight,
+  Mesh,
+  type MeshLambertMaterial,
+  PerspectiveCamera,
+  Scene,
+  WebGLRenderer,
+} from 'three';
 import { RoundedBoxGeometry } from 'three/examples/jsm/geometries/RoundedBoxGeometry.js';
 import { useElementVisibility } from '@/shared/lib';
 import {
@@ -35,11 +43,11 @@ export function TechCube3D() {
     const height = 300;
 
     // 1. WebGL Scene & Camera
-    const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(36, width / height, 0.1, 100);
+    const scene = new Scene();
+    const camera = new PerspectiveCamera(36, width / height, 0.1, 100);
     camera.position.set(0, 0, 5.4);
 
-    const renderer = new THREE.WebGLRenderer({
+    const renderer = new WebGLRenderer({
       antialias: true,
       alpha: true,
       powerPreference: 'high-performance',
@@ -55,8 +63,8 @@ export function TechCube3D() {
       document.documentElement.getAttribute('data-theme') === 'light';
 
     const materialCache: {
-      dark: THREE.MeshLambertMaterial[] | null;
-      light: THREE.MeshLambertMaterial[] | null;
+      dark: MeshLambertMaterial[] | null;
+      light: MeshLambertMaterial[] | null;
     } = {
       dark: isInitialLight ? null : buildCubeMaterials(sharedBumpMap, false),
       light: isInitialLight ? buildCubeMaterials(sharedBumpMap, true) : null,
@@ -72,7 +80,7 @@ export function TechCube3D() {
 
     // 2. True 3D RoundedBoxGeometry
     const geometry = new RoundedBoxGeometry(2.15, 2.15, 2.15, 8, 0.26);
-    const cubeMesh = new THREE.Mesh(
+    const cubeMesh = new Mesh(
       geometry,
       getOrCreateMaterials(isInitialLight)
     );
@@ -80,20 +88,20 @@ export function TechCube3D() {
     scene.add(cubeMesh);
 
     // 3. Balanced 3-point matte lighting adapted to theme
-    const ambientLight = new THREE.AmbientLight(
+    const ambientLight = new AmbientLight(
       0xffffff,
       isInitialLight ? 2.25 : 1.05
     );
     scene.add(ambientLight);
 
-    const keyLight = new THREE.DirectionalLight(
+    const keyLight = new DirectionalLight(
       0xffffff,
       isInitialLight ? 1.25 : 1.65
     );
     keyLight.position.set(4, 6, 5);
     scene.add(keyLight);
 
-    const fillLight = new THREE.DirectionalLight(
+    const fillLight = new DirectionalLight(
       0x94a3b8,
       isInitialLight ? 0.75 : 0.55
     );

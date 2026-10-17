@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { memo, useState } from 'react';
 import { Briefcase, CheckCircle2, GraduationCap, Rocket } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import {
@@ -23,6 +23,89 @@ const CAREER_BY_TYPE: Record<'all' | CareerEntryType, CareerEntryMetadata[]> = {
   education: CAREER_ENTRIES.filter((entry) => entry.type === 'education'),
   milestone: CAREER_ENTRIES.filter((entry) => entry.type === 'milestone'),
 };
+
+const CareerTimelineCard = memo(function CareerTimelineCardComponent({
+  entry,
+}: {
+  entry: CareerEntryMetadata;
+}) {
+  const t = useTranslations('career');
+  const Icon = TYPE_ICONS[entry.type];
+  const achievements = t.raw(`entries.${entry.id}.achievements`) as string[];
+
+  return (
+    <div className="relative pl-14 sm:pl-16">
+      {/* Timeline Node Icon */}
+      <div
+        className={cn(
+          'absolute top-6 left-0 z-10 flex h-10 w-10 items-center justify-center overflow-hidden rounded-2xl border bg-[var(--ui-surface)] sm:h-12 sm:w-12',
+          entry.isCurrent
+            ? 'border-[var(--ui-accent)] text-[var(--ui-accent)] shadow-[0_0_20px_-4px_var(--ui-accent-glow)]'
+            : 'border-[var(--ui-border)] text-[var(--ui-text-secondary)]'
+        )}
+      >
+        <div
+          className={cn(
+            'flex h-full w-full items-center justify-center',
+            entry.isCurrent && 'bg-[var(--ui-accent)]/15'
+          )}
+        >
+          <Icon className="h-5 w-5" />
+        </div>
+      </div>
+
+      <GlassCard interactive className="p-6 sm:p-8">
+        <div className="flex flex-wrap items-start justify-between gap-3">
+          <div>
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="font-mono text-xs font-bold text-[var(--ui-accent)]">
+                {t(`entries.${entry.id}.period`)}
+              </span>
+              {entry.isCurrent && (
+                <Badge variant="accent">{t('currentBadge')}</Badge>
+              )}
+            </div>
+            <h3 className="mt-1 text-xl font-bold text-[var(--ui-text-primary)] sm:text-2xl">
+              {t(`entries.${entry.id}.role`)}
+            </h3>
+            <p className="text-sm font-semibold text-[var(--ui-text-secondary)]">
+              {t(`entries.${entry.id}.organization`)} •{' '}
+              <span className="font-normal text-[var(--ui-text-muted)]">
+                {t(`entries.${entry.id}.location`)}
+              </span>
+            </p>
+          </div>
+        </div>
+
+        <p className="mt-4 text-sm leading-relaxed text-[var(--ui-text-secondary)] sm:text-base">
+          {t(`entries.${entry.id}.summary`)}
+        </p>
+
+        {Array.isArray(achievements) && achievements.length > 0 && (
+          <ul className="mt-4 space-y-2">
+            {achievements.map((item, idx) => (
+              <li
+                key={idx}
+                className="flex items-start gap-2.5 text-xs leading-relaxed text-[var(--ui-text-secondary)] sm:text-sm"
+              >
+                <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-[var(--ui-accent)]" />
+                <span>{item}</span>
+              </li>
+            ))}
+          </ul>
+        )}
+
+        <div className="mt-5 flex flex-wrap gap-1.5 border-t border-[var(--ui-border)] pt-4">
+          {entry.technologies.map((tech) => (
+            <Badge key={tech} variant="default">
+              {tech}
+            </Badge>
+          ))}
+        </div>
+      </GlassCard>
+    </div>
+  );
+});
 
 export function CareerTimeline() {
   const t = useTranslations('career');
@@ -69,84 +152,11 @@ export function CareerTimeline() {
 
       {/* Vertical Timeline */}
       <div className="relative space-y-6 before:absolute before:top-4 before:bottom-4 before:left-5 before:z-0 before:w-px before:bg-gradient-to-b before:from-[var(--ui-accent)] before:via-[var(--ui-border)] before:to-transparent sm:before:left-6">
-        {filteredEntries.map((entry) => {
-          const Icon = TYPE_ICONS[entry.type];
-          const achievements = t.raw(`entries.${entry.id}.achievements`) as string[];
-
-          return (
-            <div key={entry.id} className="relative pl-14 sm:pl-16">
-              {/* Timeline Node Icon */}
-              <div
-                className={cn(
-                  'absolute top-6 left-0 z-10 flex h-10 w-10 items-center justify-center overflow-hidden rounded-2xl border bg-[var(--ui-surface)] sm:h-12 sm:w-12',
-                  entry.isCurrent
-                    ? 'border-[var(--ui-accent)] text-[var(--ui-accent)] shadow-[0_0_20px_-4px_var(--ui-accent-glow)]'
-                    : 'border-[var(--ui-border)] text-[var(--ui-text-secondary)]'
-                )}
-              >
-                <div
-                  className={cn(
-                    'flex h-full w-full items-center justify-center',
-                    entry.isCurrent && 'bg-[var(--ui-accent)]/15'
-                  )}
-                >
-                  <Icon className="h-5 w-5" />
-                </div>
-              </div>
-
-              <GlassCard interactive className="p-6 sm:p-8">
-                <div className="flex flex-wrap items-start justify-between gap-3">
-                  <div>
-                    <div className="flex flex-wrap items-center gap-2">
-                      <span className="font-mono text-xs font-bold text-[var(--ui-accent)]">
-                        {t(`entries.${entry.id}.period`)}
-                      </span>
-                      {entry.isCurrent && (
-                        <Badge variant="accent">{t('currentBadge')}</Badge>
-                      )}
-                    </div>
-                    <h3 className="mt-1 text-xl font-bold text-[var(--ui-text-primary)] sm:text-2xl">
-                      {t(`entries.${entry.id}.role`)}
-                    </h3>
-                    <p className="text-sm font-semibold text-[var(--ui-text-secondary)]">
-                      {t(`entries.${entry.id}.organization`)} •{' '}
-                      <span className="font-normal text-[var(--ui-text-muted)]">
-                        {t(`entries.${entry.id}.location`)}
-                      </span>
-                    </p>
-                  </div>
-                </div>
-
-                <p className="mt-4 text-sm leading-relaxed text-[var(--ui-text-secondary)] sm:text-base">
-                  {t(`entries.${entry.id}.summary`)}
-                </p>
-
-                {Array.isArray(achievements) && achievements.length > 0 && (
-                  <ul className="mt-4 space-y-2">
-                    {achievements.map((item, idx) => (
-                      <li
-                        key={idx}
-                        className="flex items-start gap-2.5 text-xs leading-relaxed text-[var(--ui-text-secondary)] sm:text-sm"
-                      >
-                        <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-[var(--ui-accent)]" />
-                        <span>{item}</span>
-                      </li>
-                    ))}
-                  </ul>
-                )}
-
-                <div className="mt-5 flex flex-wrap gap-1.5 border-t border-[var(--ui-border)] pt-4">
-                  {entry.technologies.map((tech) => (
-                    <Badge key={tech} variant="default">
-                      {tech}
-                    </Badge>
-                  ))}
-                </div>
-              </GlassCard>
-            </div>
-          );
-        })}
+        {filteredEntries.map((entry) => (
+          <CareerTimelineCard key={entry.id} entry={entry} />
+        ))}
       </div>
     </section>
   );
 }
+

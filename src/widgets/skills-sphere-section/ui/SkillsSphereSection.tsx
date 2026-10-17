@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { memo, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import {
   SKILLS_DATA,
@@ -20,6 +20,38 @@ const SKILLS_BY_CATEGORY: Record<SkillCategoryKey, SkillItem[]> =
     },
     {} as Record<SkillCategoryKey, SkillItem[]>
   );
+
+const SkillCategoryCard = memo(function SkillCategoryCardComponent({
+  categoryLabel,
+  skills,
+}: {
+  categoryLabel: string;
+  skills: SkillItem[];
+}) {
+  return (
+    <GlassCard interactive className="p-5">
+      <div className="mb-3 flex items-center justify-between">
+        <h3 className="font-mono text-xs font-bold tracking-wider text-[var(--ui-accent)] uppercase">
+          {categoryLabel}
+        </h3>
+        <span className="font-mono text-xs text-[var(--ui-text-muted)]">
+          {skills.length}
+        </span>
+      </div>
+
+      <div className="flex flex-wrap gap-1.5">
+        {skills.map((skill) => (
+          <Badge
+            key={skill.name}
+            variant={skill.highlight ? 'accent' : 'default'}
+          >
+            {skill.name}
+          </Badge>
+        ))}
+      </div>
+    </GlassCard>
+  );
+});
 
 export function SkillsSphereSection() {
   const t = useTranslations('skills');
@@ -86,35 +118,16 @@ export function SkillsSphereSection() {
 
         {/* Categorized Resume Matrix */}
         <div className="grid gap-4 sm:grid-cols-2 lg:col-span-7">
-          {visibleCategories.map((category) => {
-            const categorySkills = SKILLS_BY_CATEGORY[category];
-
-            return (
-              <GlassCard key={category} interactive className="p-5">
-                <div className="mb-3 flex items-center justify-between">
-                  <h3 className="font-mono text-xs font-bold tracking-wider text-[var(--ui-accent)] uppercase">
-                    {t(`categories.${category}`)}
-                  </h3>
-                  <span className="font-mono text-xs text-[var(--ui-text-muted)]">
-                    {categorySkills.length}
-                  </span>
-                </div>
-
-                <div className="flex flex-wrap gap-1.5">
-                  {categorySkills.map((skill) => (
-                    <Badge
-                      key={skill.name}
-                      variant={skill.highlight ? 'accent' : 'default'}
-                    >
-                      {skill.name}
-                    </Badge>
-                  ))}
-                </div>
-              </GlassCard>
-            );
-          })}
+          {visibleCategories.map((category) => (
+            <SkillCategoryCard
+              key={category}
+              categoryLabel={t(`categories.${category}`)}
+              skills={SKILLS_BY_CATEGORY[category]}
+            />
+          ))}
         </div>
       </div>
     </section>
   );
 }
+

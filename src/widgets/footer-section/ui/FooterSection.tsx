@@ -1,17 +1,19 @@
 'use client';
 
+import { memo } from 'react';
 import { useTranslations } from 'next-intl';
 import { DEVELOPER_PROFILE } from '@/entities/developer-profile';
 
-export function FooterSection() {
+const CURRENT_YEAR = new Date().getFullYear();
+
+function FooterSectionComponent() {
   const tCommon = useTranslations('common');
 
   return (
     <footer className="mt-12 border-t border-[var(--ui-border)] py-10 pb-24 lg:pb-10">
-
       <div className="flex flex-col items-start justify-between gap-4 text-xs text-[var(--ui-text-muted)] sm:flex-row sm:items-center">
         <p className="font-mono">
-          © {new Date().getFullYear()} {DEVELOPER_PROFILE.fullName} •{' '}
+          © {CURRENT_YEAR} {DEVELOPER_PROFILE.fullName} •{' '}
           <span className="text-[var(--ui-accent)]">
             {tCommon('portfolio')}
           </span>
@@ -34,3 +36,6 @@ export function FooterSection() {
     </footer>
   );
 }
+
+export const FooterSection = memo(FooterSectionComponent);
+

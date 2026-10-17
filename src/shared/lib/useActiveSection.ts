@@ -2,6 +2,10 @@
 
 import { useEffect, useState } from 'react';
 
+/**
+ * Tracks the currently active section in the viewport using a single
+ * IntersectionObserver (zero scroll listeners and zero offsetTop layout reflows).
+ */
 export function useActiveSection<T extends string>(
   sectionIds: readonly T[],
   defaultSection: T
@@ -9,55 +13,53 @@ export function useActiveSection<T extends string>(
   const [activeSection, setActiveSection] = useState<T>(defaultSection);
 
   useEffect(() => {
-    let rafId = 0;
-    let ticking = false;
-    let elementsCache: Array<{ id: T; el: HTMLElement }> = [];
+    if (
+      typeof document === 'undefined' ||
+      typeof IntersectionObserver === 'undefined'
+    ) {
+      return;
+    }
 
-    const refreshElements = () => {
-      elementsCache = [];
-      for (let i = 0; i < sectionIds.length; i += 1) {
-        const id = sectionIds[i];
-        const el = document.getElementById(id);
-        if (el) {
-          elementsCache.push({ id, el });
+    const visibleSections = new Map<T, number>();
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (let i = 0; i < entries.length; i += 1) {
+          const entry = entries[i];
+          const id = entry.target.id as T;
+          if (entry.isIntersecting) {
+            visibleSections.set(id, entry.intersectionRatio);
+          } else {
+            visibleSections.delete(id);
+          }
         }
-      }
-    };
 
-    const updateActiveSection = () => {
-      ticking = false;
-      if (elementsCache.length !== sectionIds.length) {
-        refreshElements();
-      }
-
-      const scrollPosition = window.scrollY + window.innerHeight * 0.32;
-
-      for (let i = elementsCache.length - 1; i >= 0; i -= 1) {
-        const { id, el } = elementsCache[i];
-        if (el.offsetTop <= scrollPosition) {
-          setActiveSection((prev) => (prev === id ? prev : id));
-          break;
+        // Pick the last section in document order that is currently in the active viewport band
+        for (let i = sectionIds.length - 1; i >= 0; i -= 1) {
+          const candidate = sectionIds[i];
+          if (visibleSections.has(candidate)) {
+            setActiveSection((prev) => (prev === candidate ? prev : candidate));
+            return;
+          }
         }
+      },
+      {
+        // Active detection band: top 32% to bottom 45% of the viewport
+        rootMargin: '-28% 0px -55% 0px',
+        threshold: [0, 0.25],
       }
-    };
+    );
 
-    const handleScroll = () => {
-      if (!ticking) {
-        ticking = true;
-        rafId = window.requestAnimationFrame(updateActiveSection);
+    for (let i = 0; i < sectionIds.length; i += 1) {
+      const el = document.getElementById(sectionIds[i]);
+      if (el) {
+        observer.observe(el);
       }
-    };
+    }
 
-    refreshElements();
-    updateActiveSection();
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => {
-      window.removeEventListener('scroll', handleScroll);
-      if (rafId) {
-        window.cancelAnimationFrame(rafId);
-      }
-    };
+    return () => observer.disconnect();
   }, [sectionIds]);
 
   return activeSection;
 }
+

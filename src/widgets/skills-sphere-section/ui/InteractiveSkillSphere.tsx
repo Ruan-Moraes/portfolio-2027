@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useRef } from 'react';
+import { memo, useEffect, useRef } from 'react';
 import { SKILLS_DATA, type SkillCategoryKey } from '@/entities/skill';
 import { cn, useElementVisibility } from '@/shared/lib';
 
@@ -18,8 +18,26 @@ interface InteractiveSkillSphereProps {
 }
 
 const RADIUS_PX = 138;
+const FRAME_INTERVAL_MS = 1000 / 40; // 40 FPS pacing eliminates 120Hz style mutation overhead
 
-export function InteractiveSkillSphere({
+// Pre-compute 3D Fibonacci Sphere coordinates once at module load
+const GOLDEN_ANGLE = Math.PI * (3 - Math.sqrt(5));
+const BASE_SPHERE_POINTS: readonly SpherePoint[] = SKILLS_DATA.map(
+  (skill, index) => {
+    const count = SKILLS_DATA.length;
+    const y = 1 - (index / (count - 1)) * 2;
+    const radiusAtY = Math.sqrt(1 - y * y);
+    const theta = GOLDEN_ANGLE * index;
+    return {
+      ...skill,
+      x: Math.cos(theta) * radiusAtY,
+      y,
+      z: Math.sin(theta) * radiusAtY,
+    };
+  }
+);
+
+function InteractiveSkillSphereComponent({
   selectedCategory,
 }: InteractiveSkillSphereProps) {
   const containerRef = useRef<HTMLDivElement | null>(null);
@@ -30,29 +48,8 @@ export function InteractiveSkillSphere({
   const speedRef = useRef({ vx: 0.0045, vy: 0.0065 });
   const resumeLoopRef = useRef<(() => void) | null>(null);
 
-  // Distribute skills evenly on a 3D Fibonacci Sphere once
-  const basePoints = useMemo<SpherePoint[]>(() => {
-    const count = SKILLS_DATA.length;
-    const goldenAngle = Math.PI * (3 - Math.sqrt(5));
-
-    return SKILLS_DATA.map((skill, index) => {
-      const y = 1 - (index / (count - 1)) * 2;
-      const radiusAtY = Math.sqrt(1 - y * y);
-      const theta = goldenAngle * index;
-      const x = Math.cos(theta) * radiusAtY;
-      const z = Math.sin(theta) * radiusAtY;
-
-      return {
-        ...skill,
-        x,
-        y,
-        z,
-      };
-    });
-  }, []);
-
   const pointsRef = useRef<SpherePoint[]>(
-    basePoints.map((pt) => ({ ...pt }))
+    BASE_SPHERE_POINTS.map((pt) => ({ ...pt }))
   );
 
   // Synchronize category filter and visibility without triggering 60fps React re-renders
@@ -66,7 +63,9 @@ export function InteractiveSkillSphere({
       const baseOpacity = Math.max(0.22, Math.min(1, (point.z + 1.35) / 2.1));
       const isMatched =
         selectedCategory === 'all' || point.category === selectedCategory;
-      el.style.opacity = (isMatched ? baseOpacity : baseOpacity * 0.25).toFixed(3);
+      el.style.opacity = (isMatched ? baseOpacity : baseOpacity * 0.25).toFixed(
+        2
+      );
     }
   }, [selectedCategory]);
 
@@ -80,48 +79,59 @@ export function InteractiveSkillSphere({
   useEffect(() => {
     let frameId = 0;
     let isRunning = false;
+    let lastFrameTime = 0;
     const pts = pointsRef.current;
+    const lastZIndices = new Int16Array(pts.length);
 
-    const animate = () => {
+    const animate = (timestamp: number) => {
       if (!isVisibleRef.current) {
         isRunning = false;
         return;
       }
 
-      const { vx, vy } = speedRef.current;
-      const cosX = Math.cos(vx);
-      const sinX = Math.sin(vx);
-      const cosY = Math.cos(vy);
-      const sinY = Math.sin(vy);
-      const activeCat = selectedCategoryRef.current;
+      if (timestamp - lastFrameTime >= FRAME_INTERVAL_MS) {
+        lastFrameTime = timestamp;
 
-      for (let i = 0; i < pts.length; i += 1) {
-        const pt = pts[i];
-        // Rotate around X
-        const y1 = pt.y * cosX - pt.z * sinX;
-        const z1 = pt.y * sinX + pt.z * cosX;
-        // Rotate around Y
-        const x2 = pt.x * cosY + z1 * sinY;
-        const z2 = -pt.x * sinY + z1 * cosY;
+        const { vx, vy } = speedRef.current;
+        const cosX = Math.cos(vx);
+        const sinX = Math.sin(vx);
+        const cosY = Math.cos(vy);
+        const sinY = Math.sin(vy);
+        const activeCat = selectedCategoryRef.current;
 
-        pt.x = x2;
-        pt.y = y1;
-        pt.z = z2;
+        for (let i = 0; i < pts.length; i += 1) {
+          const pt = pts[i];
+          // Rotate around X
+          const y1 = pt.y * cosX - pt.z * sinX;
+          const z1 = pt.y * sinX + pt.z * cosX;
+          // Rotate around Y
+          const x2 = pt.x * cosY + z1 * sinY;
+          const z2 = -pt.x * sinY + z1 * cosY;
 
-        const el = itemRefs.current[i];
-        if (!el) continue;
+          pt.x = x2;
+          pt.y = y1;
+          pt.z = z2;
 
-        const scale = (z2 + 2) / 3;
-        const baseOpacity = Math.max(0.22, Math.min(1, (z2 + 1.35) / 2.1));
-        const isMatched = activeCat === 'all' || pt.category === activeCat;
+          const el = itemRefs.current[i];
+          if (!el) continue;
 
-        el.style.transform = `translate3d(${(x2 * RADIUS_PX).toFixed(1)}px, ${(
-          y1 * RADIUS_PX
-        ).toFixed(1)}px, 0) scale(${scale.toFixed(2)})`;
-        el.style.opacity = (
-          isMatched ? baseOpacity : baseOpacity * 0.25
-        ).toFixed(3);
-        el.style.zIndex = String(Math.round(scale * 100));
+          const scale = (z2 + 2) / 3;
+          const baseOpacity = Math.max(0.22, Math.min(1, (z2 + 1.35) / 2.1));
+          const isMatched = activeCat === 'all' || pt.category === activeCat;
+
+          el.style.transform = `translate3d(${(x2 * RADIUS_PX).toFixed(1)}px, ${(
+            y1 * RADIUS_PX
+          ).toFixed(1)}px, 0) scale(${scale.toFixed(2)})`;
+          el.style.opacity = (
+            isMatched ? baseOpacity : baseOpacity * 0.25
+          ).toFixed(2);
+
+          const nextZ = Math.round(scale * 100);
+          if (lastZIndices[i] !== nextZ) {
+            lastZIndices[i] = nextZ;
+            el.style.zIndex = String(nextZ);
+          }
+        }
       }
 
       frameId = window.requestAnimationFrame(animate);
@@ -187,7 +197,7 @@ export function InteractiveSkillSphere({
       />
 
       <div className="relative h-0 w-0">
-        {basePoints.map((point, index) => {
+        {BASE_SPHERE_POINTS.map((point, index) => {
           const scale = (point.z + 2) / 3;
           const opacity = Math.max(0.22, Math.min(1, (point.z + 1.35) / 2.1));
           const isMatchedCategory =
@@ -204,7 +214,7 @@ export function InteractiveSkillSphere({
                   point.y * RADIUS_PX
                 ).toFixed(1)}px, 0) scale(${scale.toFixed(2)})`,
                 opacity: Number(
-                  (isMatchedCategory ? opacity : opacity * 0.25).toFixed(3)
+                  (isMatchedCategory ? opacity : opacity * 0.25).toFixed(2)
                 ),
                 zIndex: Math.round(scale * 100),
               }}
@@ -223,3 +233,6 @@ export function InteractiveSkillSphere({
     </div>
   );
 }
+
+export const InteractiveSkillSphere = memo(InteractiveSkillSphereComponent);
+

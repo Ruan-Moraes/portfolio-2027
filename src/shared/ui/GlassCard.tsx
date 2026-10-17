@@ -1,4 +1,4 @@
-import type { HTMLAttributes, ReactNode } from 'react';
+import { memo, type HTMLAttributes, type ReactNode } from 'react';
 import { cn } from '@/shared/lib';
 
 interface GlassCardProps extends HTMLAttributes<HTMLDivElement> {
@@ -7,7 +7,7 @@ interface GlassCardProps extends HTMLAttributes<HTMLDivElement> {
   glow?: boolean;
 }
 
-export function GlassCard({
+function GlassCardComponent({
   children,
   className,
   interactive = false,
@@ -29,3 +29,6 @@ export function GlassCard({
     </div>
   );
 }
+
+export const GlassCard = memo(GlassCardComponent);
+

@@ -1,4 +1,4 @@
-import type { ButtonHTMLAttributes, ReactNode } from 'react';
+import { memo, type ButtonHTMLAttributes, type ReactNode } from 'react';
 import { cn } from '@/shared/lib';
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
@@ -7,7 +7,7 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   size?: 'sm' | 'md' | 'lg';
 }
 
-export function Button({
+function ButtonComponent({
   children,
   className,
   variant = 'primary',
@@ -37,3 +37,6 @@ export function Button({
     </button>
   );
 }
+
+export const Button = memo(ButtonComponent);
+

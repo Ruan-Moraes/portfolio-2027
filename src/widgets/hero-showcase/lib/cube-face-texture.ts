@@ -1,4 +1,8 @@
-import * as THREE from 'three';
+import {
+  CanvasTexture,
+  MeshLambertMaterial,
+  SRGBColorSpace,
+} from 'three';
 import { CUBE_FACES_TECH } from '@/entities/skill';
 import { drawCornerRoots } from './cube-root-traces';
 
@@ -9,7 +13,7 @@ const FRAME_RADIUS = 62;
 /**
  * Creates a shared procedural micro-texture bump map clipped strictly inside the face border.
  */
-export function createCubeBumpTexture(): THREE.CanvasTexture {
+export function createCubeBumpTexture(): CanvasTexture {
   const bumpCanvas = document.createElement('canvas');
   bumpCanvas.width = TEX_SIZE;
   bumpCanvas.height = TEX_SIZE;
@@ -42,7 +46,7 @@ export function createCubeBumpTexture(): THREE.CanvasTexture {
     bCtx.restore();
   }
 
-  const bumpTex = new THREE.CanvasTexture(bumpCanvas);
+  const bumpTex = new CanvasTexture(bumpCanvas);
   bumpTex.anisotropy = 4;
   return bumpTex;
 }
@@ -51,9 +55,9 @@ export function createCubeBumpTexture(): THREE.CanvasTexture {
  * Builds the 6 Lambert materials for the 3D technology cube adapted to the active theme mode.
  */
 export function buildCubeMaterials(
-  sharedBumpMap: THREE.CanvasTexture,
+  sharedBumpMap: CanvasTexture,
   isLight: boolean
-): THREE.MeshLambertMaterial[] {
+): MeshLambertMaterial[] {
   const frameSize = TEX_SIZE - FRAME_PAD * 2;
 
   return CUBE_FACES_TECH.map((item, faceIdx) => {
@@ -257,14 +261,15 @@ export function buildCubeMaterials(
       ctx.fillText(item.subtitle, TEX_SIZE / 2, TEX_SIZE / 2 + 106);
     }
 
-    const texture = new THREE.CanvasTexture(canvas);
-    texture.colorSpace = THREE.SRGBColorSpace;
+    const texture = new CanvasTexture(canvas);
+    texture.colorSpace = SRGBColorSpace;
     texture.anisotropy = 4;
 
-    return new THREE.MeshLambertMaterial({
+    return new MeshLambertMaterial({
       map: texture,
       bumpMap: sharedBumpMap,
       bumpScale: isLight ? 0.003 : 0.008,
     });
   });
 }
+

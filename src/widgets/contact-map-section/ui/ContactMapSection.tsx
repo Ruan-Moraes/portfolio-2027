@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { memo, useEffect, useRef, useState } from 'react';
 import dynamic from 'next/dynamic';
 import {
   Check,
@@ -26,9 +26,13 @@ const BeloHorizonteMap = dynamic(
   }
 );
 
-export function ContactMapSection() {
-  const t = useTranslations('contact');
-  const tCommon = useTranslations('common');
+const CopyEmailButton = memo(function CopyEmailButtonComponent({
+  copiedLabel,
+  copyEmailLabel,
+}: {
+  copiedLabel: string;
+  copyEmailLabel: string;
+}) {
   const [copiedEmail, setCopiedEmail] = useState(false);
   const copyTimerRef = useRef<number | null>(null);
 
@@ -55,6 +59,33 @@ export function ContactMapSection() {
       // Ignore clipboard failure
     }
   };
+
+  return (
+    <button
+      type="button"
+      onClick={handleCopyEmail}
+      title={copiedEmail ? copiedLabel : copyEmailLabel}
+      aria-label={copiedEmail ? copiedLabel : copyEmailLabel}
+      className="group flex h-12 w-full cursor-pointer items-center justify-between gap-3 rounded-xl border border-[var(--ui-border)] bg-[var(--ui-surface-elevated)]/60 px-3.5 text-left transition-colors hover:border-[var(--ui-accent)]"
+    >
+      <div className="flex min-w-0 items-center gap-2.5">
+        <Mail className="h-4 w-4 shrink-0 text-[var(--ui-accent)]" />
+        <span className="truncate font-mono text-xs font-semibold text-[var(--ui-text-primary)] transition-colors group-hover:text-[var(--ui-accent)]">
+          {copiedEmail ? copiedLabel : DEVELOPER_PROFILE.email}
+        </span>
+      </div>
+      {copiedEmail ? (
+        <Check className="h-4 w-4 shrink-0 text-[var(--ui-accent)]" />
+      ) : (
+        <Copy className="h-3.5 w-3.5 shrink-0 text-[var(--ui-accent)] transition-transform group-hover:scale-110" />
+      )}
+    </button>
+  );
+});
+
+export function ContactMapSection() {
+  const t = useTranslations('contact');
+  const tCommon = useTranslations('common');
 
   return (
     <section id="contact" className="scroll-mt-20 py-20">
@@ -92,25 +123,10 @@ export function ContactMapSection() {
 
           <GlassCard className="space-y-2.5 p-5">
             {/* Top Bar: Full-width clickable Email Copy Button */}
-            <button
-              type="button"
-              onClick={handleCopyEmail}
-              title={copiedEmail ? tCommon('copied') : tCommon('copyEmail')}
-              aria-label={copiedEmail ? tCommon('copied') : tCommon('copyEmail')}
-              className="group flex h-12 w-full cursor-pointer items-center justify-between gap-3 rounded-xl border border-[var(--ui-border)] bg-[var(--ui-surface-elevated)]/60 px-3.5 text-left transition-colors hover:border-[var(--ui-accent)]"
-            >
-              <div className="flex min-w-0 items-center gap-2.5">
-                <Mail className="h-4 w-4 shrink-0 text-[var(--ui-accent)]" />
-                <span className="truncate font-mono text-xs font-semibold text-[var(--ui-text-primary)] transition-colors group-hover:text-[var(--ui-accent)]">
-                  {copiedEmail ? tCommon('copied') : DEVELOPER_PROFILE.email}
-                </span>
-              </div>
-              {copiedEmail ? (
-                <Check className="h-4 w-4 shrink-0 text-[var(--ui-accent)]" />
-              ) : (
-                <Copy className="h-3.5 w-3.5 shrink-0 text-[var(--ui-accent)] transition-transform group-hover:scale-110" />
-              )}
-            </button>
+            <CopyEmailButton
+              copiedLabel={tCommon('copied')}
+              copyEmailLabel={tCommon('copyEmail')}
+            />
 
             {/* Two-Column Standardized Channels: Left (WhatsApp + Phone) | Right (LinkedIn + GitHub) */}
             <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2">
