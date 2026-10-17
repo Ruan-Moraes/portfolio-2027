@@ -21,7 +21,7 @@ export function Button({
       className={cn(
         'inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl font-medium transition-all duration-200 focus-visible:ring-2 focus-visible:ring-[var(--ui-accent)] focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50',
         variant === 'primary' &&
-          'border border-transparent bg-[var(--ui-accent)] text-slate-950 shadow-[0_0_24px_-4px_var(--ui-accent-glow)] hover:brightness-110',
+          'border border-transparent bg-[var(--ui-accent)] text-white drop-shadow-[0_1px_1px_rgba(0,0,0,0.35)] shadow-[0_0_24px_-4px_var(--ui-accent-glow)] hover:brightness-110',
         variant === 'secondary' &&
           'border border-[var(--ui-border)] bg-[var(--ui-surface-elevated)] text-[var(--ui-text-primary)] hover:border-[var(--ui-accent)]/60 hover:text-[var(--ui-accent)]',
         variant === 'ghost' &&
