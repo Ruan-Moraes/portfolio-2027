@@ -41,7 +41,7 @@ export function ContactMapSection() {
 
       <div className="grid gap-8 lg:grid-cols-12">
         {/* Left Column: Form */}
-        <GlassCard className="p-6 sm:p-8 lg:col-span-7">
+        <GlassCard className="flex flex-col p-6 sm:p-8 lg:col-span-7">
           <ContactForm />
         </GlassCard>
 
@@ -65,9 +65,10 @@ export function ContactMapSection() {
             </p>
           </GlassCard>
 
-          <GlassCard className="space-y-3 p-5">
-            <div className="flex items-center justify-between rounded-xl border border-[var(--ui-border)] bg-[var(--ui-surface-elevated)]/60 p-3">
-              <div className="flex items-center gap-3 overflow-hidden">
+          <GlassCard className="space-y-2.5 p-5">
+            {/* Top Bar: Email + Copy Action */}
+            <div className="flex h-12 items-center justify-between rounded-xl border border-[var(--ui-border)] bg-[var(--ui-surface-elevated)]/60 px-3.5">
+              <div className="flex items-center gap-2.5 overflow-hidden">
                 <Mail className="h-4 w-4 shrink-0 text-[var(--ui-accent)]" />
                 <span className="truncate font-mono text-xs text-[var(--ui-text-primary)]">
                   {DEVELOPER_PROFILE.email}
@@ -76,7 +77,7 @@ export function ContactMapSection() {
               <button
                 type="button"
                 onClick={handleCopyEmail}
-                className="inline-flex shrink-0 cursor-pointer items-center gap-1 rounded-lg bg-[var(--ui-accent)]/15 px-2.5 py-1 text-xs font-semibold text-[var(--ui-accent)] transition-colors hover:bg-[var(--ui-accent)] hover:text-white"
+                className="inline-flex h-8 shrink-0 cursor-pointer items-center gap-1.5 rounded-lg bg-[var(--ui-accent)]/15 px-3 text-xs font-semibold text-[var(--ui-accent)] transition-colors hover:bg-[var(--ui-accent)] hover:text-white"
               >
                 {copiedEmail ? (
                   <>
@@ -92,46 +93,49 @@ export function ContactMapSection() {
               </button>
             </div>
 
-            <div className="grid grid-cols-2 gap-2.5">
-              <a
-                href={DEVELOPER_PROFILE.whatsappHref}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center justify-center gap-2 rounded-xl border border-[var(--ui-border)] bg-[var(--ui-surface-elevated)] p-3 text-xs font-bold text-[var(--ui-text-primary)] transition-colors hover:border-[var(--ui-accent)] hover:text-[var(--ui-accent)]"
-              >
-                <MessageCircle className="h-4 w-4 text-[var(--ui-accent)]" />
-                <span>{tCommon('openWhatsApp')}</span>
-              </a>
+            {/* Two-Column Standardized Channels: Left (WhatsApp + Phone) | Right (LinkedIn + GitHub) */}
+            <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2">
+              <div className="flex flex-col gap-2.5">
+                <a
+                  href={DEVELOPER_PROFILE.whatsappHref}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex h-12 items-center justify-start gap-2.5 rounded-xl border border-[var(--ui-border)] bg-[var(--ui-surface-elevated)]/60 px-3.5 text-left text-xs font-semibold text-[var(--ui-text-primary)] transition-colors hover:border-[var(--ui-accent)] hover:text-[var(--ui-accent)]"
+                >
+                  <MessageCircle className="h-4 w-4 shrink-0 text-[var(--ui-accent)]" />
+                  <span className="truncate">{tCommon('openWhatsApp')}</span>
+                </a>
 
-              <a
-                href={DEVELOPER_PROFILE.phoneHref}
-                className="flex items-center justify-center gap-2 rounded-xl border border-[var(--ui-border)] bg-[var(--ui-surface-elevated)] p-3 font-mono text-xs font-bold text-[var(--ui-text-primary)] transition-colors hover:border-[var(--ui-accent)] hover:text-[var(--ui-accent)]"
-              >
-                <Phone className="h-4 w-4 text-[var(--ui-accent)]" />
-                <span>{DEVELOPER_PROFILE.phoneFormatted}</span>
-              </a>
-            </div>
+                <a
+                  href={DEVELOPER_PROFILE.phoneHref}
+                  className="flex h-12 items-center justify-start gap-2.5 rounded-xl border border-[var(--ui-border)] bg-[var(--ui-surface-elevated)]/60 px-3.5 text-left font-mono text-xs font-semibold text-[var(--ui-text-primary)] transition-colors hover:border-[var(--ui-accent)] hover:text-[var(--ui-accent)]"
+                >
+                  <Phone className="h-4 w-4 shrink-0 text-[var(--ui-accent)]" />
+                  <span className="truncate">{DEVELOPER_PROFILE.phoneFormatted}</span>
+                </a>
+              </div>
 
-            <div className="grid grid-cols-2 gap-2.5 pt-1">
-              <a
-                href={DEVELOPER_PROFILE.linkedinUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center justify-between rounded-xl border border-[var(--ui-border)] bg-[var(--ui-surface-elevated)]/60 px-3.5 py-2.5 text-xs font-semibold text-[var(--ui-text-secondary)] transition-colors hover:border-[var(--ui-accent)] hover:text-[var(--ui-text-primary)]"
-              >
-                <span>LinkedIn</span>
-                <ExternalLink className="h-3.5 w-3.5 text-[var(--ui-accent)]" />
-              </a>
+              <div className="flex flex-col gap-2.5">
+                <a
+                  href={DEVELOPER_PROFILE.linkedinUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex h-12 items-center justify-between rounded-xl border border-[var(--ui-border)] bg-[var(--ui-surface-elevated)]/60 px-3.5 text-left text-xs font-semibold text-[var(--ui-text-primary)] transition-colors hover:border-[var(--ui-accent)] hover:text-[var(--ui-accent)]"
+                >
+                  <span>LinkedIn</span>
+                  <ExternalLink className="h-3.5 w-3.5 shrink-0 text-[var(--ui-accent)]" />
+                </a>
 
-              <a
-                href={DEVELOPER_PROFILE.githubUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center justify-between rounded-xl border border-[var(--ui-border)] bg-[var(--ui-surface-elevated)]/60 px-3.5 py-2.5 text-xs font-semibold text-[var(--ui-text-secondary)] transition-colors hover:border-[var(--ui-accent)] hover:text-[var(--ui-text-primary)]"
-              >
-                <span>GitHub</span>
-                <ExternalLink className="h-3.5 w-3.5 text-[var(--ui-accent)]" />
-              </a>
+                <a
+                  href={DEVELOPER_PROFILE.githubUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex h-12 items-center justify-between rounded-xl border border-[var(--ui-border)] bg-[var(--ui-surface-elevated)]/60 px-3.5 text-left text-xs font-semibold text-[var(--ui-text-primary)] transition-colors hover:border-[var(--ui-accent)] hover:text-[var(--ui-accent)]"
+                >
+                  <span>GitHub</span>
+                  <ExternalLink className="h-3.5 w-3.5 shrink-0 text-[var(--ui-accent)]" />
+                </a>
+              </div>
             </div>
           </GlassCard>
         </div>

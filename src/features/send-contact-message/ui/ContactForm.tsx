@@ -86,7 +86,11 @@ export function ContactForm() {
     'w-full rounded-xl border border-[var(--ui-border)] bg-[var(--ui-surface-elevated)]/70 px-4 py-3 text-sm text-[var(--ui-text-primary)] placeholder:text-[var(--ui-text-muted)] transition-colors focus:border-[var(--ui-accent)] focus:outline-none';
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4" noValidate>
+    <form
+      onSubmit={handleSubmit}
+      className="flex h-full flex-col gap-4"
+      noValidate
+    >
       <div className="grid gap-4 sm:grid-cols-2">
         <div>
           <label
@@ -143,7 +147,7 @@ export function ContactForm() {
         />
       </div>
 
-      <div>
+      <div className="flex flex-1 flex-col">
         <label
           htmlFor="contact-message"
           className="mb-1.5 block text-xs font-medium text-[var(--ui-text-secondary)]"
@@ -152,11 +156,11 @@ export function ContactForm() {
         </label>
         <textarea
           id="contact-message"
-          rows={4}
+          rows={5}
           value={message}
           onChange={(e) => setMessage(e.target.value)}
           placeholder={t('messagePlaceholder')}
-          className={inputClasses}
+          className={`${inputClasses} min-h-[8.5rem] flex-1 resize-none`}
           required
         />
       </div>
@@ -181,15 +185,17 @@ export function ContactForm() {
         </div>
       )}
 
-      <Button
-        type="submit"
-        size="lg"
-        disabled={status === 'submitting'}
-        className="w-full sm:w-auto"
-      >
-        <Send className="h-4 w-4" />
-        <span>{status === 'submitting' ? t('sending') : t('submit')}</span>
-      </Button>
+      <div className="pt-1">
+        <Button
+          type="submit"
+          size="lg"
+          disabled={status === 'submitting'}
+          className="w-full sm:w-auto"
+        >
+          <Send className="h-4 w-4" />
+          <span>{status === 'submitting' ? t('sending') : t('submit')}</span>
+        </Button>
+      </div>
     </form>
   );
 }
