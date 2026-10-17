@@ -56,13 +56,23 @@ export function StarfieldCanvas() {
     window.addEventListener('mousemove', handleMouseMove, { passive: true });
     window.addEventListener('resize', handleResize, { passive: true });
 
-    const render = () => {
-      ctx.clearRect(0, 0, width, height);
+    let isLight =
+      document.documentElement.getAttribute('data-theme') === 'light';
+    let accentColor =
+      getComputedStyle(document.documentElement)
+        .getPropertyValue('--ui-accent')
+        .trim() || '#00ff7f';
 
-      const accentColor =
+    const syncThemeTokens = () => {
+      isLight = document.documentElement.getAttribute('data-theme') === 'light';
+      accentColor =
         getComputedStyle(document.documentElement)
           .getPropertyValue('--ui-accent')
           .trim() || '#00ff7f';
+    };
+
+    const render = () => {
+      ctx.clearRect(0, 0, width, height);
 
       const offsetX = (mouseX - width / 2) * 0.012;
       const offsetY = (mouseY - height / 2) * 0.012;
@@ -80,10 +90,13 @@ export function StarfieldCanvas() {
 
         ctx.beginPath();
         ctx.arc(drawX, drawY, star.size, 0, Math.PI * 2);
-        ctx.fillStyle =
-          i % 9 === 0
-            ? accentColor
-            : `rgba(226, 232, 240, ${star.opacity.toFixed(2)})`;
+        if (i % 9 === 0) {
+          ctx.fillStyle = accentColor;
+        } else if (isLight) {
+          ctx.fillStyle = `rgba(51, 65, 85, ${(star.opacity * 0.72).toFixed(2)})`;
+        } else {
+          ctx.fillStyle = `rgba(226, 232, 240, ${star.opacity.toFixed(2)})`;
+        }
         ctx.fill();
       }
 
@@ -92,9 +105,21 @@ export function StarfieldCanvas() {
       }
     };
 
+    const observer = new MutationObserver(() => {
+      syncThemeTokens();
+      if (prefersReducedMotion) {
+        render();
+      }
+    });
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ['data-theme', 'data-accent', 'style'],
+    });
+
     render();
 
     return () => {
+      observer.disconnect();
       window.cancelAnimationFrame(animationFrameId);
       window.removeEventListener('mousemove', handleMouseMove);
       window.removeEventListener('resize', handleResize);
