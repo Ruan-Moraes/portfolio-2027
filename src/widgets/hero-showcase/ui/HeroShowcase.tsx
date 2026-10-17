@@ -1,6 +1,12 @@
 'use client';
 
-import { ArrowRight, Download, Sparkles, Terminal } from 'lucide-react';
+import {
+  ArrowRight,
+  Download,
+  MessageSquare,
+  Sparkles,
+  Terminal,
+} from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { DEVELOPER_PROFILE } from '@/entities/developer-profile';
 import {
@@ -91,17 +97,19 @@ export function HeroShowcase() {
             <a
               href={DEVELOPER_PROFILE.cvPdfPath}
               download
-              className="inline-flex items-center justify-center gap-2 rounded-xl border border-[var(--ui-border)] bg-[var(--ui-surface-elevated)] px-6 py-3.5 text-base font-semibold text-[var(--ui-text-primary)] transition-all hover:border-[var(--ui-accent)]/60 hover:text-[var(--ui-accent)]"
+              className="inline-flex h-12 items-center justify-center gap-2 rounded-xl border border-[var(--ui-border)] bg-[var(--ui-surface-elevated)] px-6 text-base font-semibold text-[var(--ui-text-primary)] transition-all hover:border-[var(--ui-accent)]/60 hover:text-[var(--ui-accent)]"
             >
               <Download className="h-4 w-4 text-[var(--ui-accent)]" />
               <span>{tCommon('downloadCV')}</span>
             </a>
 
             <Button
-              variant="ghost"
+              variant="secondary"
               size="lg"
               onClick={() => scrollTo('contact')}
+              className="border-[var(--ui-accent)]/40 bg-[var(--ui-accent)]/10 text-[var(--ui-accent)] hover:border-[var(--ui-accent)] hover:bg-[var(--ui-accent)]/20"
             >
+              <MessageSquare className="h-4 w-4" />
               <span>{t('ctaContact')}</span>
             </Button>
           </div>

@@ -164,13 +164,13 @@ export function AmbientSoundbar() {
       aria-pressed={isPlaying}
       aria-label={isPlaying ? t('musicPlaying') : t('musicPaused')}
       title={isPlaying ? t('musicPlaying') : t('musicPaused')}
-      className="group relative flex h-9 cursor-pointer items-center gap-2 rounded-xl border border-[var(--ui-border)] bg-[var(--ui-surface)]/80 px-3 text-xs backdrop-blur-md transition-all hover:border-[var(--ui-accent)]/60"
+      className="group relative inline-flex h-9 cursor-pointer items-center justify-center gap-2 rounded-xl border border-[var(--ui-border)] bg-[var(--ui-surface)]/80 px-3 text-xs backdrop-blur-md transition-all hover:border-[var(--ui-accent)]/60"
     >
-      <span className="font-script text-sm text-[var(--ui-accent)] opacity-85">
+      <span className="font-script flex items-center pt-0.5 text-base leading-none text-[var(--ui-accent)] opacity-90">
         &lt;{t('musicLabel')}&gt;
       </span>
 
-      <span className="flex h-3.5 items-end gap-0.5">
+      <span className="flex h-3.5 items-center gap-0.5">
         {[0, 1, 2, 3, 4].map((bar) => (
           <span
             key={bar}
@@ -179,7 +179,7 @@ export function AmbientSoundbar() {
             }}
             className={cn(
               'w-0.5 rounded-full bg-[var(--ui-accent)] transition-all duration-300',
-              isPlaying ? 'h-3.5 animate-sound-wave' : 'h-1 opacity-50'
+              isPlaying ? 'h-3.5 animate-sound-wave' : 'h-1.5 opacity-60'
             )}
           />
         ))}

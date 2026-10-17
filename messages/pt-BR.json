@@ -52,8 +52,8 @@
       "productionLabel": "Apps Android, iOS & CRM",
       "architecture": "Clean & FSD",
       "architectureLabel": "Arquitetura & Testes",
-      "languages": "3 Idiomas",
-      "languagesLabel": "PT-BR, EN-US & ES-ES"
+      "languages": "SQL & Cloud",
+      "languagesLabel": "SQL Server, Postgres & Azure CI/CD"
     }
   },
   "about": {
