@@ -21,8 +21,8 @@ export function TechCube3D() {
 
     // 1. WebGL Scene & Camera
     const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(38, width / height, 0.1, 100);
-    camera.position.set(0, 0, 5.2);
+    const camera = new THREE.PerspectiveCamera(36, width / height, 0.1, 100);
+    camera.position.set(0, 0, 5.4);
 
     const renderer = new THREE.WebGLRenderer({
       antialias: true,
@@ -31,127 +31,141 @@ export function TechCube3D() {
     });
     renderer.setSize(width, height);
     renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
-    renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = 1.15;
 
     container.innerHTML = '';
     container.appendChild(renderer.domElement);
 
-    // 2. Build 6 high-DPI CanvasTextures for the 6 faces of RoundedBoxGeometry
     const texSize = 512;
-    const materials = CUBE_FACES_TECH.map((item) => {
-      const canvas = document.createElement('canvas');
-      canvas.width = texSize;
-      canvas.height = texSize;
-      const ctx = canvas.getContext('2d');
 
-      if (ctx) {
-        // Deep slate base covering the entire UV including rounded fillets/corners
-        const bgGrad = ctx.createLinearGradient(0, 0, texSize, texSize);
-        bgGrad.addColorStop(0, '#091124');
-        bgGrad.addColorStop(0.5, '#030712');
-        bgGrad.addColorStop(1, '#091124');
-        ctx.fillStyle = bgGrad;
-        ctx.fillRect(0, 0, texSize, texSize);
+    const buildMaterials = () => {
+      const rootStyle = getComputedStyle(document.documentElement);
+      const themeAccent =
+        rootStyle.getPropertyValue('--ui-accent').trim() || '#00ff7f';
 
-        // Glowing rounded frame inside the flat region of the RoundedBoxGeometry face
-        const pad = 74;
-        const radius = 48;
-        const frameSize = texSize - pad * 2;
+      return CUBE_FACES_TECH.map((item) => {
+        const canvas = document.createElement('canvas');
+        canvas.width = texSize;
+        canvas.height = texSize;
+        const ctx = canvas.getContext('2d');
 
-        const radialGlow = ctx.createRadialGradient(
-          texSize / 2,
-          texSize / 2 - 20,
-          16,
-          texSize / 2,
-          texSize / 2,
-          180
-        );
-        radialGlow.addColorStop(0, `${item.color}38`);
-        radialGlow.addColorStop(1, 'rgba(3, 7, 18, 0)');
+        if (ctx) {
+          // Matte deep-space dark surface (including rounded bevel corners)
+          ctx.fillStyle = '#070e1e';
+          ctx.fillRect(0, 0, texSize, texSize);
 
-        ctx.beginPath();
-        ctx.roundRect(pad, pad, frameSize, frameSize, radius);
-        ctx.fillStyle = radialGlow;
-        ctx.fill();
+          // Border sits right along the rounded bevel boundary (bevel is ~48px on 512px texture)
+          const pad = 52;
+          const radius = 52;
+          const frameSize = texSize - pad * 2; // 408px
 
-        ctx.lineWidth = 4.5;
-        ctx.strokeStyle = item.color;
-        ctx.shadowColor = item.color;
-        ctx.shadowBlur = 16;
-        ctx.stroke();
-        ctx.shadowBlur = 0;
+          // Subtle inner surface fill
+          const panelGrad = ctx.createLinearGradient(
+            pad,
+            pad,
+            pad + frameSize,
+            pad + frameSize
+          );
+          panelGrad.addColorStop(0, '#0d162c');
+          panelGrad.addColorStop(0.5, '#060b18');
+          panelGrad.addColorStop(1, '#0d162c');
 
-        // Tech Symbol
-        ctx.fillStyle = item.color;
-        ctx.font = '900 94px ui-monospace, SFMono-Regular, Menlo, monospace';
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        ctx.fillText(item.symbol, texSize / 2, texSize / 2 - 48);
+          ctx.beginPath();
+          ctx.roundRect(pad, pad, frameSize, frameSize, radius);
+          ctx.fillStyle = panelGrad;
+          ctx.fill();
 
-        // Tech Name
-        ctx.fillStyle = '#f8fafc';
-        ctx.font = '700 36px system-ui, -apple-system, sans-serif';
-        ctx.fillText(
-          item.name,
-          texSize / 2,
-          texSize / 2 + 34,
-          frameSize - 32
-        );
+          // Consistent border color matching the portfolio's active accent (--ui-accent)
+          ctx.lineWidth = 4;
+          ctx.strokeStyle = themeAccent;
+          ctx.globalAlpha = 0.6;
+          ctx.stroke();
+          ctx.globalAlpha = 1;
 
-        // Tech Subtitle
-        ctx.fillStyle = '#94a3b8';
-        ctx.font = '500 18px ui-monospace, SFMono-Regular, Menlo, monospace';
-        ctx.fillText(
-          item.subtitle,
-          texSize / 2,
-          texSize / 2 + 80,
-          frameSize - 36
-        );
-      }
+          // Content strictly centered inside a 320px safe zone so text never touches the border
+          const safeTextWidth = 310;
 
-      const texture = new THREE.CanvasTexture(canvas);
-      texture.colorSpace = THREE.SRGBColorSpace;
-      texture.anisotropy = 4;
+          // 1. Tech Symbol
+          ctx.fillStyle = item.color;
+          ctx.font =
+            '900 84px ui-monospace, SFMono-Regular, Menlo, Monaco, monospace';
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+          ctx.fillText(item.symbol, texSize / 2, texSize / 2 - 50);
 
-      return new THREE.MeshStandardMaterial({
-        map: texture,
-        roughness: 0.25,
-        metalness: 0.15,
+          // 2. Tech Name
+          ctx.fillStyle = '#f8fafc';
+          ctx.font = '700 32px system-ui, -apple-system, sans-serif';
+          ctx.fillText(item.name, texSize / 2, texSize / 2 + 26, safeTextWidth);
+
+          // 3. Tech Subtitle (auto-fitted so it never overflows the safe zone)
+          ctx.fillStyle = '#94a3b8';
+          let subtitleFontPx = 18;
+          ctx.font = `500 ${subtitleFontPx}px ui-monospace, SFMono-Regular, Menlo, monospace`;
+          while (
+            ctx.measureText(item.subtitle).width > safeTextWidth &&
+            subtitleFontPx > 12
+          ) {
+            subtitleFontPx -= 1;
+            ctx.font = `500 ${subtitleFontPx}px ui-monospace, SFMono-Regular, Menlo, monospace`;
+          }
+          ctx.fillText(item.subtitle, texSize / 2, texSize / 2 + 72);
+        }
+
+        const texture = new THREE.CanvasTexture(canvas);
+        texture.colorSpace = THREE.SRGBColorSpace;
+        texture.anisotropy = 4;
+
+        // MeshLambertMaterial = pure matte surface (0 specular glare/reflections when spinning)
+        return new THREE.MeshLambertMaterial({
+          map: texture,
+        });
       });
-    });
+    };
 
-    // 3. True 3D RoundedBoxGeometry (smooth curved corners and edges with 0 gaps)
-    const geometry = new RoundedBoxGeometry(2.15, 2.15, 2.15, 8, 0.28);
+    let materials = buildMaterials();
+
+    // True 3D RoundedBoxGeometry (smooth curved corners and edges with 0 gaps)
+    const geometry = new RoundedBoxGeometry(2.15, 2.15, 2.15, 8, 0.24);
     const cubeMesh = new THREE.Mesh(geometry, materials);
     cubeMesh.rotation.set(-0.35, 0.55, 0);
     scene.add(cubeMesh);
 
-    // 4. Studio Lighting so curved corners catch subtle specular highlights
-    const ambientLight = new THREE.AmbientLight(0xffffff, 1.9);
+    // Soft uniform lighting without specular glare
+    const ambientLight = new THREE.AmbientLight(0xffffff, 2.4);
     scene.add(ambientLight);
 
-    const keyLight = new THREE.DirectionalLight(0xffffff, 1.8);
-    keyLight.position.set(4, 5, 6);
-    scene.add(keyLight);
+    const softFrontLight = new THREE.DirectionalLight(0xffffff, 0.55);
+    softFrontLight.position.set(2, 3, 6);
+    scene.add(softFrontLight);
 
-    const rimLight = new THREE.DirectionalLight(0x00ff7f, 1.1);
-    rimLight.position.set(-5, -4, 3);
-    scene.add(rimLight);
+    // Rebuild textures if user switches theme accent color
+    const observer = new MutationObserver(() => {
+      const nextMaterials = buildMaterials();
+      cubeMesh.material = nextMaterials;
+      materials.forEach((mat) => {
+        mat.map?.dispose();
+        mat.dispose();
+      });
+      materials = nextMaterials;
+    });
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ['style', 'data-theme'],
+    });
 
-    // 5. Animation Loop
+    // Animation Loop
     let frameId = 0;
     let clockTime = 0;
 
     const animate = () => {
       if (!isDraggingRef.current) {
-        const speed = isHoveredRef.current ? 0.003 : 0.011;
+        const speed = isHoveredRef.current ? 0.003 : 0.01;
         clockTime += speed;
         cubeMesh.rotation.y =
           0.55 + clockTime + manualRotationRef.current.ry;
         cubeMesh.rotation.x =
           -0.32 +
-          Math.sin(clockTime * 0.7) * 0.38 +
+          Math.sin(clockTime * 0.7) * 0.36 +
           manualRotationRef.current.rx;
       }
 
@@ -162,6 +176,7 @@ export function TechCube3D() {
     animate();
 
     return () => {
+      observer.disconnect();
       window.cancelAnimationFrame(frameId);
       geometry.dispose();
       materials.forEach((mat) => {
