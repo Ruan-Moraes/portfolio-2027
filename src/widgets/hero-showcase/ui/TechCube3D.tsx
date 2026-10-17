@@ -64,7 +64,31 @@ export function TechCube3D() {
           ctx.fillStyle = aura;
           ctx.fillRect(0, 0, texSize, texSize);
 
-          // 3. Subtle circular tech emblem behind the symbol (sized generously for 2- and 3-letter symbols like OPS)
+          // 3. Harmonious content container border (stroke only — preserves unified background)
+          const pad = 58;
+          const frameSize = texSize - pad * 2;
+          const frameRadius = 48;
+          const borderGrad = ctx.createLinearGradient(
+            pad,
+            pad,
+            texSize - pad,
+            texSize - pad
+          );
+          borderGrad.addColorStop(0, `${item.color}80`);
+          borderGrad.addColorStop(0.5, 'rgba(148, 163, 184, 0.25)');
+          borderGrad.addColorStop(1, `${item.color}60`);
+
+          ctx.save();
+          ctx.beginPath();
+          ctx.roundRect(pad, pad, frameSize, frameSize, frameRadius);
+          ctx.strokeStyle = borderGrad;
+          ctx.lineWidth = 3;
+          ctx.shadowColor = item.color;
+          ctx.shadowBlur = 10;
+          ctx.stroke();
+          ctx.restore();
+
+          // 4. Subtle circular tech emblem behind the symbol (sized generously for 2- and 3-letter symbols like OPS)
           const badgeRadius = 82;
           const badgeY = texSize / 2 - 66;
           ctx.beginPath();
