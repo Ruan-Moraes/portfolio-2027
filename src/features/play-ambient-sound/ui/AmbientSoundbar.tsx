@@ -1,19 +1,22 @@
 'use client';
 
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { memo, useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { cn } from '@/shared/lib';
 
 interface SynthNodes {
   context: AudioContext;
   masterGain: GainNode;
-  schedulerId: number;
+  schedulerId: number | null;
+  stepIndex: number;
 }
 
 interface ChordProgressionStep {
   pad: number[];
   melody: number[];
 }
+
+const SOUND_BARS = [0, 1, 2, 3, 4] as const;
 
 // Progressão Lo-Fi / Chillhop alegre e relaxante (Fmaj7 -> Em7 -> Dm7 -> Cmaj7)
 const LOFI_CHORDS: ChordProgressionStep[] = [
@@ -68,7 +71,10 @@ function playRhodesNote(
   // Envelope ADSR macio (sem glissando assustador)
   env.gain.setValueAtTime(0.0001, startTime);
   env.gain.linearRampToValueAtTime(peakGain, startTime + 0.08);
-  env.gain.exponentialRampToValueAtTime(peakGain * 0.45, startTime + duration * 0.5);
+  env.gain.exponentialRampToValueAtTime(
+    peakGain * 0.45,
+    startTime + duration * 0.5
+  );
   env.gain.exponentialRampToValueAtTime(0.0001, startTime + duration);
 
   osc.connect(filter);
@@ -93,76 +99,129 @@ function playRhodesNote(
   };
 }
 
-export function AmbientSoundbar() {
+function AmbientSoundbarComponent() {
   const t = useTranslations('common');
   const [isPlaying, setIsPlaying] = useState(false);
+  const isPlayingRef = useRef(false);
   const synthRef = useRef<SynthNodes | null>(null);
 
-  const stopSynth = useCallback(() => {
+  const pauseSynth = useCallback(() => {
     const active = synthRef.current;
     if (!active) return;
 
-    window.clearInterval(active.schedulerId);
-    active.masterGain.disconnect();
-    void active.context.close();
-    synthRef.current = null;
+    if (active.schedulerId !== null) {
+      window.clearInterval(active.schedulerId);
+      active.schedulerId = null;
+    }
+    if (active.context.state === 'running') {
+      void active.context.suspend();
+    }
+    isPlayingRef.current = false;
     setIsPlaying(false);
   }, []);
 
-  const startSynth = useCallback(() => {
-    const AudioCtx =
-      window.AudioContext ||
-      (window as unknown as { webkitAudioContext: typeof AudioContext })
-        .webkitAudioContext;
+  const destroySynth = useCallback(() => {
+    const active = synthRef.current;
+    if (!active) return;
 
-    if (!AudioCtx) return;
+    if (active.schedulerId !== null) {
+      window.clearInterval(active.schedulerId);
+    }
+    active.masterGain.disconnect();
+    void active.context.close();
+    synthRef.current = null;
+    isPlayingRef.current = false;
+  }, []);
 
-    const context = new AudioCtx();
-    const masterGain = context.createGain();
-    masterGain.gain.setValueAtTime(0.18, context.currentTime);
-    masterGain.connect(context.destination);
+  const startSynth = useCallback(async () => {
+    let nodes = synthRef.current;
 
-    let stepIndex = 0;
+    if (!nodes) {
+      const AudioCtx =
+        window.AudioContext ||
+        (window as unknown as { webkitAudioContext: typeof AudioContext })
+          .webkitAudioContext;
+
+      if (!AudioCtx) return;
+
+      const context = new AudioCtx();
+      const masterGain = context.createGain();
+      masterGain.gain.setValueAtTime(0.18, context.currentTime);
+      masterGain.connect(context.destination);
+
+      nodes = {
+        context,
+        masterGain,
+        schedulerId: null,
+        stepIndex: 0,
+      };
+      synthRef.current = nodes;
+    }
+
+    if (nodes.context.state === 'suspended') {
+      await nodes.context.resume();
+    }
 
     const triggerBar = () => {
-      if (context.state !== 'running' || document.hidden) return;
-      const now = context.currentTime + 0.05;
-      const step = LOFI_CHORDS[stepIndex % LOFI_CHORDS.length];
-      stepIndex += 1;
+      const current = synthRef.current;
+      if (
+        !current ||
+        current.context.state !== 'running' ||
+        document.hidden ||
+        !isPlayingRef.current
+      ) {
+        return;
+      }
+      const now = current.context.currentTime + 0.05;
+      const step = LOFI_CHORDS[current.stepIndex % LOFI_CHORDS.length];
+      current.stepIndex += 1;
 
       step.pad.forEach((freq, i) => {
-        playRhodesNote(context, masterGain, freq, now + i * 0.04, 3.1, 0.055);
+        playRhodesNote(
+          current.context,
+          current.masterGain,
+          freq,
+          now + i * 0.04,
+          3.1,
+          0.055
+        );
       });
 
       step.melody.forEach((noteFreq, beatIdx) => {
         const noteStart = now + beatIdx * 0.78;
-        playRhodesNote(context, masterGain, noteFreq, noteStart, 1.35, 0.042);
+        playRhodesNote(
+          current.context,
+          current.masterGain,
+          noteFreq,
+          noteStart,
+          1.35,
+          0.042
+        );
       });
     };
 
-    triggerBar();
-    const schedulerId = window.setInterval(triggerBar, 3200);
-
-    synthRef.current = {
-      context,
-      masterGain,
-      schedulerId,
-    };
+    isPlayingRef.current = true;
     setIsPlaying(true);
+
+    triggerBar();
+    if (nodes.schedulerId !== null) {
+      window.clearInterval(nodes.schedulerId);
+    }
+    nodes.schedulerId = window.setInterval(triggerBar, 3200);
   }, []);
 
   const toggleSound = () => {
-    if (isPlaying) {
-      stopSynth();
+    if (isPlayingRef.current) {
+      pauseSynth();
     } else {
-      startSynth();
+      void startSynth();
     }
   };
 
   useEffect(() => {
     const handleVisibilityChange = () => {
       const active = synthRef.current;
-      if (!active) return;
+      if (!active || !isPlayingRef.current) return;
       if (document.hidden && active.context.state === 'running') {
         void active.context.suspend();
       } else if (!document.hidden && active.context.state === 'suspended') {
@@ -173,9 +232,9 @@ export function AmbientSoundbar() {
     document.addEventListener('visibilitychange', handleVisibilityChange);
     return () => {
       document.removeEventListener('visibilitychange', handleVisibilityChange);
-      stopSynth();
+      destroySynth();
     };
-  }, [stopSynth]);
+  }, [destroySynth]);
 
   return (
     <button
@@ -191,7 +250,7 @@ export function AmbientSoundbar() {
       </span>
 
       <span className="flex h-3.5 items-center gap-0.5">
-        {[0, 1, 2, 3, 4].map((bar) => (
+        {SOUND_BARS.map((bar) => (
           <span
             key={bar}
             style={{
@@ -207,3 +266,6 @@ export function AmbientSoundbar() {
     </button>
   );
 }
+
+export const AmbientSoundbar = memo(AmbientSoundbarComponent);
+

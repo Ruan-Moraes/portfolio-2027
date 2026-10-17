@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import { AnimatedLetters } from './AnimatedLetters';
 import { CodeTag } from './CodeTag';
 import { cn } from '@/shared/lib';
@@ -9,7 +10,7 @@ interface SectionHeadingProps {
   className?: string;
 }
 
-export function SectionHeading({
+function SectionHeadingComponent({
   tag,
   title,
   subtitle,
@@ -35,3 +36,6 @@ export function SectionHeading({
     </div>
   );
 }
+
+export const SectionHeading = memo(SectionHeadingComponent);
+

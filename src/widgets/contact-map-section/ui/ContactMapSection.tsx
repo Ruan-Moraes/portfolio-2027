@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+import dynamic from 'next/dynamic';
 import {
   Check,
   Copy,
@@ -14,7 +15,16 @@ import { useTranslations } from 'next-intl';
 import { DEVELOPER_PROFILE } from '@/entities/developer-profile';
 import { ContactForm } from '@/features/send-contact-message';
 import { Badge, GlassCard, SectionHeading } from '@/shared/ui';
-import { BeloHorizonteMap } from './BeloHorizonteMap';
+
+const BeloHorizonteMap = dynamic(
+  () => import('./BeloHorizonteMap').then((mod) => mod.BeloHorizonteMap),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="relative h-72 w-full overflow-hidden rounded-2xl border border-[var(--ui-border)] bg-slate-950 sm:h-80" />
+    ),
+  }
+);
 
 export function ContactMapSection() {
   const t = useTranslations('contact');

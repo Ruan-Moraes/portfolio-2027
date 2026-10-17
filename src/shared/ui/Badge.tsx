@@ -1,4 +1,4 @@
-import type { HTMLAttributes, ReactNode } from 'react';
+import { memo, type HTMLAttributes, type ReactNode } from 'react';
 import { cn } from '@/shared/lib';
 
 interface BadgeProps extends HTMLAttributes<HTMLSpanElement> {
@@ -6,7 +6,7 @@ interface BadgeProps extends HTMLAttributes<HTMLSpanElement> {
   variant?: 'default' | 'accent' | 'outline';
 }
 
-export function Badge({
+function BadgeComponent({
   children,
   className,
   variant = 'default',
@@ -30,3 +30,6 @@ export function Badge({
     </span>
   );
 }
+
+export const Badge = memo(BadgeComponent);
+

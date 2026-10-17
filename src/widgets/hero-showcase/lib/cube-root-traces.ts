@@ -77,20 +77,21 @@ function drawRootSegmentChain(
   ctx.fill();
 }
 
-/**
- * Renders 2 unique, organic tree-root trajectories per corner (8 roots per face, 48 across the cube).
- */
-export function drawCornerRoots({
-  ctx,
-  texSize,
-  pad,
-  faceIdx,
-  accentHex,
-  isLight,
-}: DrawCornerRootsParams): void {
-  ctx.save();
-  ctx.lineCap = 'round';
-  ctx.lineJoin = 'round';
+interface ComputedRootTrace {
+  mainPts: Array<[number, number]>;
+  subBranches: Array<Array<[number, number]>>;
+}
+
+const rootGeometryCache = new Map<string, ComputedRootTrace[]>();
+
+function getOrComputeFaceRoots(
+  faceIdx: number,
+  texSize: number,
+  pad: number
+): ComputedRootTrace[] {
+  const cacheKey = `${faceIdx}:${texSize}:${pad}`;
+  const cached = rootGeometryCache.get(cacheKey);
+  if (cached) return cached;
 
   const corners = [
     { cornerIdx: 0, isLeft: true, isTop: true, cx: pad + 14, cy: pad + 14 },
@@ -116,6 +117,8 @@ export function drawCornerRoots({
       cy: texSize - pad - 14,
     },
   ];
+
+  const traces: ComputedRootTrace[] = [];
 
   corners.forEach(({ cornerIdx, isLeft, isTop, cx, cy }) => {
     const dirX = isLeft ? 1 : -1;
@@ -210,12 +213,38 @@ export function drawCornerRoots({
         if (!placed) break;
       }
 
-      drawRootSegmentChain(ctx, mainPts, 2.35, false, accentHex, isLight);
-      subBranches.forEach((branch) =>
-        drawRootSegmentChain(ctx, branch, 1.45, true, accentHex, isLight)
-      );
+      traces.push({ mainPts, subBranches });
     }
   });
 
+  rootGeometryCache.set(cacheKey, traces);
+  return traces;
+}
+
+/**
+ * Renders 2 unique, organic tree-root trajectories per corner (8 roots per face, 48 across the cube).
+ */
+export function drawCornerRoots({
+  ctx,
+  texSize,
+  pad,
+  faceIdx,
+  accentHex,
+  isLight,
+}: DrawCornerRootsParams): void {
+  ctx.save();
+  ctx.lineCap = 'round';
+  ctx.lineJoin = 'round';
+
+  const traces = getOrComputeFaceRoots(faceIdx, texSize, pad);
+  for (let i = 0; i < traces.length; i += 1) {
+    const { mainPts, subBranches } = traces[i];
+    drawRootSegmentChain(ctx, mainPts, 2.35, false, accentHex, isLight);
+    for (let j = 0; j < subBranches.length; j += 1) {
+      drawRootSegmentChain(ctx, subBranches[j], 1.45, true, accentHex, isLight);
+    }
+  }
+
   ctx.restore();
 }
+

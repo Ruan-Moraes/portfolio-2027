@@ -1,7 +1,7 @@
 'use client';
 
 import { Moon, Palette, Sun } from 'lucide-react';
-import { useState } from 'react';
+import { memo, useEffect, useRef, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import {
   ACCENT_COLORS,
@@ -11,13 +11,40 @@ import {
 import { cn } from '@/shared/lib';
 import { useThemePreferences } from '../model/theme.context';
 
-export function ThemeQuickControls() {
+function ThemeQuickControlsComponent() {
   const t = useTranslations('theme');
   const { mode, accent, toggleMode, setAccent } = useThemePreferences();
   const [open, setOpen] = useState(false);
+  const containerRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    if (!open) return;
+
+    const handlePointerDown = (event: MouseEvent) => {
+      if (
+        containerRef.current &&
+        !containerRef.current.contains(event.target as Node)
+      ) {
+        setOpen(false);
+      }
+    };
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        setOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handlePointerDown);
+    document.addEventListener('keydown', handleKeyDown);
+    return () => {
+      document.removeEventListener('mousedown', handlePointerDown);
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [open]);
 
   return (
-    <div className="relative flex items-center gap-1.5">
+    <div ref={containerRef} className="relative flex items-center gap-1.5">
       <button
         type="button"
         onClick={toggleMode}
@@ -88,3 +115,6 @@ export function ThemeQuickControls() {
     </div>
   );
 }
+
+export const ThemeQuickControls = memo(ThemeQuickControlsComponent);
+

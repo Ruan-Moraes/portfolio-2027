@@ -1,5 +1,6 @@
 'use client';
 
+import { memo } from 'react';
 import { useLocale } from 'next-intl';
 import {
   LOCALE_METADATA,
@@ -9,7 +10,7 @@ import {
 import { cn } from '@/shared/lib';
 import { usePortfolioLocale } from '../model/locale.context';
 
-export function LanguageSwitcher() {
+function LanguageSwitcherComponent() {
   const currentLocale = useLocale() as SupportedLocale;
   const { setLocale } = usePortfolioLocale();
 
@@ -48,3 +49,6 @@ export function LanguageSwitcher() {
     </div>
   );
 }
+
+export const LanguageSwitcher = memo(LanguageSwitcherComponent);
+

@@ -1,10 +1,11 @@
 'use client';
 
+import { memo } from 'react';
 import { Command } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useCommandPalette } from '../model/command-palette.context';
 
-export function CommandPaletteTrigger() {
+function CommandPaletteTriggerComponent() {
   const t = useTranslations('common');
   const { openPalette } = useCommandPalette();
 
@@ -23,3 +24,6 @@ export function CommandPaletteTrigger() {
     </button>
   );
 }
+
+export const CommandPaletteTrigger = memo(CommandPaletteTriggerComponent);
+

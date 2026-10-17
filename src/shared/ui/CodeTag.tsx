@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import { cn } from '@/shared/lib';
 
 interface CodeTagProps {
@@ -7,7 +8,7 @@ interface CodeTagProps {
   className?: string;
 }
 
-export function CodeTag({
+function CodeTagComponent({
   tag,
   closing = false,
   selfClosing = false,
@@ -31,3 +32,6 @@ export function CodeTag({
     </span>
   );
 }
+
+export const CodeTag = memo(CodeTagComponent);
+

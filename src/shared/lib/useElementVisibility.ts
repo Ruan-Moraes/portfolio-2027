@@ -1,10 +1,32 @@
 'use client';
 
-import { useEffect, useState, type RefObject } from 'react';
+import {
+  useEffect,
+  useState,
+  useSyncExternalStore,
+  type RefObject,
+} from 'react';
 
 interface UseElementVisibilityOptions {
   rootMargin?: string;
   threshold?: number;
+}
+
+function subscribePageVisibility(onStoreChange: () => void): () => void {
+  if (typeof document === 'undefined') {
+    return () => {};
+  }
+  document.addEventListener('visibilitychange', onStoreChange);
+  return () => document.removeEventListener('visibilitychange', onStoreChange);
+}
+
+function getPageVisibilitySnapshot(): boolean {
+  if (typeof document === 'undefined') return true;
+  return document.visibilityState === 'visible';
+}
+
+function getServerVisibilitySnapshot(): boolean {
+  return true;
 }
 
 /**
@@ -20,7 +42,11 @@ export function useElementVisibility(
   const threshold = options?.threshold ?? 0.01;
 
   const [isIntersecting, setIsIntersecting] = useState(true);
-  const [isPageVisible, setIsPageVisible] = useState(true);
+  const isPageVisible = useSyncExternalStore(
+    subscribePageVisibility,
+    getPageVisibilitySnapshot,
+    getServerVisibilitySnapshot
+  );
 
   useEffect(() => {
     const element = elementRef.current;
@@ -42,18 +68,6 @@ export function useElementVisibility(
     return () => observer.disconnect();
   }, [elementRef, rootMargin, threshold]);
 
-  useEffect(() => {
-    if (typeof document === 'undefined') return;
-
-    const handleVisibilityChange = () => {
-      setIsPageVisible(document.visibilityState === 'visible');
-    };
-
-    handleVisibilityChange();
-    document.addEventListener('visibilitychange', handleVisibilityChange);
-    return () =>
-      document.removeEventListener('visibilitychange', handleVisibilityChange);
-  }, []);
-
   return isIntersecting && isPageVisible;
 }
+
