@@ -6,9 +6,81 @@ import { cn } from '@/shared/lib';
 
 interface SynthNodes {
   context: AudioContext;
-  gainNode: GainNode;
-  oscillators: OscillatorNode[];
-  intervalId: number;
+  masterGain: GainNode;
+  schedulerId: number;
+}
+
+interface ChordProgressionStep {
+  pad: number[];
+  melody: number[];
+}
+
+// Progressão Lo-Fi / Chillhop alegre e relaxante (Fmaj7 -> Em7 -> Dm7 -> Cmaj7)
+const LOFI_CHORDS: ChordProgressionStep[] = [
+  {
+    // Fmaj7 (F3, A3, C4, E4) + notas da pentatônica de Dó maior
+    pad: [174.61, 220.0, 261.63, 329.63],
+    melody: [523.25, 659.25, 587.33, 523.25],
+  },
+  {
+    // Em7 (E3, G3, B3, D4)
+    pad: [164.81, 196.0, 246.94, 293.66],
+    melody: [493.88, 587.33, 659.25, 783.99],
+  },
+  {
+    // Dm9 (D3, F3, A3, E4)
+    pad: [146.83, 174.61, 220.0, 329.63],
+    melody: [440.0, 523.25, 587.33, 659.25],
+  },
+  {
+    // Cmaj9 (C3, E3, G3, D4)
+    pad: [130.81, 164.81, 196.0, 293.66],
+    melody: [523.25, 659.25, 783.99, 659.25],
+  },
+];
+
+function playRhodesNote(
+  context: AudioContext,
+  destination: AudioNode,
+  freq: number,
+  startTime: number,
+  duration: number,
+  peakGain: number
+) {
+  const osc = context.createOscillator();
+  const subOsc = context.createOscillator();
+  const filter = context.createBiquadFilter();
+  const env = context.createGain();
+
+  osc.type = 'sine';
+  osc.frequency.setValueAtTime(freq, startTime);
+
+  // Harmônico suave de piano elétrico (Rhodes)
+  subOsc.type = 'triangle';
+  subOsc.frequency.setValueAtTime(freq * 2, startTime);
+
+  const subGain = context.createGain();
+  subGain.gain.setValueAtTime(0.12, startTime);
+
+  filter.type = 'lowpass';
+  filter.frequency.setValueAtTime(1400, startTime);
+
+  // Envelope ADSR macio (sem glissando assustador)
+  env.gain.setValueAtTime(0.0001, startTime);
+  env.gain.linearRampToValueAtTime(peakGain, startTime + 0.08);
+  env.gain.exponentialRampToValueAtTime(peakGain * 0.45, startTime + duration * 0.5);
+  env.gain.exponentialRampToValueAtTime(0.0001, startTime + duration);
+
+  osc.connect(filter);
+  subOsc.connect(subGain);
+  subGain.connect(filter);
+  filter.connect(env);
+  env.connect(destination);
+
+  osc.start(startTime);
+  subOsc.start(startTime);
+  osc.stop(startTime + duration + 0.05);
+  subOsc.stop(startTime + duration + 0.05);
 }
 
 export function AmbientSoundbar() {
@@ -20,16 +92,8 @@ export function AmbientSoundbar() {
     const active = synthRef.current;
     if (!active) return;
 
-    window.clearInterval(active.intervalId);
-    active.oscillators.forEach((osc) => {
-      try {
-        osc.stop();
-        osc.disconnect();
-      } catch {
-        // Ignore already stopped oscillators
-      }
-    });
-    active.gainNode.disconnect();
+    window.clearInterval(active.schedulerId);
+    active.masterGain.disconnect();
     void active.context.close();
     synthRef.current = null;
     setIsPlaying(false);
@@ -45,44 +109,36 @@ export function AmbientSoundbar() {
 
     const context = new AudioCtx();
     const masterGain = context.createGain();
-    masterGain.gain.setValueAtTime(0.035, context.currentTime);
+    masterGain.gain.setValueAtTime(0.18, context.currentTime);
     masterGain.connect(context.destination);
 
-    // Acorde espacial cyber-ambient (Fmaj7 / Dm9 atmosférico)
-    const baseFrequencies = [146.83, 220.0, 261.63, 329.63];
-    const oscillators = baseFrequencies.map((freq, idx) => {
-      const osc = context.createOscillator();
-      osc.type = idx % 2 === 0 ? 'sine' : 'triangle';
-      osc.frequency.setValueAtTime(freq, context.currentTime);
-      osc.connect(masterGain);
-      osc.start();
-      return osc;
-    });
+    let stepIndex = 0;
 
-    let chordIndex = 0;
-    const progressions = [
-      [146.83, 220.0, 261.63, 329.63],
-      [130.81, 196.0, 246.94, 293.66],
-      [116.54, 174.61, 220.0, 261.63],
-      [130.81, 196.0, 246.94, 329.63],
-    ];
+    const triggerBar = () => {
+      if (context.state === 'closed') return;
+      const now = context.currentTime + 0.05;
+      const step = LOFI_CHORDS[stepIndex % LOFI_CHORDS.length];
+      stepIndex += 1;
 
-    const intervalId = window.setInterval(() => {
-      chordIndex = (chordIndex + 1) % progressions.length;
-      const chord = progressions[chordIndex];
-      oscillators.forEach((osc, i) => {
-        osc.frequency.exponentialRampToValueAtTime(
-          chord[i],
-          context.currentTime + 2.4
-        );
+      // Acorde suave de piano elétrico (warm pad)
+      step.pad.forEach((freq, i) => {
+        playRhodesNote(context, masterGain, freq, now + i * 0.04, 3.1, 0.055);
       });
-    }, 4500);
+
+      // Dedilhado melódico calmo (estilo Lo-Fi / Kalimba suave)
+      step.melody.forEach((noteFreq, beatIdx) => {
+        const noteStart = now + beatIdx * 0.78;
+        playRhodesNote(context, masterGain, noteFreq, noteStart, 1.35, 0.042);
+      });
+    };
+
+    triggerBar();
+    const schedulerId = window.setInterval(triggerBar, 3200);
 
     synthRef.current = {
       context,
-      gainNode: masterGain,
-      oscillators,
-      intervalId,
+      masterGain,
+      schedulerId,
     };
     setIsPlaying(true);
   }, []);
