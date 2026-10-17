@@ -64,25 +64,25 @@ export function TechCube3D() {
           ctx.fillStyle = aura;
           ctx.fillRect(0, 0, texSize, texSize);
 
-          // 3. Harmonious content container border (stroke only — preserves unified background)
-          const pad = 58;
+          // 3. Harmonious content container border positioned close to the face boundary
+          const pad = 24;
           const frameSize = texSize - pad * 2;
-          const frameRadius = 48;
+          const frameRadius = 58;
           const borderGrad = ctx.createLinearGradient(
             pad,
             pad,
             texSize - pad,
             texSize - pad
           );
-          borderGrad.addColorStop(0, `${item.color}80`);
-          borderGrad.addColorStop(0.5, 'rgba(148, 163, 184, 0.25)');
-          borderGrad.addColorStop(1, `${item.color}60`);
+          borderGrad.addColorStop(0, `${item.color}88`);
+          borderGrad.addColorStop(0.5, 'rgba(148, 163, 184, 0.28)');
+          borderGrad.addColorStop(1, `${item.color}66`);
 
           ctx.save();
           ctx.beginPath();
           ctx.roundRect(pad, pad, frameSize, frameSize, frameRadius);
           ctx.strokeStyle = borderGrad;
-          ctx.lineWidth = 3;
+          ctx.lineWidth = 3.5;
           ctx.shadowColor = item.color;
           ctx.shadowBlur = 10;
           ctx.stroke();
