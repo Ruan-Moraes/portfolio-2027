@@ -17,11 +17,11 @@ export function SectionHeading({
 }: SectionHeadingProps) {
   return (
     <div className={cn('mb-10 space-y-2', className)}>
-      <div className="ml-8 flex items-center gap-2 sm:ml-10">
+      <div className="flex items-center gap-2">
         <CodeTag tag={tag} />
         <span className="h-px max-w-24 flex-1 bg-gradient-to-r from-[var(--ui-accent)]/50 to-transparent" />
       </div>
-      <div className="pl-12 sm:pl-14 space-y-2">
+      <div className="space-y-2 pl-4 sm:pl-6">
         <h2 className="text-3xl font-bold tracking-tight text-[var(--ui-text-primary)] sm:text-4xl lg:text-5xl">
           <AnimatedLetters text={title} />
         </h2>
@@ -31,7 +31,7 @@ export function SectionHeading({
           </p>
         )}
       </div>
-      <CodeTag tag={tag} closing className="ml-8 sm:ml-10" />
+      <CodeTag tag={tag} closing />
     </div>
   );
 }

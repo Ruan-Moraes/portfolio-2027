@@ -59,8 +59,8 @@ export function HeroShowcase() {
           </div>
 
           <div className="space-y-2">
-            <CodeTag tag="h1" className="ml-8 sm:ml-10" />
-            <div className="pl-12 sm:pl-14 space-y-2">
+            <CodeTag tag="h1" />
+            <div className="space-y-2 pl-4 sm:pl-6">
               <p className="font-mono text-sm font-semibold tracking-wider text-[var(--ui-accent)] uppercase sm:text-base">
                 {t('greeting')}
               </p>
@@ -71,7 +71,7 @@ export function HeroShowcase() {
                 <AnimatedLetters text={t('role')} delayOffset={12} />
               </p>
             </div>
-            <CodeTag tag="h1" closing className="ml-8 sm:ml-10" />
+            <CodeTag tag="h1" closing />
           </div>
 
           <p className="font-mono text-xs font-semibold tracking-wide text-[var(--ui-accent)] sm:text-sm">
