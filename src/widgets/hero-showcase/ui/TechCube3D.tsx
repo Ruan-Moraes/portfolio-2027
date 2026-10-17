@@ -38,10 +38,6 @@ export function TechCube3D() {
     const texSize = 512;
 
     const buildMaterials = () => {
-      const rootStyle = getComputedStyle(document.documentElement);
-      const themeAccent =
-        rootStyle.getPropertyValue('--ui-accent').trim() || '#00ff7f';
-
       return CUBE_FACES_TECH.map((item) => {
         const canvas = document.createElement('canvas');
         canvas.width = texSize;
@@ -49,64 +45,25 @@ export function TechCube3D() {
         const ctx = canvas.getContext('2d');
 
         if (ctx) {
-          // Outer bevel/chamfer surface (slightly lighter slate so the rounded 3D edges/corners stand out from the space background)
-          const bevelGrad = ctx.createLinearGradient(0, 0, texSize, texSize);
-          bevelGrad.addColorStop(0, '#132038');
-          bevelGrad.addColorStop(0.5, '#0b1426');
-          bevelGrad.addColorStop(1, '#132038');
-          ctx.fillStyle = bevelGrad;
+          // Single unified surface across the entire cube face and rounded corners (no nested container, no borders)
+          ctx.fillStyle = '#0d1527';
           ctx.fillRect(0, 0, texSize, texSize);
 
-          // Subtle outer edge line right at the start of the 3D bevel curvature
-          ctx.beginPath();
-          ctx.roundRect(14, 14, texSize - 28, texSize - 28, 72);
-          ctx.lineWidth = 2;
-          ctx.strokeStyle = 'rgba(148, 163, 184, 0.22)';
-          ctx.stroke();
-
-          // Main face border sitting on the flat face boundary
-          const pad = 52;
-          const radius = 50;
-          const frameSize = texSize - pad * 2; // 408px
-
-          // Deep inner face fill
-          const panelGrad = ctx.createLinearGradient(
-            pad,
-            pad,
-            pad + frameSize,
-            pad + frameSize
-          );
-          panelGrad.addColorStop(0, '#091122');
-          panelGrad.addColorStop(0.5, '#040812');
-          panelGrad.addColorStop(1, '#091122');
-
-          ctx.beginPath();
-          ctx.roundRect(pad, pad, frameSize, frameSize, radius);
-          ctx.fillStyle = panelGrad;
-          ctx.fill();
-
-          // Consistent border color matching the portfolio's active accent (--ui-accent)
-          ctx.lineWidth = 4;
-          ctx.strokeStyle = themeAccent;
-          ctx.globalAlpha = 0.72;
-          ctx.stroke();
-          ctx.globalAlpha = 1;
-
-          // Content strictly centered inside a 310px safe zone so text never touches the border
-          const safeTextWidth = 310;
+          // Content strictly centered inside a 320px safe zone
+          const safeTextWidth = 320;
 
           // 1. Tech Symbol
           ctx.fillStyle = item.color;
           ctx.font =
-            '900 84px ui-monospace, SFMono-Regular, Menlo, Monaco, monospace';
+            '900 88px ui-monospace, SFMono-Regular, Menlo, Monaco, monospace';
           ctx.textAlign = 'center';
           ctx.textBaseline = 'middle';
-          ctx.fillText(item.symbol, texSize / 2, texSize / 2 - 50);
+          ctx.fillText(item.symbol, texSize / 2, texSize / 2 - 48);
 
           // 2. Tech Name
           ctx.fillStyle = '#f8fafc';
-          ctx.font = '700 32px system-ui, -apple-system, sans-serif';
-          ctx.fillText(item.name, texSize / 2, texSize / 2 + 26, safeTextWidth);
+          ctx.font = '700 34px system-ui, -apple-system, sans-serif';
+          ctx.fillText(item.name, texSize / 2, texSize / 2 + 28, safeTextWidth);
 
           // 3. Tech Subtitle (auto-fitted so it never overflows the safe zone)
           ctx.fillStyle = '#94a3b8';
@@ -119,14 +76,14 @@ export function TechCube3D() {
             subtitleFontPx -= 1;
             ctx.font = `500 ${subtitleFontPx}px ui-monospace, SFMono-Regular, Menlo, monospace`;
           }
-          ctx.fillText(item.subtitle, texSize / 2, texSize / 2 + 72);
+          ctx.fillText(item.subtitle, texSize / 2, texSize / 2 + 74);
         }
 
         const texture = new THREE.CanvasTexture(canvas);
         texture.colorSpace = THREE.SRGBColorSpace;
         texture.anisotropy = 4;
 
-        // Matte Lambert material — natural 3D depth shading across faces & curved corners without mirror/specular glare
+        // Matte Lambert material — natural 3D depth shading across faces & curved corners
         return new THREE.MeshLambertMaterial({
           map: texture,
         });
