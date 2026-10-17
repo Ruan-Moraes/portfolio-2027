@@ -84,7 +84,7 @@ export function TechCube3D() {
       const isLight =
         document.documentElement.getAttribute('data-theme') === 'light';
 
-      return CUBE_FACES_TECH.map((item) => {
+      return CUBE_FACES_TECH.map((item, faceIdx) => {
         const canvas = document.createElement('canvas');
         canvas.width = texSize;
         canvas.height = texSize;
@@ -169,33 +169,91 @@ export function TechCube3D() {
           ctx.fillStyle = sheenAura;
           ctx.fillRect(pad, pad, frameSize, frameSize);
 
-          // Technical single circuit trace emerging from each of the 4 corners inside the content container
+          // Technical dual circuit traces emerging from the 4 corners, each with a unique trajectory
           ctx.save();
           ctx.strokeStyle = isLight ? `${item.color}90` : `${item.color}55`;
           ctx.fillStyle = item.color;
           ctx.lineWidth = 2;
 
-          const drawCornerCircuit = (
-            cx: number,
-            cy: number,
-            sx: number,
-            sy: number
-          ) => {
+          const drawTrace = (points: Array<[number, number]>) => {
+            if (points.length < 2) return;
             ctx.beginPath();
-            ctx.moveTo(cx + sx * 28, cy + sy * 22);
-            ctx.lineTo(cx + sx * 86, cy + sy * 22);
-            ctx.lineTo(cx + sx * 106, cy + sy * 42);
+            ctx.moveTo(points[0][0], points[0][1]);
+            for (let i = 1; i < points.length; i += 1) {
+              ctx.lineTo(points[i][0], points[i][1]);
+            }
             ctx.stroke();
 
+            const last = points[points.length - 1];
             ctx.beginPath();
-            ctx.arc(cx + sx * 106, cy + sy * 42, 3, 0, Math.PI * 2);
+            ctx.arc(last[0], last[1], 3, 0, Math.PI * 2);
             ctx.fill();
           };
 
-          drawCornerCircuit(pad + 12, pad + 12, 1, 1);
-          drawCornerCircuit(texSize - pad - 12, pad + 12, -1, 1);
-          drawCornerCircuit(pad + 12, texSize - pad - 12, 1, -1);
-          drawCornerCircuit(texSize - pad - 12, texSize - pad - 12, -1, -1);
+          const shift = (faceIdx % 3) * 6;
+          const tlX = pad + 12;
+          const tlY = pad + 12;
+          const trX = texSize - pad - 12;
+          const trY = pad + 12;
+          const blX = pad + 12;
+          const blY = texSize - pad - 12;
+          const brX = texSize - pad - 12;
+          const brY = texSize - pad - 12;
+
+          // Top-Left corner: 2 lines with unique stepped + angled paths
+          drawTrace([
+            [tlX + 38, tlY + 16],
+            [tlX + 94 + shift, tlY + 16],
+            [tlX + 114 + shift, tlY + 36],
+            [tlX + 136 + shift, tlY + 36],
+          ]);
+          drawTrace([
+            [tlX + 16, tlY + 42],
+            [tlX + 16, tlY + 86 + shift],
+            [tlX + 38, tlY + 108 + shift],
+          ]);
+
+          // Top-Right corner: 2 lines with unique jogged trajectory
+          drawTrace([
+            [trX - 36, trY + 18],
+            [trX - 72 - shift, trY + 18],
+            [trX - 92 - shift, trY + 38],
+          ]);
+          drawTrace([
+            [trX - 18, trY + 40],
+            [trX - 18, trY + 70],
+            [trX - 36, trY + 88],
+            [trX - 36, trY + 120 + shift],
+          ]);
+
+          // Bottom-Left corner: 2 lines with asymmetric dogleg trajectory
+          drawTrace([
+            [blX + 42, blY - 18],
+            [blX + 78 + shift, blY - 18],
+            [blX + 102 + shift, blY - 42],
+          ]);
+          drawTrace([
+            [blX + 18, blY - 38],
+            [blX + 18, blY - 66],
+            [blX + 36, blY - 84],
+            [blX + 36, blY - 112 - shift],
+            [blX + 52, blY - 128 - shift],
+          ]);
+
+          // Bottom-Right corner: 2 lines with stepped horizontal & long vertical trace
+          drawTrace([
+            [brX - 38, brY - 16],
+            [brX - 66, brY - 16],
+            [brX - 84, brY - 34],
+            [brX - 116 - shift, brY - 34],
+            [brX - 132 - shift, brY - 50],
+          ]);
+          drawTrace([
+            [brX - 16, brY - 44],
+            [brX - 16, brY - 98 - shift],
+            [brX - 38, brY - 120 - shift],
+          ]);
+
           ctx.restore();
 
           ctx.restore(); // End clip for inner content container
