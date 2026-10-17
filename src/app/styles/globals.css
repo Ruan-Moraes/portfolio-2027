@@ -110,40 +110,29 @@ body {
   inset: 0;
   width: 200px;
   height: 200px;
+  border: 1px solid rgba(148, 163, 184, 0.14);
   backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
-  transform-style: preserve-3d;
 }
 
-.cube-face::before {
-  content: '';
-  position: absolute;
-  inset: 4px;
-  border-radius: 16px;
-  background: #020617;
-  transform: translateZ(-3px);
-  backface-visibility: visible;
-  pointer-events: none;
-}
-
-/* Standard orthogonal 6 cube faces with rounded corners and sealed core */
+/* Exact 100px half-width for a 200x200x200 cube — vertices meet with zero overhang */
 .cube-face-1 {
-  transform: rotateY(0deg) translateZ(96px);
+  transform: rotateY(0deg) translateZ(100px);
 }
 .cube-face-2 {
-  transform: rotateY(90deg) translateZ(96px);
+  transform: rotateY(90deg) translateZ(100px);
 }
 .cube-face-3 {
-  transform: rotateY(180deg) translateZ(96px);
+  transform: rotateY(180deg) translateZ(100px);
 }
 .cube-face-4 {
-  transform: rotateY(-90deg) translateZ(96px);
+  transform: rotateY(-90deg) translateZ(100px);
 }
 .cube-face-5 {
-  transform: rotateX(90deg) translateZ(96px);
+  transform: rotateX(90deg) translateZ(100px);
 }
 .cube-face-6 {
-  transform: rotateX(-90deg) translateZ(96px);
+  transform: rotateX(-90deg) translateZ(100px);
 }
 
 @keyframes spinCube3D {
