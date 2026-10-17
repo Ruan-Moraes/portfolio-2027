@@ -37,6 +37,49 @@ export function TechCube3D() {
 
     const texSize = 512;
 
+    // Subtle procedural micro-texture bump map for tactile anodized surface feel (zero glare)
+    const createBumpTexture = () => {
+      const bumpCanvas = document.createElement('canvas');
+      bumpCanvas.width = texSize;
+      bumpCanvas.height = texSize;
+      const bCtx = bumpCanvas.getContext('2d');
+      if (bCtx) {
+        const pad = 8;
+        const frameSize = texSize - pad * 2;
+        const frameRadius = 62;
+
+        // Smooth neutral height outside the border (no texture outside the border)
+        bCtx.fillStyle = '#808080';
+        bCtx.fillRect(0, 0, texSize, texSize);
+
+        // Fine micro-grid relief strictly inside the content border
+        bCtx.save();
+        bCtx.beginPath();
+        bCtx.roundRect(pad, pad, frameSize, frameSize, frameRadius);
+        bCtx.clip();
+
+        bCtx.strokeStyle = '#969696';
+        bCtx.lineWidth = 1;
+        const step = 16;
+        for (let i = 0; i <= texSize; i += step) {
+          bCtx.beginPath();
+          bCtx.moveTo(i, 0);
+          bCtx.lineTo(i, texSize);
+          bCtx.stroke();
+          bCtx.beginPath();
+          bCtx.moveTo(0, i);
+          bCtx.lineTo(texSize, i);
+          bCtx.stroke();
+        }
+        bCtx.restore();
+      }
+      const bumpTex = new THREE.CanvasTexture(bumpCanvas);
+      bumpTex.anisotropy = 4;
+      return bumpTex;
+    };
+
+    const sharedBumpMap = createBumpTexture();
+
     const buildMaterials = () => {
       return CUBE_FACES_TECH.map((item) => {
         const canvas = document.createElement('canvas');
@@ -49,36 +92,75 @@ export function TechCube3D() {
           const frameSize = texSize - pad * 2;
           const frameRadius = 62;
 
-          // 1. Non-content outer area (bevels & corners): slightly lighter slate-navy tone
-          ctx.fillStyle = '#16243d';
+          // 1. Area outside the border (no content): clean solid background with a slightly lighter slate-indigo tone
+          ctx.fillStyle = '#182642';
           ctx.fillRect(0, 0, texSize, texSize);
 
-          // 2. Content container area (close to the face limit): slightly deeper midnight tone
+          // 2. Content area (strictly inside the border at pad = 8): rich deep slate-indigo base + textures
           ctx.save();
           ctx.beginPath();
           ctx.roundRect(pad, pad, frameSize, frameSize, frameRadius);
-          ctx.fillStyle = '#0d1527';
+          ctx.fillStyle = '#111c35';
           ctx.fill();
           ctx.clip();
 
-          // 3. Soft radial ambient aura in the center of the content container
-          const aura = ctx.createRadialGradient(
+          // Tactile architectural tech grid + micro-dots inside the content container
+          const gridStep = 32;
+          ctx.strokeStyle = 'rgba(148, 163, 184, 0.055)';
+          ctx.lineWidth = 1;
+          for (let i = gridStep; i < texSize; i += gridStep) {
+            ctx.beginPath();
+            ctx.moveTo(i, 0);
+            ctx.lineTo(i, texSize);
+            ctx.stroke();
+
+            ctx.beginPath();
+            ctx.moveTo(0, i);
+            ctx.lineTo(texSize, i);
+            ctx.stroke();
+          }
+
+          // Micro intersection nodes inside the face
+          ctx.fillStyle = `${item.color}2e`;
+          for (let x = gridStep; x <= texSize - gridStep; x += gridStep) {
+            for (let y = gridStep; y <= texSize - gridStep; y += gridStep) {
+              ctx.fillRect(x - 1, y - 1, 2, 2);
+            }
+          }
+
+          // Vibrant multi-layered radial color infusion
+          const primaryAura = ctx.createRadialGradient(
             texSize / 2,
-            texSize / 2 - 24,
-            10,
+            texSize / 2 - 36,
+            12,
             texSize / 2,
             texSize / 2,
-            215
+            225
           );
-          aura.addColorStop(0, `${item.color}30`);
-          aura.addColorStop(0.55, `${item.color}10`);
-          aura.addColorStop(1, 'rgba(13, 21, 39, 0)');
-          ctx.fillStyle = aura;
+          primaryAura.addColorStop(0, `${item.color}42`);
+          primaryAura.addColorStop(0.45, `${item.color}1c`);
+          primaryAura.addColorStop(0.78, `${item.color}08`);
+          primaryAura.addColorStop(1, 'rgba(17, 28, 53, 0)');
+          ctx.fillStyle = primaryAura;
           ctx.fillRect(pad, pad, frameSize, frameSize);
 
-          ctx.restore();
+          // Subtle top-left anodized highlight wash for extra depth
+          const sheenAura = ctx.createRadialGradient(
+            140,
+            120,
+            10,
+            140,
+            120,
+            180
+          );
+          sheenAura.addColorStop(0, 'rgba(255, 255, 255, 0.05)');
+          sheenAura.addColorStop(1, 'rgba(255, 255, 255, 0)');
+          ctx.fillStyle = sheenAura;
+          ctx.fillRect(pad, pad, frameSize, frameSize);
 
-          // 4. Harmonious content container border right at the face limit
+          ctx.restore(); // End clip for inner content container
+
+          // 3. Harmonious content container border right at the face limit (pad = 8)
           const borderGrad = ctx.createLinearGradient(
             pad,
             pad,
@@ -86,8 +168,8 @@ export function TechCube3D() {
             texSize - pad
           );
           borderGrad.addColorStop(0, `${item.color}99`);
-          borderGrad.addColorStop(0.5, 'rgba(148, 163, 184, 0.32)');
-          borderGrad.addColorStop(1, `${item.color}70`);
+          borderGrad.addColorStop(0.5, 'rgba(148, 163, 184, 0.34)');
+          borderGrad.addColorStop(1, `${item.color}75`);
 
           ctx.save();
           ctx.beginPath();
@@ -95,11 +177,26 @@ export function TechCube3D() {
           ctx.strokeStyle = borderGrad;
           ctx.lineWidth = 3.5;
           ctx.shadowColor = item.color;
-          ctx.shadowBlur = 10;
+          ctx.shadowBlur = 12;
           ctx.stroke();
           ctx.restore();
 
-          // 5. Subtle circular tech emblem behind the symbol
+          // Subtle inner hairline frame for hardware depth
+          ctx.save();
+          ctx.beginPath();
+          ctx.roundRect(
+            pad + 10,
+            pad + 10,
+            frameSize - 20,
+            frameSize - 20,
+            frameRadius - 8
+          );
+          ctx.strokeStyle = 'rgba(255, 255, 255, 0.05)';
+          ctx.lineWidth = 1;
+          ctx.stroke();
+          ctx.restore();
+
+          // 4. Layered circular tech emblem behind the symbol
           const badgeRadius = 82;
           const badgeY = texSize / 2 - 66;
           const badgeGrad = ctx.createRadialGradient(
@@ -110,22 +207,33 @@ export function TechCube3D() {
             badgeY,
             badgeRadius
           );
-          badgeGrad.addColorStop(0, `${item.color}28`);
-          badgeGrad.addColorStop(0.7, `${item.color}14`);
-          badgeGrad.addColorStop(1, `${item.color}06`);
+          badgeGrad.addColorStop(0, `${item.color}32`);
+          badgeGrad.addColorStop(0.7, `${item.color}18`);
+          badgeGrad.addColorStop(1, `${item.color}08`);
 
           ctx.beginPath();
           ctx.arc(texSize / 2, badgeY, badgeRadius, 0, Math.PI * 2);
           ctx.fillStyle = badgeGrad;
           ctx.fill();
 
+          // Crisp concentric ring around the badge
           ctx.beginPath();
           ctx.arc(texSize / 2, badgeY, badgeRadius, 0, Math.PI * 2);
-          ctx.strokeStyle = `${item.color}38`;
-          ctx.lineWidth = 1.5;
+          ctx.strokeStyle = `${item.color}48`;
+          ctx.lineWidth = 1.75;
           ctx.stroke();
 
-          // 6. Tech Symbol with soft neon glow
+          // Outer dashed orbital ring for technical detail
+          ctx.save();
+          ctx.beginPath();
+          ctx.setLineDash([6, 8]);
+          ctx.arc(texSize / 2, badgeY, badgeRadius + 11, 0, Math.PI * 2);
+          ctx.strokeStyle = `${item.color}28`;
+          ctx.lineWidth = 1.25;
+          ctx.stroke();
+          ctx.restore();
+
+          // 5. Tech Symbol with soft neon glow
           ctx.save();
           ctx.shadowColor = item.color;
           ctx.shadowBlur = 18;
@@ -140,15 +248,15 @@ export function TechCube3D() {
           // Content strictly centered inside a 320px safe zone
           const safeTextWidth = 320;
 
-          // 7. Tech Name
+          // 6. Tech Name
           ctx.fillStyle = '#f8fafc';
           ctx.font = '800 34px system-ui, -apple-system, sans-serif';
           ctx.textAlign = 'center';
           ctx.textBaseline = 'middle';
           ctx.fillText(item.name, texSize / 2, texSize / 2 + 48, safeTextWidth);
 
-          // 8. Subtle glowing accent divider bar between title and subtitle
-          const barWidth = 60;
+          // 7. Subtle glowing accent divider bar between title and subtitle
+          const barWidth = 64;
           const barY = texSize / 2 + 76;
           const barGrad = ctx.createLinearGradient(
             texSize / 2 - barWidth,
@@ -162,8 +270,8 @@ export function TechCube3D() {
           ctx.fillStyle = barGrad;
           ctx.fillRect(texSize / 2 - barWidth, barY - 1.5, barWidth * 2, 3);
 
-          // 9. Tech Subtitle (auto-fitted so it never overflows the safe zone)
-          ctx.fillStyle = '#cbd5e1';
+          // 8. Tech Subtitle (auto-fitted so it never overflows the safe zone)
+          ctx.fillStyle = '#dbeafe';
           let subtitleFontPx = 19;
           ctx.font = `600 ${subtitleFontPx}px ui-monospace, SFMono-Regular, Menlo, monospace`;
           while (
@@ -180,9 +288,11 @@ export function TechCube3D() {
         texture.colorSpace = THREE.SRGBColorSpace;
         texture.anisotropy = 4;
 
-        // Matte Lambert material — natural 3D depth shading across faces & curved corners
+        // Matte Lambert material with subtle micro-bump texture — rich 3D depth with zero glare
         return new THREE.MeshLambertMaterial({
           map: texture,
+          bumpMap: sharedBumpMap,
+          bumpScale: 0.008,
         });
       });
     };
@@ -257,6 +367,7 @@ export function TechCube3D() {
       observer.disconnect();
       window.cancelAnimationFrame(frameId);
       geometry.dispose();
+      sharedBumpMap.dispose();
       materials.forEach((mat) => {
         mat.map?.dispose();
         mat.dispose();
