@@ -143,9 +143,19 @@ export function InteractiveSkillSphere({
     };
   }, []);
 
+  const rectRef = useRef<DOMRect | null>(null);
+
+  const handleMouseEnter = () => {
+    if (containerRef.current) {
+      rectRef.current = containerRef.current.getBoundingClientRect();
+    }
+  };
+
   const handleMouseMove = (event: React.MouseEvent<HTMLDivElement>) => {
-    const rect = containerRef.current?.getBoundingClientRect();
+    const rect =
+      rectRef.current ?? containerRef.current?.getBoundingClientRect();
     if (!rect) return;
+    rectRef.current = rect;
 
     const relX =
       (event.clientX - (rect.left + rect.width / 2)) / (rect.width / 2);
@@ -159,12 +169,14 @@ export function InteractiveSkillSphere({
   };
 
   const handleMouseLeave = () => {
+    rectRef.current = null;
     speedRef.current = { vx: 0.0045, vy: 0.0065 };
   };
 
   return (
     <div
       ref={containerRef}
+      onMouseEnter={handleMouseEnter}
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
       className="relative flex h-[340px] w-full items-center justify-center overflow-hidden rounded-2xl select-none sm:h-[380px]"

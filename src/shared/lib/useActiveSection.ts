@@ -11,15 +11,30 @@ export function useActiveSection<T extends string>(
   useEffect(() => {
     let rafId = 0;
     let ticking = false;
+    let elementsCache: Array<{ id: T; el: HTMLElement }> = [];
+
+    const refreshElements = () => {
+      elementsCache = [];
+      for (let i = 0; i < sectionIds.length; i += 1) {
+        const id = sectionIds[i];
+        const el = document.getElementById(id);
+        if (el) {
+          elementsCache.push({ id, el });
+        }
+      }
+    };
 
     const updateActiveSection = () => {
       ticking = false;
+      if (elementsCache.length !== sectionIds.length) {
+        refreshElements();
+      }
+
       const scrollPosition = window.scrollY + window.innerHeight * 0.32;
 
-      for (let i = sectionIds.length - 1; i >= 0; i--) {
-        const id = sectionIds[i];
-        const element = document.getElementById(id);
-        if (element && element.offsetTop <= scrollPosition) {
+      for (let i = elementsCache.length - 1; i >= 0; i -= 1) {
+        const { id, el } = elementsCache[i];
+        if (el.offsetTop <= scrollPosition) {
           setActiveSection((prev) => (prev === id ? prev : id));
           break;
         }
@@ -33,6 +48,7 @@ export function useActiveSection<T extends string>(
       }
     };
 
+    refreshElements();
     updateActiveSection();
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => {

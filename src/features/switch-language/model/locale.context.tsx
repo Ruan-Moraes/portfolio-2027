@@ -11,15 +11,35 @@ import {
 } from 'react';
 import { NextIntlClientProvider, type AbstractIntlMessages } from 'next-intl';
 import { SUPPORTED_LOCALES, type SupportedLocale } from '@/shared/config';
-import enUSMessages from '../../../../messages/en-US.json';
-import esESMessages from '../../../../messages/es-ES.json';
-import ptBRMessages from '../../../../messages/pt-BR.json';
 
-const MESSAGES_BY_LOCALE: Record<SupportedLocale, AbstractIntlMessages> = {
-  'pt-BR': ptBRMessages as unknown as AbstractIntlMessages,
-  'en-US': enUSMessages as unknown as AbstractIntlMessages,
-  'es-ES': esESMessages as unknown as AbstractIntlMessages,
-};
+const messageCache = new Map<SupportedLocale, AbstractIntlMessages>();
+
+async function loadLocaleMessages(
+  targetLocale: SupportedLocale
+): Promise<AbstractIntlMessages> {
+  const cached = messageCache.get(targetLocale);
+  if (cached) return cached;
+
+  let loaded: AbstractIntlMessages;
+  switch (targetLocale) {
+    case 'en-US':
+      loaded = (await import('../../../../messages/en-US.json'))
+        .default as unknown as AbstractIntlMessages;
+      break;
+    case 'es-ES':
+      loaded = (await import('../../../../messages/es-ES.json'))
+        .default as unknown as AbstractIntlMessages;
+      break;
+    case 'pt-BR':
+    default:
+      loaded = (await import('../../../../messages/pt-BR.json'))
+        .default as unknown as AbstractIntlMessages;
+      break;
+  }
+
+  messageCache.set(targetLocale, loaded);
+  return loaded;
+}
 
 interface PortfolioLocaleContextValue {
   locale: SupportedLocale;
@@ -32,34 +52,55 @@ const PortfolioLocaleContext = createContext<PortfolioLocaleContextValue | null>
 
 interface PortfolioLocaleProviderProps {
   initialLocale: SupportedLocale;
+  initialMessages?: AbstractIntlMessages;
   children: ReactNode;
 }
 
 export function PortfolioLocaleProvider({
   initialLocale,
+  initialMessages,
   children,
 }: PortfolioLocaleProviderProps) {
+  if (initialMessages && !messageCache.has(initialLocale)) {
+    messageCache.set(initialLocale, initialMessages);
+  }
+
   const [locale, setLocaleState] = useState<SupportedLocale>(initialLocale);
+  const [messages, setMessages] = useState<AbstractIntlMessages | undefined>(
+    () => initialMessages ?? messageCache.get(initialLocale)
+  );
 
-  const setLocale = useCallback((nextLocale: SupportedLocale) => {
-    if (!SUPPORTED_LOCALES.includes(nextLocale)) return;
+  // Warm the remaining locale dictionaries during browser idle time so switching is 0ms
+  useEffect(() => {
+    const warmOtherLocales = () => {
+      SUPPORTED_LOCALES.forEach((loc) => {
+        if (!messageCache.has(loc)) {
+          void loadLocaleMessages(loc);
+        }
+      });
+    };
 
-    setLocaleState((prev) => {
-      if (prev === nextLocale) return prev;
-      return nextLocale;
-    });
+    if (typeof window !== 'undefined' && 'requestIdleCallback' in window) {
+      const idleId = window.requestIdleCallback(warmOtherLocales, {
+        timeout: 2000,
+      });
+      return () => window.cancelIdleCallback(idleId);
+    }
 
-    if (typeof window !== 'undefined') {
+    const timerId = globalThis.setTimeout(warmOtherLocales, 300);
+    return () => globalThis.clearTimeout(timerId);
+  }, []);
+
+  const applyBrowserLocaleMetadata = useCallback(
+    (nextLocale: SupportedLocale, dict: AbstractIntlMessages) => {
+      if (typeof window === 'undefined') return;
       document.documentElement.lang = nextLocale;
 
-      const seoSection = (
-        MESSAGES_BY_LOCALE[nextLocale] as Record<string, { title?: string }>
-      )?.seo;
+      const seoSection = (dict as Record<string, { title?: string }>)?.seo;
       if (seoSection?.title) {
         document.title = seoSection.title;
       }
 
-      // Update the URL path in-place without triggering a Next.js route remount
       const { pathname, search, hash } = window.location;
       const segments = pathname.split('/').filter(Boolean);
       if (
@@ -72,8 +113,30 @@ export function PortfolioLocaleProvider({
       }
       const nextUrl = `/${segments.join('/')}${search}${hash}`;
       window.history.replaceState(window.history.state, '', nextUrl);
-    }
-  }, []);
+    },
+    []
+  );
+
+  const setLocale = useCallback(
+    (nextLocale: SupportedLocale) => {
+      if (!SUPPORTED_LOCALES.includes(nextLocale)) return;
+
+      const cached = messageCache.get(nextLocale);
+      if (cached) {
+        setLocaleState(nextLocale);
+        setMessages(cached);
+        applyBrowserLocaleMetadata(nextLocale, cached);
+        return;
+      }
+
+      void loadLocaleMessages(nextLocale).then((loaded) => {
+        setLocaleState(nextLocale);
+        setMessages(loaded);
+        applyBrowserLocaleMetadata(nextLocale, loaded);
+      });
+    },
+    [applyBrowserLocaleMetadata]
+  );
 
   // Keep state synced if user navigates with browser Back/Forward buttons
   useEffect(() => {
@@ -81,8 +144,11 @@ export function PortfolioLocaleProvider({
       const segments = window.location.pathname.split('/').filter(Boolean);
       const urlLocale = segments[0] as SupportedLocale | undefined;
       if (urlLocale && SUPPORTED_LOCALES.includes(urlLocale)) {
-        setLocaleState(urlLocale);
-        document.documentElement.lang = urlLocale;
+        void loadLocaleMessages(urlLocale).then((loaded) => {
+          setLocaleState(urlLocale);
+          setMessages(loaded);
+          document.documentElement.lang = urlLocale;
+        });
       }
     };
 
@@ -99,7 +165,7 @@ export function PortfolioLocaleProvider({
     <PortfolioLocaleContext.Provider value={contextValue}>
       <NextIntlClientProvider
         locale={locale}
-        messages={MESSAGES_BY_LOCALE[locale]}
+        messages={messages}
         timeZone="America/Sao_Paulo"
       >
         {children}

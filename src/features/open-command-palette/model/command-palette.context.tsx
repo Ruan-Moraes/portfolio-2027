@@ -6,6 +6,7 @@ import {
   useContext,
   useEffect,
   useMemo,
+  useRef,
   useState,
   type ReactNode,
 } from 'react';
@@ -23,17 +24,33 @@ const CommandPaletteContext = createContext<CommandPaletteContextValue | null>(
 
 export function CommandPaletteProvider({ children }: { children: ReactNode }) {
   const [isOpen, setIsOpen] = useState(false);
+  const isOpenRef = useRef(false);
 
-  const openPalette = useCallback(() => setIsOpen(true), []);
-  const closePalette = useCallback(() => setIsOpen(false), []);
-  const togglePalette = useCallback(() => setIsOpen((prev) => !prev), []);
+  const openPalette = useCallback(() => {
+    isOpenRef.current = true;
+    setIsOpen(true);
+  }, []);
+
+  const closePalette = useCallback(() => {
+    if (!isOpenRef.current) return;
+    isOpenRef.current = false;
+    setIsOpen(false);
+  }, []);
+
+  const togglePalette = useCallback(() => {
+    setIsOpen((prev) => {
+      const next = !prev;
+      isOpenRef.current = next;
+      return next;
+    });
+  }, []);
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'k') {
         event.preventDefault();
         togglePalette();
-      } else if (event.key === 'Escape') {
+      } else if (event.key === 'Escape' && isOpenRef.current) {
         closePalette();
       }
     };

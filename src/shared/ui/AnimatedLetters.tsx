@@ -1,6 +1,10 @@
 'use client';
 
-import { memo, type MouseEvent } from 'react';
+import {
+  memo,
+  type AnimationEvent,
+  type MouseEvent,
+} from 'react';
 import { cn } from '@/shared/lib';
 
 interface AnimatedLettersProps {
@@ -16,18 +20,29 @@ function AnimatedLettersComponent({
   text,
   className,
   letterClassName,
-  delayOffset = 0,
 }: AnimatedLettersProps) {
-  const handleMouseEnter = (event: MouseEvent<HTMLSpanElement>) => {
-    event.currentTarget.classList.add(...RUBBER_BAND_CLASSES);
+  // Single delegated listener on the container instead of 2 listeners per character span
+  const handleMouseOver = (event: MouseEvent<HTMLSpanElement>) => {
+    const target = event.target as HTMLElement;
+    if (target.dataset.char === '1') {
+      target.classList.add(...RUBBER_BAND_CLASSES);
+    }
   };
 
-  const handleAnimationEnd = (event: React.AnimationEvent<HTMLSpanElement>) => {
-    event.currentTarget.classList.remove(...RUBBER_BAND_CLASSES);
+  const handleAnimationEnd = (event: AnimationEvent<HTMLSpanElement>) => {
+    const target = event.target as HTMLElement;
+    if (target.dataset.char === '1') {
+      target.classList.remove(...RUBBER_BAND_CLASSES);
+    }
   };
 
   return (
-    <span aria-label={text} className={cn('inline-block', className)}>
+    <span
+      aria-label={text}
+      onMouseOver={handleMouseOver}
+      onAnimationEnd={handleAnimationEnd}
+      className={cn('inline-block', className)}
+    >
       {Array.from(text).map((char, index) => {
         const isSpace = char === ' ';
 
@@ -35,14 +50,12 @@ function AnimatedLettersComponent({
           <span
             key={`${char}-${index}`}
             aria-hidden="true"
-            onMouseEnter={isSpace ? undefined : handleMouseEnter}
-            onAnimationEnd={isSpace ? undefined : handleAnimationEnd}
-            style={{
-              animationDelay: `${(index + delayOffset) * 35}ms`,
-            }}
+            data-char={isSpace ? undefined : '1'}
             className={cn(
               'inline-block transition-colors duration-200 select-none',
-              isSpace ? 'w-[0.3em]' : 'cursor-default hover:text-[var(--ui-accent)]',
+              isSpace
+                ? 'w-[0.3em]'
+                : 'cursor-default hover:text-[var(--ui-accent)]',
               letterClassName
             )}
           >

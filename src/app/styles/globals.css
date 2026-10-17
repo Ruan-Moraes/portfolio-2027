@@ -87,3 +87,10 @@ body {
   animation: soundWave 0.9s ease-in-out infinite;
   transform-origin: bottom;
 }
+
+/* Skip layout and paint work for off-screen sections until scrolled near viewport */
+section[id]:not(#home) {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 600px;
+}
+

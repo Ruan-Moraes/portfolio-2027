@@ -5,6 +5,7 @@ import { Briefcase, CheckCircle2, GraduationCap, Rocket } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import {
   CAREER_ENTRIES,
+  type CareerEntryMetadata,
   type CareerEntryType,
 } from '@/entities/career-entry';
 import { cn } from '@/shared/lib';
@@ -16,14 +17,18 @@ const TYPE_ICONS: Record<CareerEntryType, typeof Briefcase> = {
   milestone: Rocket,
 };
 
+const CAREER_BY_TYPE: Record<'all' | CareerEntryType, CareerEntryMetadata[]> = {
+  all: CAREER_ENTRIES,
+  work: CAREER_ENTRIES.filter((entry) => entry.type === 'work'),
+  education: CAREER_ENTRIES.filter((entry) => entry.type === 'education'),
+  milestone: CAREER_ENTRIES.filter((entry) => entry.type === 'milestone'),
+};
+
 export function CareerTimeline() {
   const t = useTranslations('career');
   const [filter, setFilter] = useState<'all' | CareerEntryType>('all');
 
-  const filteredEntries =
-    filter === 'all'
-      ? CAREER_ENTRIES
-      : CAREER_ENTRIES.filter((entry) => entry.type === filter);
+  const filteredEntries = CAREER_BY_TYPE[filter];
 
   const tabs: { id: 'all' | CareerEntryType; label: string }[] = [
     { id: 'all', label: t('tabs.all') },
