@@ -64,27 +64,27 @@ export function TechCube3D() {
           ctx.fillStyle = aura;
           ctx.fillRect(0, 0, texSize, texSize);
 
-          // 3. Subtle circular tech emblem behind the symbol
-          const badgeRadius = 64;
-          const badgeY = texSize / 2 - 58;
+          // 3. Subtle circular tech emblem behind the symbol (sized generously for 2- and 3-letter symbols like OPS)
+          const badgeRadius = 82;
+          const badgeY = texSize / 2 - 66;
           ctx.beginPath();
           ctx.arc(texSize / 2, badgeY, badgeRadius, 0, Math.PI * 2);
-          ctx.fillStyle = `${item.color}14`;
+          ctx.fillStyle = `${item.color}16`;
           ctx.fill();
 
-          // 4. Tech Symbol with soft neon glow
+          // 4. Tech Symbol with soft neon glow and comfortable letter spacing
           ctx.save();
           ctx.shadowColor = item.color;
           ctx.shadowBlur = 18;
           ctx.fillStyle = item.color;
           ctx.font =
-            '900 68px ui-monospace, SFMono-Regular, Menlo, Monaco, monospace';
+            '900 62px ui-monospace, SFMono-Regular, Menlo, Monaco, monospace';
           ctx.textAlign = 'center';
           ctx.textBaseline = 'middle';
           ctx.fillText(item.symbol, texSize / 2, badgeY + 2);
           ctx.restore();
 
-          //Content strictly centered inside a 320px safe zone
+          // Content strictly centered inside a 320px safe zone
           const safeTextWidth = 320;
 
           // 5. Tech Name
@@ -92,11 +92,11 @@ export function TechCube3D() {
           ctx.font = '800 34px system-ui, -apple-system, sans-serif';
           ctx.textAlign = 'center';
           ctx.textBaseline = 'middle';
-          ctx.fillText(item.name, texSize / 2, texSize / 2 + 40, safeTextWidth);
+          ctx.fillText(item.name, texSize / 2, texSize / 2 + 48, safeTextWidth);
 
           // 6. Subtle glowing accent divider bar between title and subtitle
           const barWidth = 56;
-          const barY = texSize / 2 + 68;
+          const barY = texSize / 2 + 76;
           const barGrad = ctx.createLinearGradient(
             texSize / 2 - barWidth,
             barY,
@@ -120,7 +120,7 @@ export function TechCube3D() {
             subtitleFontPx -= 1;
             ctx.font = `600 ${subtitleFontPx}px ui-monospace, SFMono-Regular, Menlo, monospace`;
           }
-          ctx.fillText(item.subtitle, texSize / 2, texSize / 2 + 98);
+          ctx.fillText(item.subtitle, texSize / 2, texSize / 2 + 106);
         }
 
         const texture = new THREE.CanvasTexture(canvas);
