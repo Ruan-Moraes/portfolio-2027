@@ -23,7 +23,7 @@ export function LanguageSwitcher() {
     <div
       role="group"
       aria-label="Language switcher"
-      className="inline-flex items-center rounded-xl border border-[var(--ui-border)] bg-[var(--ui-surface)]/80 p-0.5 backdrop-blur-md"
+      className="inline-flex h-9 items-center gap-0.5 rounded-xl border border-[var(--ui-border)] bg-[var(--ui-surface)]/80 p-1 backdrop-blur-md"
     >
       {SUPPORTED_LOCALES.map((locale) => {
         const meta = LOCALE_METADATA[locale];
@@ -36,7 +36,7 @@ export function LanguageSwitcher() {
             onClick={() => handleSelectLocale(locale)}
             title={meta.label}
             className={cn(
-              'cursor-pointer rounded-lg px-2 py-1 text-xs font-semibold transition-all duration-200',
+              'flex h-full cursor-pointer items-center justify-center rounded-lg px-2.5 text-xs font-semibold transition-all duration-200',
               isActive
                 ? 'bg-[var(--ui-accent)] text-slate-950 shadow-sm'
                 : 'text-[var(--ui-text-secondary)] hover:text-[var(--ui-text-primary)]'
