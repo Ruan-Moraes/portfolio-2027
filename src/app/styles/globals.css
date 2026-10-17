@@ -1,5 +1,4 @@
 @import 'tailwindcss';
-@import 'leaflet/dist/leaflet.css';
 
 :root,
 [data-theme='dark'] {
@@ -87,76 +86,4 @@ body {
 .animate-sound-wave {
   animation: soundWave 0.9s ease-in-out infinite;
   transform-origin: bottom;
-}
-
-/* 3D Rotating Tech Cube (metal-oopa cubespinner evolution) */
-.cube-scene {
-  perspective: 1000px;
-}
-
-.cube-spinner {
-  position: relative;
-  width: 200px;
-  height: 200px;
-  margin: 0 auto;
-  transform-style: preserve-3d;
-  transform-origin: 100px 100px 0;
-  will-change: transform;
-  animation: spinCube3D 18s ease-in-out infinite;
-}
-
-.cube-spinner:hover {
-  animation-play-state: paused;
-}
-
-.cube-face {
-  position: absolute;
-  inset: 0;
-  width: 200px;
-  height: 200px;
-  backface-visibility: hidden;
-  -webkit-backface-visibility: hidden;
-  transform-style: preserve-3d;
-}
-
-/* Standard orthogonal 6 cube faces without overlapping Z-fighting */
-.cube-face-1 {
-  transform: rotateY(0deg) translateZ(100px);
-}
-.cube-face-2 {
-  transform: rotateY(90deg) translateZ(100px);
-}
-.cube-face-3 {
-  transform: rotateY(180deg) translateZ(100px);
-}
-.cube-face-4 {
-  transform: rotateY(-90deg) translateZ(100px);
-}
-.cube-face-5 {
-  transform: rotateX(90deg) translateZ(100px);
-}
-.cube-face-6 {
-  transform: rotateX(-90deg) translateZ(100px);
-}
-
-@keyframes spinCube3D {
-  0%,
-  100% {
-    transform: rotateX(-18deg) rotateY(22deg);
-  }
-  16% {
-    transform: rotateX(-18deg) rotateY(-68deg);
-  }
-  33% {
-    transform: rotateX(-18deg) rotateY(-158deg);
-  }
-  50% {
-    transform: rotateX(-18deg) rotateY(-248deg);
-  }
-  66% {
-    transform: rotateX(-72deg) rotateY(-290deg);
-  }
-  83% {
-    transform: rotateX(72deg) rotateY(-338deg);
-  }
 }

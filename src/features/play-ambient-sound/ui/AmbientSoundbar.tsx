@@ -79,8 +79,18 @@ function playRhodesNote(
 
   osc.start(startTime);
   subOsc.start(startTime);
-  osc.stop(startTime + duration + 0.05);
-  subOsc.stop(startTime + duration + 0.05);
+  const stopAt = startTime + duration + 0.05;
+  osc.stop(stopAt);
+  subOsc.stop(stopAt);
+
+  // Release Web Audio graph nodes once note finishes to prevent memory accumulation
+  subOsc.onended = () => {
+    osc.disconnect();
+    subOsc.disconnect();
+    subGain.disconnect();
+    filter.disconnect();
+    env.disconnect();
+  };
 }
 
 export function AmbientSoundbar() {
@@ -115,17 +125,15 @@ export function AmbientSoundbar() {
     let stepIndex = 0;
 
     const triggerBar = () => {
-      if (context.state === 'closed') return;
+      if (context.state !== 'running' || document.hidden) return;
       const now = context.currentTime + 0.05;
       const step = LOFI_CHORDS[stepIndex % LOFI_CHORDS.length];
       stepIndex += 1;
 
-      // Acorde suave de piano elétrico (warm pad)
       step.pad.forEach((freq, i) => {
         playRhodesNote(context, masterGain, freq, now + i * 0.04, 3.1, 0.055);
       });
 
-      // Dedilhado melódico calmo (estilo Lo-Fi / Kalimba suave)
       step.melody.forEach((noteFreq, beatIdx) => {
         const noteStart = now + beatIdx * 0.78;
         playRhodesNote(context, masterGain, noteFreq, noteStart, 1.35, 0.042);
@@ -152,7 +160,19 @@ export function AmbientSoundbar() {
   };
 
   useEffect(() => {
+    const handleVisibilityChange = () => {
+      const active = synthRef.current;
+      if (!active) return;
+      if (document.hidden && active.context.state === 'running') {
+        void active.context.suspend();
+      } else if (!document.hidden && active.context.state === 'suspended') {
+        void active.context.resume();
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
     return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
       stopSynth();
     };
   }, [stopSynth]);

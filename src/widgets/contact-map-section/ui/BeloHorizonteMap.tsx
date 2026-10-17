@@ -1,5 +1,6 @@
 'use client';
 
+import 'leaflet/dist/leaflet.css';
 import { useEffect, useRef, useState } from 'react';
 import { DEVELOPER_PROFILE } from '@/entities/developer-profile';
 

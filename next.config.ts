@@ -5,6 +5,9 @@ const withNextIntl = createNextIntlPlugin('./src/shared/i18n/request.ts');
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
+  experimental: {
+    optimizePackageImports: ['lucide-react', 'three'],
+  },
   images: {
     remotePatterns: [
       {

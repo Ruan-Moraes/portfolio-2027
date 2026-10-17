@@ -7,9 +7,11 @@ interface Star {
   y: number;
   z: number;
   size: number;
-  opacity: number;
+  bucket: 0 | 1 | 2 | 3; // 0 = accent, 1..3 = opacity tiers for batched path drawing
   speed: number;
 }
+
+const FRAME_INTERVAL_MS = 1000 / 30; // 30 FPS frame-pacing (cuts Canvas CPU/GPU load by 50%)
 
 export function StarfieldCanvas() {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
@@ -18,7 +20,7 @@ export function StarfieldCanvas() {
     const canvas = canvasRef.current;
     if (!canvas) return;
 
-    const ctx = canvas.getContext('2d');
+    const ctx = canvas.getContext('2d', { alpha: true });
     if (!ctx) return;
 
     let animationFrameId = 0;
@@ -29,14 +31,14 @@ export function StarfieldCanvas() {
       '(prefers-reduced-motion: reduce)'
     ).matches;
 
-    const starCount = Math.min(220, Math.floor((width * height) / 8500));
-    const stars: Star[] = Array.from({ length: starCount }, () => ({
+    const starCount = Math.min(130, Math.floor((width * height) / 12000));
+    const stars: Star[] = Array.from({ length: starCount }, (_, i) => ({
       x: Math.random() * width,
       y: Math.random() * height,
-      z: Math.random() * 2 + 0.5,
-      size: Math.random() * 1.8 + 0.4,
-      opacity: Math.random() * 0.75 + 0.2,
-      speed: (Math.random() * 0.35 + 0.08) * (prefersReducedMotion ? 0 : 1),
+      z: Math.random() * 1.8 + 0.5,
+      size: Math.random() * 1.6 + 0.5,
+      bucket: i % 9 === 0 ? 0 : ((1 + (i % 3)) as 1 | 2 | 3),
+      speed: (Math.random() * 0.55 + 0.14) * (prefersReducedMotion ? 0 : 1),
     }));
 
     let mouseX = width / 2;
@@ -73,51 +75,64 @@ export function StarfieldCanvas() {
 
     let isPageVisible = document.visibilityState === 'visible';
     let isRunning = false;
+    let lastFrameTime = 0;
 
-    const render = () => {
-      isRunning = false;
+    const drawFrame = () => {
       ctx.clearRect(0, 0, width, height);
 
       const offsetX = (mouseX - width / 2) * 0.012;
       const offsetY = (mouseY - height / 2) * 0.012;
 
-      const lightFillPrefix = 'rgba(51, 65, 85, ';
-      const darkFillPrefix = 'rgba(226, 232, 240, ';
+      const bucketStyles = [
+        accentColor,
+        isLight ? 'rgba(51, 65, 85, 0.26)' : 'rgba(226, 232, 240, 0.32)',
+        isLight ? 'rgba(51, 65, 85, 0.45)' : 'rgba(226, 232, 240, 0.58)',
+        isLight ? 'rgba(51, 65, 85, 0.66)' : 'rgba(226, 232, 240, 0.85)',
+      ];
 
-      for (let i = 0; i < stars.length; i++) {
-        const star = stars[i];
-        star.y -= star.speed;
-        if (star.y < 0) {
-          star.y = height;
-          star.x = Math.random() * width;
-        }
-
-        const drawX = (star.x + offsetX * star.z + width) % width;
-        const drawY = (star.y + offsetY * star.z + height) % height;
-
+      // Batch all stars into 4 draw calls per frame instead of 130+ individual ctx.fill() calls
+      for (let b = 0; b < 4; b += 1) {
         ctx.beginPath();
-        ctx.arc(drawX, drawY, star.size, 0, Math.PI * 2);
-        if (i % 9 === 0) {
-          ctx.fillStyle = accentColor;
-        } else if (isLight) {
-          ctx.fillStyle = `${lightFillPrefix}${(star.opacity * 0.72).toFixed(2)})`;
-        } else {
-          ctx.fillStyle = `${darkFillPrefix}${star.opacity.toFixed(2)})`;
+        for (let i = 0; i < stars.length; i += 1) {
+          const star = stars[i];
+          if (star.bucket !== b) continue;
+
+          star.y -= star.speed;
+          if (star.y < 0) {
+            star.y = height;
+            star.x = Math.random() * width;
+          }
+
+          const drawX = (star.x + offsetX * star.z + width) % width;
+          const drawY = (star.y + offsetY * star.z + height) % height;
+
+          ctx.moveTo(drawX + star.size, drawY);
+          ctx.arc(drawX, drawY, star.size, 0, Math.PI * 2);
         }
+        ctx.fillStyle = bucketStyles[b];
         ctx.fill();
       }
+    };
 
-      if (!prefersReducedMotion && isPageVisible) {
-        isRunning = true;
-        animationFrameId = window.requestAnimationFrame(render);
+    const loop = (timestamp: number) => {
+      if (!isPageVisible || prefersReducedMotion) {
+        isRunning = false;
+        return;
       }
+
+      if (timestamp - lastFrameTime >= FRAME_INTERVAL_MS) {
+        lastFrameTime = timestamp;
+        drawFrame();
+      }
+
+      animationFrameId = window.requestAnimationFrame(loop);
     };
 
     const handleVisibilityChange = () => {
       isPageVisible = document.visibilityState === 'visible';
       if (isPageVisible && !prefersReducedMotion && !isRunning) {
         isRunning = true;
-        animationFrameId = window.requestAnimationFrame(render);
+        animationFrameId = window.requestAnimationFrame(loop);
       } else if (!isPageVisible && isRunning) {
         window.cancelAnimationFrame(animationFrameId);
         isRunning = false;
@@ -129,7 +144,7 @@ export function StarfieldCanvas() {
     const observer = new MutationObserver(() => {
       syncThemeTokens();
       if (prefersReducedMotion || !isPageVisible) {
-        render();
+        drawFrame();
       }
     });
     observer.observe(document.documentElement, {
@@ -137,7 +152,11 @@ export function StarfieldCanvas() {
       attributeFilter: ['data-theme', 'data-accent', 'style'],
     });
 
-    render();
+    drawFrame();
+    if (!prefersReducedMotion && isPageVisible) {
+      isRunning = true;
+      animationFrameId = window.requestAnimationFrame(loop);
+    }
 
     return () => {
       observer.disconnect();
@@ -152,7 +171,7 @@ export function StarfieldCanvas() {
     <canvas
       ref={canvasRef}
       aria-hidden="true"
-      className="pointer-events-none fixed inset-0 z-0 opacity-80 transition-opacity duration-500"
+      className="pointer-events-none fixed inset-0 z-0 opacity-80"
     />
   );
 }

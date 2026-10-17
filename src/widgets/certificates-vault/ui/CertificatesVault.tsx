@@ -5,11 +5,21 @@ import { Award, Calendar, ExternalLink, ShieldCheck } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 import {
   CERTIFICATES_DATA,
+  type CertificateItem,
   type CertificatePlatform,
 } from '@/entities/certificate';
 import type { SupportedLocale } from '@/shared/config';
 import { cn } from '@/shared/lib';
 import { Badge, GlassCard, SectionHeading } from '@/shared/ui';
+
+const CERTIFICATES_BY_PLATFORM: Record<
+  'all' | CertificatePlatform,
+  CertificateItem[]
+> = {
+  all: CERTIFICATES_DATA,
+  Udemy: CERTIFICATES_DATA.filter((c) => c.platform === 'Udemy'),
+  DIO: CERTIFICATES_DATA.filter((c) => c.platform === 'DIO'),
+};
 
 export function CertificatesVault() {
   const t = useTranslations('certificates');
@@ -19,10 +29,7 @@ export function CertificatesVault() {
     'all' | CertificatePlatform
   >('all');
 
-  const filtered =
-    platformFilter === 'all'
-      ? CERTIFICATES_DATA
-      : CERTIFICATES_DATA.filter((item) => item.platform === platformFilter);
+  const filtered = CERTIFICATES_BY_PLATFORM[platformFilter];
 
   return (
     <section id="certificates" className="scroll-mt-20 py-20">
@@ -36,11 +43,7 @@ export function CertificatesVault() {
         <div className="flex flex-wrap gap-2">
           {(['all', 'Udemy', 'DIO'] as const).map((platform) => {
             const isSelected = platformFilter === platform;
-            const count =
-              platform === 'all'
-                ? CERTIFICATES_DATA.length
-                : CERTIFICATES_DATA.filter((c) => c.platform === platform)
-                    .length;
+            const count = CERTIFICATES_BY_PLATFORM[platform].length;
 
             return (
               <button

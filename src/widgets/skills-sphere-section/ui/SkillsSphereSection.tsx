@@ -6,10 +6,20 @@ import {
   SKILLS_DATA,
   SKILL_CATEGORIES,
   type SkillCategoryKey,
+  type SkillItem,
 } from '@/entities/skill';
 import { cn } from '@/shared/lib';
 import { Badge, GlassCard, SectionHeading } from '@/shared/ui';
 import { InteractiveSkillSphere } from './InteractiveSkillSphere';
+
+const SKILLS_BY_CATEGORY: Record<SkillCategoryKey, SkillItem[]> =
+  SKILL_CATEGORIES.reduce(
+    (acc, category) => {
+      acc[category] = SKILLS_DATA.filter((s) => s.category === category);
+      return acc;
+    },
+    {} as Record<SkillCategoryKey, SkillItem[]>
+  );
 
 export function SkillsSphereSection() {
   const t = useTranslations('skills');
@@ -45,9 +55,7 @@ export function SkillsSphereSection() {
 
         {SKILL_CATEGORIES.map((category) => {
           const isSelected = selectedCategory === category;
-          const count = SKILLS_DATA.filter(
-            (s) => s.category === category
-          ).length;
+          const count = SKILLS_BY_CATEGORY[category].length;
 
           return (
             <button
@@ -79,9 +87,7 @@ export function SkillsSphereSection() {
         {/* Categorized Resume Matrix */}
         <div className="grid gap-4 sm:grid-cols-2 lg:col-span-7">
           {visibleCategories.map((category) => {
-            const categorySkills = SKILLS_DATA.filter(
-              (skill) => skill.category === category
-            );
+            const categorySkills = SKILLS_BY_CATEGORY[category];
 
             return (
               <GlassCard key={category} interactive className="p-5">

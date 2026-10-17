@@ -1,5 +1,6 @@
 'use client';
 
+import dynamic from 'next/dynamic';
 import {
   ArrowRight,
   Download,
@@ -16,7 +17,18 @@ import {
   CodeTag,
   GlassCard,
 } from '@/shared/ui';
-import { TechCube3D } from './TechCube3D';
+
+const TechCube3D = dynamic(
+  () => import('./TechCube3D').then((mod) => mod.TechCube3D),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="relative flex flex-col items-center justify-center py-4">
+        <div className="h-[280px] w-[280px] sm:h-[300px] sm:w-[300px]" />
+      </div>
+    ),
+  }
+);
 
 export function HeroShowcase() {
   const t = useTranslations('hero');
