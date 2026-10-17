@@ -169,21 +169,30 @@ export function TechCube3D() {
       attributeFilter: ['style', 'data-theme'],
     });
 
-    // Animation Loop
+    // Animation Loop with smooth real-time damping (lerp) during and after drag
     let frameId = 0;
     let clockTime = 0;
+    let currentRx = -0.32;
+    let currentRy = 0.55;
 
     const animate = () => {
       if (!isDraggingRef.current) {
-        const speed = isHoveredRef.current ? 0.003 : 0.01;
+        const speed = isHoveredRef.current ? 0.0025 : 0.009;
         clockTime += speed;
-        cubeMesh.rotation.y =
-          0.55 + clockTime + manualRotationRef.current.ry;
-        cubeMesh.rotation.x =
-          -0.32 +
-          Math.sin(clockTime * 0.7) * 0.36 +
-          manualRotationRef.current.rx;
       }
+
+      const targetRy = 0.55 + clockTime + manualRotationRef.current.ry;
+      const targetRx =
+        -0.32 +
+        Math.sin(clockTime * 0.7) * 0.34 +
+        manualRotationRef.current.rx;
+
+      // Smoothly interpolate (lerp) every frame so dragging moves the cube in real time with fluid inertia
+      currentRy += (targetRy - currentRy) * 0.16;
+      currentRx += (targetRx - currentRx) * 0.16;
+
+      cubeMesh.rotation.y = currentRy;
+      cubeMesh.rotation.x = currentRx;
 
       renderer.render(scene, camera);
       frameId = window.requestAnimationFrame(animate);
@@ -203,12 +212,34 @@ export function TechCube3D() {
     };
   }, []);
 
+  const handlePointerDown = (clientX: number, clientY: number) => {
+    isDraggingRef.current = true;
+    lastPointerRef.current = { x: clientX, y: clientY };
+  };
+
+  const handlePointerMove = (clientX: number, clientY: number) => {
+    if (!isDraggingRef.current) return;
+    const dx = clientX - lastPointerRef.current.x;
+    const dy = clientY - lastPointerRef.current.y;
+    manualRotationRef.current.ry += dx * 0.011;
+    manualRotationRef.current.rx += dy * 0.011;
+    lastPointerRef.current = { x: clientX, y: clientY };
+  };
+
+  const handlePointerUp = () => {
+    isDraggingRef.current = false;
+  };
+
   return (
     <div className="relative flex flex-col items-center justify-center py-4">
-      {/* Glow Halo behind the 3D cube */}
+      {/* Subtle spherical orb behind the 3D cube with smooth radial falloff to 0% (never clips) */}
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute h-64 w-64 rounded-full bg-[var(--ui-accent)]/15 blur-3xl"
+        style={{
+          background:
+            'radial-gradient(circle, color-mix(in srgb, var(--ui-accent) 16%, transparent) 0%, color-mix(in srgb, var(--ui-accent) 7%, transparent) 38%, color-mix(in srgb, var(--ui-accent) 2%, transparent) 62%, transparent 76%)',
+        }}
+        className="pointer-events-none absolute h-[380px] w-[380px] rounded-full sm:h-[420px] sm:w-[420px]"
       />
 
       <div
@@ -218,25 +249,22 @@ export function TechCube3D() {
         }}
         onMouseLeave={() => {
           isHoveredRef.current = false;
-          isDraggingRef.current = false;
+          handlePointerUp();
         }}
-        onMouseDown={(e) => {
-          isDraggingRef.current = true;
-          lastPointerRef.current = { x: e.clientX, y: e.clientY };
+        onMouseDown={(e) => handlePointerDown(e.clientX, e.clientY)}
+        onMouseMove={(e) => handlePointerMove(e.clientX, e.clientY)}
+        onMouseUp={handlePointerUp}
+        onTouchStart={(e) => {
+          const touch = e.touches[0];
+          if (touch) handlePointerDown(touch.clientX, touch.clientY);
         }}
-        onMouseMove={(e) => {
-          if (!isDraggingRef.current) return;
-          const dx = e.clientX - lastPointerRef.current.x;
-          const dy = e.clientY - lastPointerRef.current.y;
-          manualRotationRef.current.ry += dx * 0.01;
-          manualRotationRef.current.rx += dy * 0.01;
-          lastPointerRef.current = { x: e.clientX, y: e.clientY };
+        onTouchMove={(e) => {
+          const touch = e.touches[0];
+          if (touch) handlePointerMove(touch.clientX, touch.clientY);
         }}
-        onMouseUp={() => {
-          isDraggingRef.current = false;
-        }}
+        onTouchEnd={handlePointerUp}
         aria-label="Interactive 3D Rounded Technology Cube"
-        className="relative z-10 flex h-[280px] w-[280px] cursor-grab items-center justify-center active:cursor-grabbing sm:h-[300px] sm:w-[300px]"
+        className="relative z-10 flex h-[280px] w-[280px] cursor-grab items-center justify-center select-none active:cursor-grabbing sm:h-[300px] sm:w-[300px]"
       />
     </div>
   );
