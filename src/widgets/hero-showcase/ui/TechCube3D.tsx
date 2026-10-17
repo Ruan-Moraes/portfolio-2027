@@ -37,6 +37,38 @@ export function TechCube3D() {
 
     const texSize = 512;
 
+    // Subtle procedural micro-texture bump map for tactile anodized surface feel (zero glare)
+    const createBumpTexture = () => {
+      const bumpCanvas = document.createElement('canvas');
+      bumpCanvas.width = texSize;
+      bumpCanvas.height = texSize;
+      const bCtx = bumpCanvas.getContext('2d');
+      if (bCtx) {
+        bCtx.fillStyle = '#808080';
+        bCtx.fillRect(0, 0, texSize, texSize);
+
+        // Fine micro-grid relief
+        bCtx.strokeStyle = '#969696';
+        bCtx.lineWidth = 1;
+        const step = 16;
+        for (let i = 0; i <= texSize; i += step) {
+          bCtx.beginPath();
+          bCtx.moveTo(i, 0);
+          bCtx.lineTo(i, texSize);
+          bCtx.stroke();
+          bCtx.beginPath();
+          bCtx.moveTo(0, i);
+          bCtx.lineTo(texSize, i);
+          bCtx.stroke();
+        }
+      }
+      const bumpTex = new THREE.CanvasTexture(bumpCanvas);
+      bumpTex.anisotropy = 4;
+      return bumpTex;
+    };
+
+    const sharedBumpMap = createBumpTexture();
+
     const buildMaterials = () => {
       return CUBE_FACES_TECH.map((item) => {
         const canvas = document.createElement('canvas');
@@ -45,26 +77,71 @@ export function TechCube3D() {
         const ctx = canvas.getContext('2d');
 
         if (ctx) {
-          // 1. Single unified surface across the entire cube face and rounded corners (0 outer borders, 0 background seams)
-          ctx.fillStyle = '#0d1527';
+          // 1. Rich deep slate-indigo base across the entire cube face and curved bevels
+          ctx.fillStyle = '#111c35';
           ctx.fillRect(0, 0, texSize, texSize);
 
-          // 2. Soft radial ambient aura in the center that fades to 0% before reaching the rounded bevels
-          const aura = ctx.createRadialGradient(
+          // 2. Tactile architectural tech grid + micro-dots (fades smoothly near bevel edges)
+          ctx.save();
+          const gridStep = 32;
+          ctx.strokeStyle = 'rgba(148, 163, 184, 0.055)';
+          ctx.lineWidth = 1;
+          for (let i = gridStep; i < texSize; i += gridStep) {
+            ctx.beginPath();
+            ctx.moveTo(i, 0);
+            ctx.lineTo(i, texSize);
+            ctx.stroke();
+
+            ctx.beginPath();
+            ctx.moveTo(0, i);
+            ctx.lineTo(texSize, i);
+            ctx.stroke();
+          }
+
+          // Micro intersection nodes inside the face
+          ctx.fillStyle = `${item.color}2e`;
+          for (let x = gridStep * 2; x <= texSize - gridStep * 2; x += gridStep) {
+            for (
+              let y = gridStep * 2;
+              y <= texSize - gridStep * 2;
+              y += gridStep
+            ) {
+              ctx.fillRect(x - 1, y - 1, 2, 2);
+            }
+          }
+          ctx.restore();
+
+          // 3. Vibrant multi-layered radial color infusion (fades to 0% before the outer bevel seam)
+          const primaryAura = ctx.createRadialGradient(
             texSize / 2,
-            texSize / 2 - 20,
-            10,
+            texSize / 2 - 36,
+            12,
             texSize / 2,
             texSize / 2,
-            195
+            225
           );
-          aura.addColorStop(0, `${item.color}26`);
-          aura.addColorStop(0.55, `${item.color}0c`);
-          aura.addColorStop(1, 'rgba(13, 21, 39, 0)');
-          ctx.fillStyle = aura;
+          primaryAura.addColorStop(0, `${item.color}42`);
+          primaryAura.addColorStop(0.45, `${item.color}1c`);
+          primaryAura.addColorStop(0.78, `${item.color}08`);
+          primaryAura.addColorStop(1, 'rgba(17, 28, 53, 0)');
+          ctx.fillStyle = primaryAura;
           ctx.fillRect(0, 0, texSize, texSize);
 
-          // 3. Harmonious content container border positioned close to the face boundary
+          // Subtle top-left anodized highlight wash for extra depth
+          const sheenAura = ctx.createRadialGradient(
+            140,
+            120,
+            10,
+            140,
+            120,
+            180
+          );
+          sheenAura.addColorStop(0, 'rgba(255, 255, 255, 0.05)');
+          sheenAura.addColorStop(1, 'rgba(255, 255, 255, 0)');
+          ctx.fillStyle = sheenAura;
+          ctx.fillRect(0, 0, texSize, texSize);
+
+          // 4. Harmonious content container border positioned close to the face boundary
           const pad = 24;
           const frameSize = texSize - pad * 2;
           const frameRadius = 58;
@@ -74,9 +151,9 @@ export function TechCube3D() {
             texSize - pad,
             texSize - pad
           );
-          borderGrad.addColorStop(0, `${item.color}88`);
-          borderGrad.addColorStop(0.5, 'rgba(148, 163, 184, 0.28)');
-          borderGrad.addColorStop(1, `${item.color}66`);
+          borderGrad.addColorStop(0, `${item.color}99`);
+          borderGrad.addColorStop(0.5, 'rgba(148, 163, 184, 0.34)');
+          borderGrad.addColorStop(1, `${item.color}75`);
 
           ctx.save();
           ctx.beginPath();
@@ -84,19 +161,63 @@ export function TechCube3D() {
           ctx.strokeStyle = borderGrad;
           ctx.lineWidth = 3.5;
           ctx.shadowColor = item.color;
-          ctx.shadowBlur = 10;
+          ctx.shadowBlur = 12;
           ctx.stroke();
           ctx.restore();
 
-          // 4. Subtle circular tech emblem behind the symbol (sized generously for 2- and 3-letter symbols like OPS)
+          // Subtle inner hairline frame for hardware depth
+          ctx.save();
+          ctx.beginPath();
+          ctx.roundRect(
+            pad + 10,
+            pad + 10,
+            frameSize - 20,
+            frameSize - 20,
+            frameRadius - 8
+          );
+          ctx.strokeStyle = 'rgba(255, 255, 255, 0.05)';
+          ctx.lineWidth = 1;
+          ctx.stroke();
+          ctx.restore();
+
+          // 5. Layered circular tech emblem behind the symbol
           const badgeRadius = 82;
           const badgeY = texSize / 2 - 66;
+          const badgeGrad = ctx.createRadialGradient(
+            texSize / 2,
+            badgeY,
+            8,
+            texSize / 2,
+            badgeY,
+            badgeRadius
+          );
+          badgeGrad.addColorStop(0, `${item.color}32`);
+          badgeGrad.addColorStop(0.7, `${item.color}18`);
+          badgeGrad.addColorStop(1, `${item.color}08`);
+
           ctx.beginPath();
           ctx.arc(texSize / 2, badgeY, badgeRadius, 0, Math.PI * 2);
-          ctx.fillStyle = `${item.color}16`;
+          ctx.fillStyle = badgeGrad;
           ctx.fill();
 
-          // 4. Tech Symbol with soft neon glow and comfortable letter spacing
+          // Crisp concentric ring around the badge
+          ctx.beginPath();
+          ctx.arc(texSize / 2, badgeY, badgeRadius, 0, Math.PI * 2);
+          ctx.strokeStyle = `${item.color}48`;
+          ctx.lineWidth = 1.75;
+          ctx.stroke();
+
+          // Outer dashed orbital ring for technical detail
+          ctx.save();
+          ctx.beginPath();
+          ctx.setLineDash([6, 8]);
+          ctx.arc(texSize / 2, badgeY, badgeRadius + 11, 0, Math.PI * 2);
+          ctx.strokeStyle = `${item.color}28`;
+          ctx.lineWidth = 1.25;
+          ctx.stroke();
+          ctx.restore();
+
+          // 6. Tech Symbol with soft neon glow
           ctx.save();
           ctx.shadowColor = item.color;
           ctx.shadowBlur = 18;
@@ -111,15 +232,15 @@ export function TechCube3D() {
           // Content strictly centered inside a 320px safe zone
           const safeTextWidth = 320;
 
-          // 5. Tech Name
+          // 7. Tech Name
           ctx.fillStyle = '#f8fafc';
           ctx.font = '800 34px system-ui, -apple-system, sans-serif';
           ctx.textAlign = 'center';
           ctx.textBaseline = 'middle';
           ctx.fillText(item.name, texSize / 2, texSize / 2 + 48, safeTextWidth);
 
-          // 6. Subtle glowing accent divider bar between title and subtitle
-          const barWidth = 56;
+          // 8. Subtle glowing accent divider bar between title and subtitle
+          const barWidth = 64;
           const barY = texSize / 2 + 76;
           const barGrad = ctx.createLinearGradient(
             texSize / 2 - barWidth,
@@ -133,8 +254,8 @@ export function TechCube3D() {
           ctx.fillStyle = barGrad;
           ctx.fillRect(texSize / 2 - barWidth, barY - 1.5, barWidth * 2, 3);
 
-          // 7. Tech Subtitle (auto-fitted so it never overflows the safe zone)
-          ctx.fillStyle = '#cbd5e1';
+          // 9. Tech Subtitle (auto-fitted so it never overflows the safe zone)
+          ctx.fillStyle = '#dbeafe';
           let subtitleFontPx = 19;
           ctx.font = `600 ${subtitleFontPx}px ui-monospace, SFMono-Regular, Menlo, monospace`;
           while (
@@ -151,9 +272,11 @@ export function TechCube3D() {
         texture.colorSpace = THREE.SRGBColorSpace;
         texture.anisotropy = 4;
 
-        // Matte Lambert material — natural 3D depth shading across faces & curved corners
+        // Matte Lambert material with subtle micro-bump texture — rich 3D depth with zero glare
         return new THREE.MeshLambertMaterial({
           map: texture,
+          bumpMap: sharedBumpMap,
+          bumpScale: 0.008,
         });
       });
     };
@@ -228,6 +351,7 @@ export function TechCube3D() {
       observer.disconnect();
       window.cancelAnimationFrame(frameId);
       geometry.dispose();
+      sharedBumpMap.dispose();
       materials.forEach((mat) => {
         mat.map?.dispose();
         mat.dispose();
