@@ -20,7 +20,7 @@ export function PortfolioHomeView() {
       <TopUtilityBar />
       <CommandPaletteModal />
 
-      <main className="relative z-10 mx-auto max-w-[92rem] px-4 sm:px-8 lg:pr-12 lg:pl-28">
+      <main className="relative z-10 mx-auto max-w-[82rem] px-4 sm:px-8 lg:pr-12 lg:pl-28">
         <HeroShowcase />
         <AboutSection />
         <SkillsSphereSection />
