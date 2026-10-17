@@ -158,6 +158,45 @@ export function TechCube3D() {
           ctx.fillStyle = sheenAura;
           ctx.fillRect(pad, pad, frameSize, frameSize);
 
+          // Technical dual circuit traces emerging from the 4 corners inside the content container
+          ctx.save();
+          ctx.strokeStyle = `${item.color}55`;
+          ctx.fillStyle = item.color;
+          ctx.lineWidth = 2;
+
+          const drawCornerCircuit = (
+            cx: number,
+            cy: number,
+            sx: number,
+            sy: number
+          ) => {
+            ctx.beginPath();
+            ctx.moveTo(cx + sx * 42, cy + sy * 18);
+            ctx.lineTo(cx + sx * 92, cy + sy * 18);
+            ctx.lineTo(cx + sx * 112, cy + sy * 38);
+            ctx.stroke();
+
+            ctx.beginPath();
+            ctx.arc(cx + sx * 112, cy + sy * 38, 3, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.beginPath();
+            ctx.moveTo(cx + sx * 18, cy + sy * 42);
+            ctx.lineTo(cx + sx * 18, cy + sy * 92);
+            ctx.lineTo(cx + sx * 38, cy + sy * 112);
+            ctx.stroke();
+
+            ctx.beginPath();
+            ctx.arc(cx + sx * 38, cy + sy * 112, 3, 0, Math.PI * 2);
+            ctx.fill();
+          };
+
+          drawCornerCircuit(pad + 12, pad + 12, 1, 1);
+          drawCornerCircuit(texSize - pad - 12, pad + 12, -1, 1);
+          drawCornerCircuit(pad + 12, texSize - pad - 12, 1, -1);
+          drawCornerCircuit(texSize - pad - 12, texSize - pad - 12, -1, -1);
+          ctx.restore();
+
           ctx.restore(); // End clip for inner content container
 
           // 3. Harmonious content container border right at the face limit (pad = 8)
