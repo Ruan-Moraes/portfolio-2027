@@ -27,10 +27,13 @@ export async function fetchGitHubReposClient(): Promise<GitHubRepositoryItem[]> 
       }
 
       const data = (await response.json()) as GitHubRepositoryItem[];
+
       if (Array.isArray(data) && data.length > 0) {
         cachedRepos = data;
+
         return data;
       }
+
       return FALLBACK_GITHUB_REPOS;
     } catch {
       return FALLBACK_GITHUB_REPOS;

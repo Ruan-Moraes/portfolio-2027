@@ -21,9 +21,9 @@ function AnimatedLettersComponent({
   className,
   letterClassName,
 }: AnimatedLettersProps) {
-  // Single delegated listener on the container instead of 2 listeners per character span
   const handleMouseOver = (event: MouseEvent<HTMLSpanElement>) => {
     const target = event.target as HTMLElement;
+
     if (target.dataset.char === '1') {
       target.classList.add(...RUBBER_BAND_CLASSES);
     }
@@ -31,6 +31,7 @@ function AnimatedLettersComponent({
 
   const handleAnimationEnd = (event: AnimationEvent<HTMLSpanElement>) => {
     const target = event.target as HTMLElement;
+
     if (target.dataset.char === '1') {
       target.classList.remove(...RUBBER_BAND_CLASSES);
     }

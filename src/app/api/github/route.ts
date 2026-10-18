@@ -24,6 +24,7 @@ export const revalidate = 1800; // ISR cache for 30 minutes
 export async function GET() {
   const username =
     process.env.GITHUB_USERNAME || DEVELOPER_PROFILE.githubUsername;
+
   const token = process.env.GITHUB_TOKEN;
 
   try {
@@ -49,6 +50,7 @@ export async function GET() {
     }
 
     const rawRepos = (await response.json()) as RawGitHubRepo[];
+
     if (!Array.isArray(rawRepos) || rawRepos.length === 0) {
       return NextResponse.json(FALLBACK_GITHUB_REPOS);
     }

@@ -43,26 +43,31 @@ body {
   font-family: var(--font-script), cursive;
 }
 
-/* Rubber-band letter animation (metal-oopa homage) */
 @keyframes rubberBand {
   0% {
     transform: scale3d(1, 1, 1);
   }
+
   30% {
     transform: scale3d(1.25, 0.75, 1);
   }
+
   40% {
     transform: scale3d(0.75, 1.25, 1);
   }
+
   50% {
     transform: scale3d(1.15, 0.85, 1);
   }
+
   65% {
     transform: scale3d(0.95, 1.05, 1);
   }
+
   75% {
     transform: scale3d(1.05, 0.95, 1);
   }
+
   100% {
     transform: scale3d(1, 1, 1);
   }
@@ -72,12 +77,12 @@ body {
   animation: rubberBand 0.85s both;
 }
 
-/* Soundbar wave animation */
 @keyframes soundWave {
   0%,
   100% {
     transform: scaleY(0.35);
   }
+
   50% {
     transform: scaleY(1);
   }
@@ -88,7 +93,6 @@ body {
   transform-origin: bottom;
 }
 
-/* Skip layout and paint work for off-screen sections until scrolled near viewport */
 section[id]:not(#home) {
   content-visibility: auto;
   contain-intrinsic-size: auto 600px;

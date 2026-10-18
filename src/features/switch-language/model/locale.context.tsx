@@ -18,26 +18,32 @@ async function loadLocaleMessages(
   targetLocale: SupportedLocale
 ): Promise<AbstractIntlMessages> {
   const cached = messageCache.get(targetLocale);
+
   if (cached) return cached;
 
   let loaded: AbstractIntlMessages;
+
   switch (targetLocale) {
     case 'en-US':
       loaded = (await import('../../../../messages/en-US.json'))
         .default as unknown as AbstractIntlMessages;
+
       break;
     case 'es-ES':
       loaded = (await import('../../../../messages/es-ES.json'))
         .default as unknown as AbstractIntlMessages;
+
       break;
     case 'pt-BR':
     default:
       loaded = (await import('../../../../messages/pt-BR.json'))
         .default as unknown as AbstractIntlMessages;
+
       break;
   }
 
   messageCache.set(targetLocale, loaded);
+
   return loaded;
 }
 
@@ -84,25 +90,31 @@ export function PortfolioLocaleProvider({
       const idleId = window.requestIdleCallback(warmOtherLocales, {
         timeout: 2000,
       });
+
       return () => window.cancelIdleCallback(idleId);
     }
 
     const timerId = globalThis.setTimeout(warmOtherLocales, 300);
+
     return () => globalThis.clearTimeout(timerId);
   }, []);
 
   const applyBrowserLocaleMetadata = useCallback(
     (nextLocale: SupportedLocale, dict: AbstractIntlMessages) => {
       if (typeof window === 'undefined') return;
+
       document.documentElement.lang = nextLocale;
 
       const seoSection = (dict as Record<string, { title?: string }>)?.seo;
+
       if (seoSection?.title) {
         document.title = seoSection.title;
       }
 
       const { pathname, search, hash } = window.location;
+
       const segments = pathname.split('/').filter(Boolean);
+
       if (
         segments.length > 0 &&
         SUPPORTED_LOCALES.includes(segments[0] as SupportedLocale)
@@ -111,7 +123,9 @@ export function PortfolioLocaleProvider({
       } else {
         segments.unshift(nextLocale);
       }
+
       const nextUrl = `/${segments.join('/')}${search}${hash}`;
+
       window.history.replaceState(window.history.state, '', nextUrl);
     },
     []
@@ -122,16 +136,20 @@ export function PortfolioLocaleProvider({
       if (!SUPPORTED_LOCALES.includes(nextLocale)) return;
 
       const cached = messageCache.get(nextLocale);
+
       if (cached) {
         setLocaleState(nextLocale);
         setMessages(cached);
+
         applyBrowserLocaleMetadata(nextLocale, cached);
+
         return;
       }
 
       void loadLocaleMessages(nextLocale).then((loaded) => {
         setLocaleState(nextLocale);
         setMessages(loaded);
+
         applyBrowserLocaleMetadata(nextLocale, loaded);
       });
     },
@@ -142,17 +160,21 @@ export function PortfolioLocaleProvider({
   useEffect(() => {
     const handlePopState = () => {
       const segments = window.location.pathname.split('/').filter(Boolean);
+
       const urlLocale = segments[0] as SupportedLocale | undefined;
+
       if (urlLocale && SUPPORTED_LOCALES.includes(urlLocale)) {
         void loadLocaleMessages(urlLocale).then((loaded) => {
           setLocaleState(urlLocale);
           setMessages(loaded);
+
           document.documentElement.lang = urlLocale;
         });
       }
     };
 
     window.addEventListener('popstate', handlePopState);
+
     return () => window.removeEventListener('popstate', handlePopState);
   }, []);
 
@@ -176,10 +198,12 @@ export function PortfolioLocaleProvider({
 
 export function usePortfolioLocale(): PortfolioLocaleContextValue {
   const context = useContext(PortfolioLocaleContext);
+
   if (!context) {
     throw new Error(
       'usePortfolioLocale must be used within a PortfolioLocaleProvider'
     );
   }
+
   return context;
 }

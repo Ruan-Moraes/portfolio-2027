@@ -22,12 +22,17 @@ const FRAME_INTERVAL_MS = 1000 / 40; // 40 FPS pacing eliminates 120Hz style mut
 
 // Pre-compute 3D Fibonacci Sphere coordinates once at module load
 const GOLDEN_ANGLE = Math.PI * (3 - Math.sqrt(5));
+
 const BASE_SPHERE_POINTS: readonly SpherePoint[] = SKILLS_DATA.map(
   (skill, index) => {
     const count = SKILLS_DATA.length;
+
     const y = 1 - (index / (count - 1)) * 2;
+
     const radiusAtY = Math.sqrt(1 - y * y);
+
     const theta = GOLDEN_ANGLE * index;
+
     return {
       ...skill,
       x: Math.cos(theta) * radiusAtY,
@@ -42,7 +47,9 @@ function InteractiveSkillSphereComponent({
 }: InteractiveSkillSphereProps) {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const itemRefs = useRef<Array<HTMLSpanElement | null>>([]);
+
   const isVisible = useElementVisibility(containerRef, { rootMargin: '100px' });
+
   const isVisibleRef = useRef(isVisible);
   const selectedCategoryRef = useRef(selectedCategory);
   const speedRef = useRef({ vx: 0.0045, vy: 0.0065 });
@@ -55,14 +62,19 @@ function InteractiveSkillSphereComponent({
   // Synchronize category filter and visibility without triggering 60fps React re-renders
   useEffect(() => {
     selectedCategoryRef.current = selectedCategory;
+
     const pts = pointsRef.current;
+
     for (let i = 0; i < pts.length; i += 1) {
       const el = itemRefs.current[i];
+
       if (!el) continue;
+
       const point = pts[i];
       const baseOpacity = Math.max(0.22, Math.min(1, (point.z + 1.35) / 2.1));
       const isMatched =
         selectedCategory === 'all' || point.category === selectedCategory;
+
       el.style.opacity = (isMatched ? baseOpacity : baseOpacity * 0.25).toFixed(
         2
       );
@@ -71,6 +83,7 @@ function InteractiveSkillSphereComponent({
 
   useEffect(() => {
     isVisibleRef.current = isVisible;
+
     if (isVisible) {
       resumeLoopRef.current?.();
     }
@@ -80,12 +93,15 @@ function InteractiveSkillSphereComponent({
     let frameId = 0;
     let isRunning = false;
     let lastFrameTime = 0;
+
     const pts = pointsRef.current;
+
     const lastZIndices = new Int16Array(pts.length);
 
     const animate = (timestamp: number) => {
       if (!isVisibleRef.current) {
         isRunning = false;
+
         return;
       }
 
@@ -93,18 +109,20 @@ function InteractiveSkillSphereComponent({
         lastFrameTime = timestamp;
 
         const { vx, vy } = speedRef.current;
+
         const cosX = Math.cos(vx);
         const sinX = Math.sin(vx);
         const cosY = Math.cos(vy);
         const sinY = Math.sin(vy);
+
         const activeCat = selectedCategoryRef.current;
 
         for (let i = 0; i < pts.length; i += 1) {
           const pt = pts[i];
-          // Rotate around X
+
           const y1 = pt.y * cosX - pt.z * sinX;
           const z1 = pt.y * sinX + pt.z * cosX;
-          // Rotate around Y
+
           const x2 = pt.x * cosY + z1 * sinY;
           const z2 = -pt.x * sinY + z1 * cosY;
 
@@ -113,6 +131,7 @@ function InteractiveSkillSphereComponent({
           pt.z = z2;
 
           const el = itemRefs.current[i];
+
           if (!el) continue;
 
           const scale = (z2 + 2) / 3;
@@ -122,13 +141,16 @@ function InteractiveSkillSphereComponent({
           el.style.transform = `translate3d(${(x2 * RADIUS_PX).toFixed(1)}px, ${(
             y1 * RADIUS_PX
           ).toFixed(1)}px, 0) scale(${scale.toFixed(2)})`;
+
           el.style.opacity = (
             isMatched ? baseOpacity : baseOpacity * 0.25
           ).toFixed(2);
 
           const nextZ = Math.round(scale * 100);
+
           if (lastZIndices[i] !== nextZ) {
             lastZIndices[i] = nextZ;
+
             el.style.zIndex = String(nextZ);
           }
         }
@@ -140,15 +162,18 @@ function InteractiveSkillSphereComponent({
     const startLoop = () => {
       if (!isRunning && isVisibleRef.current) {
         isRunning = true;
+
         frameId = window.requestAnimationFrame(animate);
       }
     };
 
     resumeLoopRef.current = startLoop;
+
     startLoop();
 
     return () => {
       resumeLoopRef.current = null;
+
       window.cancelAnimationFrame(frameId);
     };
   }, []);
@@ -164,11 +189,14 @@ function InteractiveSkillSphereComponent({
   const handleMouseMove = (event: React.MouseEvent<HTMLDivElement>) => {
     const rect =
       rectRef.current ?? containerRef.current?.getBoundingClientRect();
+
     if (!rect) return;
+
     rectRef.current = rect;
 
     const relX =
       (event.clientX - (rect.left + rect.width / 2)) / (rect.width / 2);
+
     const relY =
       (event.clientY - (rect.top + rect.height / 2)) / (rect.height / 2);
 
@@ -180,6 +208,7 @@ function InteractiveSkillSphereComponent({
 
   const handleMouseLeave = () => {
     rectRef.current = null;
+
     speedRef.current = { vx: 0.0045, vy: 0.0065 };
   };
 

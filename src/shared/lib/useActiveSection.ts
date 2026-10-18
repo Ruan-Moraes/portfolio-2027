@@ -2,10 +2,6 @@
 
 import { useEffect, useState } from 'react';
 
-/**
- * Tracks the currently active section in the viewport using a single
- * IntersectionObserver (zero scroll listeners and zero offsetTop layout reflows).
- */
 export function useActiveSection<T extends string>(
   sectionIds: readonly T[],
   defaultSection: T
@@ -26,7 +22,9 @@ export function useActiveSection<T extends string>(
       (entries) => {
         for (let i = 0; i < entries.length; i += 1) {
           const entry = entries[i];
+
           const id = entry.target.id as T;
+
           if (entry.isIntersecting) {
             visibleSections.set(id, entry.intersectionRatio);
           } else {
@@ -34,17 +32,17 @@ export function useActiveSection<T extends string>(
           }
         }
 
-        // Pick the last section in document order that is currently in the active viewport band
         for (let i = sectionIds.length - 1; i >= 0; i -= 1) {
           const candidate = sectionIds[i];
+
           if (visibleSections.has(candidate)) {
             setActiveSection((prev) => (prev === candidate ? prev : candidate));
+
             return;
           }
         }
       },
       {
-        // Active detection band: top 32% to bottom 45% of the viewport
         rootMargin: '-28% 0px -55% 0px',
         threshold: [0, 0.25],
       }
@@ -52,6 +50,7 @@ export function useActiveSection<T extends string>(
 
     for (let i = 0; i < sectionIds.length; i += 1) {
       const el = document.getElementById(sectionIds[i]);
+
       if (el) {
         observer.observe(el);
       }

@@ -9,10 +9,12 @@ interface DrawCornerRootsParams {
 
 function createDeterministicRng(seedInput: number): () => number {
   let state = (seedInput ^ 0x9e3779b9) >>> 0;
+
   return () => {
     state = Math.imul(state ^ (state >>> 16), 0x85ebca6b) >>> 0;
     state = Math.imul(state ^ (state >>> 13), 0xc2b2ae35) >>> 0;
     state = (state ^ (state >>> 16)) >>> 0;
+
     return state / 4294967296;
   };
 }
@@ -25,7 +27,7 @@ function isSafeRootPoint(
   texSize: number,
   pad: number
 ): boolean {
-  // Stay inside the rounded frame
+  // Stay inside the rounded framex
   if (x < pad + 12 || x > texSize - pad - 12) return false;
   if (y < pad + 12 || y > texSize - pad - 12) return false;
 
@@ -37,6 +39,7 @@ function isSafeRootPoint(
 
   // Circular badge + outer orbital ring exclusion (radius 93 + 23px margin = 116px)
   const distToBadge = Math.hypot(x - texSize / 2, y - (texSize / 2 - 66));
+
   if (distToBadge < 116) return false;
 
   // Title + divider + subtitle exclusion zone
@@ -54,8 +57,10 @@ function drawRootSegmentChain(
   isLight: boolean
 ) {
   if (pts.length < 2) return;
+
   for (let i = 0; i < pts.length - 1; i += 1) {
     const progress = i / Math.max(1, pts.length - 1);
+
     ctx.beginPath();
     ctx.moveTo(pts[i][0], pts[i][1]);
     ctx.lineTo(pts[i + 1][0], pts[i + 1][1]);
@@ -71,6 +76,7 @@ function drawRootSegmentChain(
   }
 
   const tip = pts[pts.length - 1];
+
   ctx.beginPath();
   ctx.arc(tip[0], tip[1], isSubBranch ? 2.1 : 3, 0, Math.PI * 2);
   ctx.fillStyle = accentHex;
@@ -90,7 +96,9 @@ function getOrComputeFaceRoots(
   pad: number
 ): ComputedRootTrace[] {
   const cacheKey = `${faceIdx}:${texSize}:${pad}`;
+
   const cached = rootGeometryCache.get(cacheKey);
+
   if (cached) return cached;
 
   const corners = [
@@ -159,6 +167,7 @@ function getOrComputeFaceRoots(
         const segLen = 30 + rng() * 18;
 
         let placed = false;
+
         const turnCandidates = [
           (rng() - 0.42) * 0.68,
           (rng() - 0.5) * 0.45,
@@ -169,6 +178,7 @@ function getOrComputeFaceRoots(
 
         for (const deltaAngle of turnCandidates) {
           const candidateAngle = currentAngle + deltaAngle;
+
           const nx = Math.round(prev[0] + Math.cos(candidateAngle) * segLen);
           const ny = Math.round(prev[1] + Math.sin(candidateAngle) * segLen);
 
@@ -181,7 +191,9 @@ function getOrComputeFaceRoots(
               const forkSign = step % 2 === 0 ? 1 : -1;
               const forkAngle =
                 currentAngle + forkSign * (0.42 + rng() * 0.36);
+
               const forkLen1 = 18 + rng() * 14;
+
               const fx1 = Math.round(prev[0] + Math.cos(forkAngle) * forkLen1);
               const fy1 = Math.round(prev[1] + Math.sin(forkAngle) * forkLen1);
 
@@ -190,11 +202,14 @@ function getOrComputeFaceRoots(
                   [prev[0], prev[1]],
                   [fx1, fy1],
                 ];
+
                 const forkAngle2 = forkAngle + (rng() - 0.5) * 0.52;
                 const forkLen2 = 14 + rng() * 12;
+
                 const fx2 = Math.round(
                   fx1 + Math.cos(forkAngle2) * forkLen2
                 );
+
                 const fy2 = Math.round(
                   fy1 + Math.sin(forkAngle2) * forkLen2
                 );
@@ -202,6 +217,7 @@ function getOrComputeFaceRoots(
                 if (isSafeRootPoint(fx2, fy2, isLeft, isTop, texSize, pad)) {
                   branchPts.push([fx2, fy2]);
                 }
+
                 subBranches.push(branchPts);
               }
             }
@@ -218,6 +234,7 @@ function getOrComputeFaceRoots(
   });
 
   rootGeometryCache.set(cacheKey, traces);
+
   return traces;
 }
 
@@ -233,13 +250,17 @@ export function drawCornerRoots({
   isLight,
 }: DrawCornerRootsParams): void {
   ctx.save();
+
   ctx.lineCap = 'round';
   ctx.lineJoin = 'round';
 
   const traces = getOrComputeFaceRoots(faceIdx, texSize, pad);
+
   for (let i = 0; i < traces.length; i += 1) {
     const { mainPts, subBranches } = traces[i];
+
     drawRootSegmentChain(ctx, mainPts, 2.35, false, accentHex, isLight);
+
     for (let j = 0; j < subBranches.length; j += 1) {
       drawRootSegmentChain(ctx, subBranches[j], 1.45, true, accentHex, isLight);
     }

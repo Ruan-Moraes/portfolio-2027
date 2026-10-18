@@ -13,8 +13,11 @@ import { useThemePreferences } from '../model/theme.context';
 
 function ThemeQuickControlsComponent() {
   const t = useTranslations('theme');
+
   const { mode, accent, toggleMode, setAccent } = useThemePreferences();
+
   const [open, setOpen] = useState(false);
+
   const containerRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
@@ -37,6 +40,7 @@ function ThemeQuickControlsComponent() {
 
     document.addEventListener('mousedown', handlePointerDown);
     document.addEventListener('keydown', handleKeyDown);
+
     return () => {
       document.removeEventListener('mousedown', handlePointerDown);
       document.removeEventListener('keydown', handleKeyDown);

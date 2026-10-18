@@ -32,6 +32,7 @@ const TechCube3D = dynamic(
 
 export function HeroShowcase() {
   const t = useTranslations('hero');
+
   const tCommon = useTranslations('common');
 
   const scrollTo = (id: string) => {

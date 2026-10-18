@@ -7,6 +7,7 @@ import { useCommandPalette } from '../model/command-palette.context';
 
 function CommandPaletteTriggerComponent() {
   const t = useTranslations('common');
+
   const { openPalette } = useCommandPalette();
 
   return (

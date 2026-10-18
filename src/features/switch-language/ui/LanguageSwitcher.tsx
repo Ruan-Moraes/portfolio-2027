@@ -12,10 +12,12 @@ import { usePortfolioLocale } from '../model/locale.context';
 
 function LanguageSwitcherComponent() {
   const currentLocale = useLocale() as SupportedLocale;
+
   const { setLocale } = usePortfolioLocale();
 
   const handleSelectLocale = (nextLocale: SupportedLocale) => {
     if (nextLocale === currentLocale) return;
+
     setLocale(nextLocale);
   };
 
@@ -27,6 +29,7 @@ function LanguageSwitcherComponent() {
     >
       {SUPPORTED_LOCALES.map((locale) => {
         const meta = LOCALE_METADATA[locale];
+
         const isActive = locale === currentLocale;
 
         return (

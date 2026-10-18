@@ -24,23 +24,29 @@ const CommandPaletteContext = createContext<CommandPaletteContextValue | null>(
 
 export function CommandPaletteProvider({ children }: { children: ReactNode }) {
   const [isOpen, setIsOpen] = useState(false);
+
   const isOpenRef = useRef(false);
 
   const openPalette = useCallback(() => {
     isOpenRef.current = true;
+
     setIsOpen(true);
   }, []);
 
   const closePalette = useCallback(() => {
     if (!isOpenRef.current) return;
+
     isOpenRef.current = false;
+
     setIsOpen(false);
   }, []);
 
   const togglePalette = useCallback(() => {
     setIsOpen((prev) => {
       const next = !prev;
+
       isOpenRef.current = next;
+
       return next;
     });
   }, []);
@@ -49,6 +55,7 @@ export function CommandPaletteProvider({ children }: { children: ReactNode }) {
     const handleKeyDown = (event: KeyboardEvent) => {
       if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'k') {
         event.preventDefault();
+
         togglePalette();
       } else if (event.key === 'Escape' && isOpenRef.current) {
         closePalette();
@@ -56,6 +63,7 @@ export function CommandPaletteProvider({ children }: { children: ReactNode }) {
     };
 
     window.addEventListener('keydown', handleKeyDown);
+
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [togglePalette, closePalette]);
 
@@ -73,10 +81,12 @@ export function CommandPaletteProvider({ children }: { children: ReactNode }) {
 
 export function useCommandPalette(): CommandPaletteContextValue {
   const context = useContext(CommandPaletteContext);
+
   if (!context) {
     throw new Error(
       'useCommandPalette must be used within a CommandPaletteProvider'
     );
   }
+
   return context;
 }

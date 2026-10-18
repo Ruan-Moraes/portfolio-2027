@@ -30,7 +30,9 @@ const CareerTimelineCard = memo(function CareerTimelineCardComponent({
   entry: CareerEntryMetadata;
 }) {
   const t = useTranslations('career');
+
   const Icon = TYPE_ICONS[entry.type];
+
   const achievements = t.raw(`entries.${entry.id}.achievements`) as string[];
 
   return (
@@ -109,6 +111,7 @@ const CareerTimelineCard = memo(function CareerTimelineCardComponent({
 
 export function CareerTimeline() {
   const t = useTranslations('career');
+
   const [filter, setFilter] = useState<'all' | CareerEntryType>('all');
 
   const filteredEntries = CAREER_BY_TYPE[filter];

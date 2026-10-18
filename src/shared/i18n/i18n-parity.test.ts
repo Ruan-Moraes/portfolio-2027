@@ -6,9 +6,11 @@ import esES from '../../../messages/es-ES.json';
 function flattenKeys(obj: Record<string, unknown>, prefix = ''): string[] {
   return Object.entries(obj).flatMap(([key, value]) => {
     const path = prefix ? `${prefix}.${key}` : key;
+
     if (value !== null && typeof value === 'object' && !Array.isArray(value)) {
       return flattenKeys(value as Record<string, unknown>, path);
     }
+
     return [path];
   });
 }
@@ -30,6 +32,7 @@ describe('i18n dictionaries parity (pt-BR, en-US, es-ES)', () => {
     const checkNoEmptyStrings = (obj: Record<string, unknown>, locale: string, prefix = '') => {
       for (const [key, value] of Object.entries(obj)) {
         const path = prefix ? `${prefix}.${key}` : key;
+
         if (typeof value === 'string') {
           expect(value.trim().length, `${locale}:${path} should not be empty`).toBeGreaterThan(0);
         } else if (value !== null && typeof value === 'object' && !Array.isArray(value)) {

@@ -43,9 +43,11 @@ export async function generateMetadata({
   params: Promise<{ locale: string }>;
 }): Promise<Metadata> {
   const { locale } = await params;
+
   const validLocale = hasLocale(routing.locales, locale)
     ? locale
     : routing.defaultLocale;
+
   const t = await getTranslations({ locale: validLocale, namespace: 'seo' });
 
   return {
@@ -81,6 +83,7 @@ export default async function LocaleLayout({
   }
 
   setRequestLocale(locale);
+
   const messages = await getMessages();
 
   return (

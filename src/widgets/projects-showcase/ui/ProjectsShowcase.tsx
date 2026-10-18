@@ -43,18 +43,22 @@ const FEATURED_BY_CATEGORY: Record<
 
 export function ProjectsShowcase() {
   const t = useTranslations('projects');
+
   const sectionRef = useRef<HTMLElement | null>(null);
+
   const isNearViewport = useElementVisibility(sectionRef, {
     rootMargin: '320px',
   });
 
   const [activeTab, setActiveTab] = useState<'featured' | 'github'>('featured');
+
   const [categoryFilter, setCategoryFilter] =
     useState<ProjectCategoryFilter>('all');
   const [repos, setRepos] =
     useState<GitHubRepositoryItem[]>(FALLBACK_GITHUB_REPOS);
   const [hasLoadedRemoteRepos, setHasLoadedRemoteRepos] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+
   const deferredSearchQuery = useDeferredValue(searchQuery);
 
   // Lazy-fetch live GitHub repos only when section approaches viewport or user opens GitHub tab
@@ -64,12 +68,15 @@ export function ProjectsShowcase() {
     }
 
     let mounted = true;
+
     fetchGitHubReposClient().then((data) => {
       if (mounted) {
         setRepos(data);
+
         setHasLoadedRemoteRepos(true);
       }
     });
+
     return () => {
       mounted = false;
     };
@@ -90,7 +97,9 @@ export function ProjectsShowcase() {
 
   const filteredRepos = useMemo(() => {
     const query = deferredSearchQuery.trim().toLowerCase();
+
     if (!query) return repos;
+
     return indexedRepos
       .filter((entry) => entry.searchBlob.includes(query))
       .map((entry) => entry.repo);

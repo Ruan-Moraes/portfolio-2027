@@ -5,6 +5,7 @@ import { AnimatedLetters, CodeTag, Badge, GlassCard } from '@/shared/ui';
 describe('Shared UI Primitives', () => {
   it('renders AnimatedLetters with accessible label and individual characters', () => {
     render(<AnimatedLetters text="Ruan Moraes" delayOffset={2} />);
+
     expect(screen.getByLabelText('Ruan Moraes')).toBeInTheDocument();
   });
 
@@ -16,6 +17,7 @@ describe('Shared UI Primitives', () => {
         <CodeTag tag="section" closing />
       </div>,
     );
+
     expect(screen.getByText('Content Inside')).toBeInTheDocument();
     expect(container.textContent).toContain('<section>');
     expect(container.textContent).toContain('</section>');
@@ -27,6 +29,7 @@ describe('Shared UI Primitives', () => {
         <Badge variant="accent">Next.js 15</Badge>
       </GlassCard>,
     );
+
     expect(screen.getByText('Next.js 15')).toBeInTheDocument();
   });
 });

@@ -12,13 +12,16 @@ const INPUT_CLASSES =
 
 function ContactFormComponent() {
   const t = useTranslations('contact.form');
+
   const [status, setStatus] = useState<
     'idle' | 'submitting' | 'success' | 'error'
   >('idle');
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+
     const form = event.currentTarget;
+
     const formData = new FormData(form);
 
     const parsed = contactMessageSchema.safeParse({
@@ -30,6 +33,7 @@ function ContactFormComponent() {
 
     if (!parsed.success) {
       setStatus('error');
+
       return;
     }
 
@@ -50,7 +54,9 @@ function ContactFormComponent() {
 
         if (res.ok) {
           setStatus('success');
+
           form.reset();
+
           return;
         }
       } catch {
@@ -62,6 +68,7 @@ function ContactFormComponent() {
     const mailtoBody = encodeURIComponent(
       `Nome: ${parsed.data.name}\nE-mail: ${parsed.data.email}\n\n${parsed.data.message}`
     );
+
     const mailtoSubject = encodeURIComponent(
       `[Portfólio 2027] ${parsed.data.subject}`
     );
@@ -74,6 +81,7 @@ function ContactFormComponent() {
     }
 
     setStatus('success');
+
     form.reset();
   };
 

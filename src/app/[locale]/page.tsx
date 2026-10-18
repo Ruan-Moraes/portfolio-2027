@@ -7,6 +7,7 @@ export default async function LocaleHomePage({
   params: Promise<{ locale: string }>;
 }) {
   const { locale } = await params;
+
   setRequestLocale(locale);
 
   return <PortfolioHomeView />;

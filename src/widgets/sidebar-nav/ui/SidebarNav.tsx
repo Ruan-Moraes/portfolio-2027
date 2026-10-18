@@ -29,11 +29,14 @@ const SECTION_ICONS: Record<PortfolioSectionId, typeof Home> = {
 
 export function SidebarNav() {
   const t = useTranslations('nav');
+
   const tCommon = useTranslations('common');
+
   const activeSection = useActiveSection(PORTFOLIO_SECTIONS, 'home');
 
   const scrollToSection = (id: PortfolioSectionId) => {
     const element = document.getElementById(id);
+
     if (element) {
       element.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }

@@ -80,13 +80,17 @@ const CertificateCard = memo(function CertificateCardComponent({
 
 export function CertificatesVault() {
   const t = useTranslations('certificates');
+
   const tCommon = useTranslations('common');
+
   const locale = useLocale() as SupportedLocale;
+
   const [platformFilter, setPlatformFilter] = useState<
     'all' | CertificatePlatform
   >('all');
 
   const filtered = CERTIFICATES_BY_PLATFORM[platformFilter];
+
   const verifyLabel = tCommon('verifyCredential');
 
   return (
@@ -101,6 +105,7 @@ export function CertificatesVault() {
         <div className="flex flex-wrap gap-2">
           {(['all', 'Udemy', 'DIO'] as const).map((platform) => {
             const isSelected = platformFilter === platform;
+
             const count = CERTIFICATES_BY_PLATFORM[platform].length;
 
             return (

@@ -15,8 +15,10 @@ const FRAME_RADIUS = 62;
  */
 export function createCubeBumpTexture(): CanvasTexture {
   const bumpCanvas = document.createElement('canvas');
+
   bumpCanvas.width = TEX_SIZE;
   bumpCanvas.height = TEX_SIZE;
+
   const bCtx = bumpCanvas.getContext('2d');
 
   if (bCtx) {
@@ -34,20 +36,27 @@ export function createCubeBumpTexture(): CanvasTexture {
 
     bCtx.strokeStyle = '#969696';
     bCtx.lineWidth = 1;
+
     const step = 16;
+
     bCtx.beginPath();
+
     for (let i = 0; i <= TEX_SIZE; i += step) {
       bCtx.moveTo(i, 0);
       bCtx.lineTo(i, TEX_SIZE);
       bCtx.moveTo(0, i);
       bCtx.lineTo(TEX_SIZE, i);
     }
+
     bCtx.stroke();
+
     bCtx.restore();
   }
 
   const bumpTex = new CanvasTexture(bumpCanvas);
+
   bumpTex.anisotropy = 4;
+
   return bumpTex;
 }
 
@@ -62,8 +71,10 @@ export function buildCubeMaterials(
 
   return CUBE_FACES_TECH.map((item, faceIdx) => {
     const canvas = document.createElement('canvas');
+
     canvas.width = TEX_SIZE;
     canvas.height = TEX_SIZE;
+
     const ctx = canvas.getContext('2d');
 
     if (ctx) {
@@ -73,29 +84,38 @@ export function buildCubeMaterials(
 
       // 2. Content area (strictly inside the border at pad = 8): base + textures
       ctx.save();
+
       ctx.beginPath();
+
       ctx.roundRect(FRAME_PAD, FRAME_PAD, frameSize, frameSize, FRAME_RADIUS);
+
       ctx.fillStyle = isLight ? '#ffffff' : '#111c35';
+
       ctx.fill();
       ctx.clip();
 
       // Tactile architectural tech grid + micro-dots inside the content container (single batched stroke)
       const gridStep = 32;
+
       ctx.strokeStyle = isLight
         ? 'rgba(15, 23, 42, 0.075)'
         : 'rgba(148, 163, 184, 0.055)';
+
       ctx.lineWidth = 1;
       ctx.beginPath();
+
       for (let i = gridStep; i < TEX_SIZE; i += gridStep) {
         ctx.moveTo(i, 0);
         ctx.lineTo(i, TEX_SIZE);
         ctx.moveTo(0, i);
         ctx.lineTo(TEX_SIZE, i);
       }
+
       ctx.stroke();
 
       // Micro intersection nodes inside the face
       ctx.fillStyle = isLight ? `${item.color}55` : `${item.color}2e`;
+
       for (let x = gridStep; x <= TEX_SIZE - gridStep; x += gridStep) {
         for (let y = gridStep; y <= TEX_SIZE - gridStep; y += gridStep) {
           ctx.fillRect(x - 1, y - 1, 2, 2);
@@ -111,6 +131,7 @@ export function buildCubeMaterials(
         TEX_SIZE / 2,
         225
       );
+
       primaryAura.addColorStop(0, isLight ? `${item.color}2e` : `${item.color}42`);
       primaryAura.addColorStop(
         0.45,
@@ -124,16 +145,19 @@ export function buildCubeMaterials(
         1,
         isLight ? 'rgba(255, 255, 255, 0)' : 'rgba(17, 28, 53, 0)'
       );
+
       ctx.fillStyle = primaryAura;
       ctx.fillRect(FRAME_PAD, FRAME_PAD, frameSize, frameSize);
 
       // Subtle top-left anodized highlight wash for extra depth
       const sheenAura = ctx.createRadialGradient(140, 120, 10, 140, 120, 180);
+
       sheenAura.addColorStop(
         0,
         isLight ? 'rgba(255, 255, 255, 0.8)' : 'rgba(255, 255, 255, 0.05)'
       );
       sheenAura.addColorStop(1, 'rgba(255, 255, 255, 0)');
+
       ctx.fillStyle = sheenAura;
       ctx.fillRect(FRAME_PAD, FRAME_PAD, frameSize, frameSize);
 
@@ -175,7 +199,9 @@ export function buildCubeMaterials(
 
       // 4. Layered circular tech emblem behind the symbol
       const badgeRadius = 82;
+
       const badgeY = TEX_SIZE / 2 - 66;
+
       const badgeGrad = ctx.createRadialGradient(
         TEX_SIZE / 2,
         badgeY,
@@ -184,6 +210,7 @@ export function buildCubeMaterials(
         badgeY,
         badgeRadius
       );
+
       badgeGrad.addColorStop(0, isLight ? `${item.color}2e` : `${item.color}32`);
       badgeGrad.addColorStop(0.7, isLight ? `${item.color}16` : `${item.color}18`);
       badgeGrad.addColorStop(1, `${item.color}08`);
@@ -234,7 +261,9 @@ export function buildCubeMaterials(
 
       // 7. Subtle glowing accent divider bar between title and subtitle
       const barWidth = 64;
+
       const barY = TEX_SIZE / 2 + 76;
+
       const barGrad = ctx.createLinearGradient(
         TEX_SIZE / 2 - barWidth,
         barY,
@@ -244,24 +273,31 @@ export function buildCubeMaterials(
       barGrad.addColorStop(0, 'rgba(255,255,255,0)');
       barGrad.addColorStop(0.5, item.color);
       barGrad.addColorStop(1, 'rgba(255,255,255,0)');
+
       ctx.fillStyle = barGrad;
       ctx.fillRect(TEX_SIZE / 2 - barWidth, barY - 1.5, barWidth * 2, 3);
 
       // 8. Tech Subtitle (auto-fitted so it never overflows the safe zone)
       ctx.fillStyle = isLight ? '#334155' : '#dbeafe';
+
       let subtitleFontPx = 19;
+
       ctx.font = `600 ${subtitleFontPx}px ui-monospace, SFMono-Regular, Menlo, monospace`;
+
       while (
         ctx.measureText(item.subtitle).width > safeTextWidth &&
         subtitleFontPx > 12
       ) {
         subtitleFontPx -= 1;
+
         ctx.font = `600 ${subtitleFontPx}px ui-monospace, SFMono-Regular, Menlo, monospace`;
       }
+
       ctx.fillText(item.subtitle, TEX_SIZE / 2, TEX_SIZE / 2 + 106);
     }
 
     const texture = new CanvasTexture(canvas);
+
     texture.colorSpace = SRGBColorSpace;
     texture.anisotropy = 4;
 

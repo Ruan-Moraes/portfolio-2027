@@ -17,9 +17,11 @@ export function StarfieldCanvas() {
 
   useEffect(() => {
     const canvas = canvasRef.current;
+
     if (!canvas) return;
 
     const ctx = canvas.getContext('2d', { alpha: true });
+
     if (!ctx) return;
 
     let animationFrameId = 0;
@@ -36,6 +38,7 @@ export function StarfieldCanvas() {
 
     for (let i = 0; i < starCount; i += 1) {
       const bucketIdx = i % 9 === 0 ? 0 : ((1 + (i % 3)) as 1 | 2 | 3);
+
       starsByBucket[bucketIdx].push({
         x: Math.random() * width,
         y: Math.random() * height,
@@ -55,9 +58,12 @@ export function StarfieldCanvas() {
 
     const handleResize = () => {
       if (resizeRafId) return;
+
       resizeRafId = window.requestAnimationFrame(() => {
         resizeRafId = 0;
+
         if (!canvas) return;
+
         width = canvas.width = window.innerWidth;
         height = canvas.height = window.innerHeight;
       });
@@ -68,6 +74,7 @@ export function StarfieldCanvas() {
 
     let isLight =
       document.documentElement.getAttribute('data-theme') === 'light';
+
     let accentColor =
       document.documentElement.style.getPropertyValue('--ui-accent').trim() ||
       '#00ff7f';
@@ -99,13 +106,16 @@ export function StarfieldCanvas() {
       // Pre-partitioned buckets: iterates strictly N stars total (instead of 4 * N)
       for (let b = 0; b < 4; b += 1) {
         const bucket = starsByBucket[b];
+
         if (bucket.length === 0) continue;
 
         ctx.beginPath();
+
         for (let i = 0; i < bucket.length; i += 1) {
           const star = bucket[i];
 
           star.y -= star.speed;
+
           if (star.y < 0) {
             star.y = height;
             star.x = Math.random() * width;
@@ -117,6 +127,7 @@ export function StarfieldCanvas() {
           ctx.moveTo(drawX + star.size, drawY);
           ctx.arc(drawX, drawY, star.size, 0, Math.PI * 2);
         }
+
         ctx.fillStyle = bucketStyles[b];
         ctx.fill();
       }
@@ -125,11 +136,13 @@ export function StarfieldCanvas() {
     const loop = (timestamp: number) => {
       if (!isPageVisible || prefersReducedMotion) {
         isRunning = false;
+
         return;
       }
 
       if (timestamp - lastFrameTime >= FRAME_INTERVAL_MS) {
         lastFrameTime = timestamp;
+
         drawFrame();
       }
 
@@ -138,11 +151,14 @@ export function StarfieldCanvas() {
 
     const handleVisibilityChange = () => {
       isPageVisible = document.visibilityState === 'visible';
+
       if (isPageVisible && !prefersReducedMotion && !isRunning) {
         isRunning = true;
+
         animationFrameId = window.requestAnimationFrame(loop);
       } else if (!isPageVisible && isRunning) {
         window.cancelAnimationFrame(animationFrameId);
+
         isRunning = false;
       }
     };
@@ -151,28 +167,36 @@ export function StarfieldCanvas() {
 
     const observer = new MutationObserver(() => {
       syncThemeTokens();
+
       if (prefersReducedMotion || !isPageVisible) {
         drawFrame();
       }
     });
+
     observer.observe(document.documentElement, {
       attributes: true,
       attributeFilter: ['data-theme', 'data-accent', 'style'],
     });
 
     drawFrame();
+
     if (!prefersReducedMotion && isPageVisible) {
       isRunning = true;
+
       animationFrameId = window.requestAnimationFrame(loop);
     }
 
     return () => {
       observer.disconnect();
+
       window.cancelAnimationFrame(animationFrameId);
+
       if (resizeRafId) {
         window.cancelAnimationFrame(resizeRafId);
       }
+
       document.removeEventListener('visibilitychange', handleVisibilityChange);
+
       window.removeEventListener('mousemove', handleMouseMove);
       window.removeEventListener('resize', handleResize);
     };

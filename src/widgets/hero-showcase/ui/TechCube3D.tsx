@@ -19,7 +19,9 @@ import {
 
 export function TechCube3D() {
   const containerRef = useRef<HTMLDivElement | null>(null);
+
   const isVisible = useElementVisibility(containerRef, { rootMargin: '100px' });
+
   const isVisibleRef = useRef(isVisible);
   const resumeLoopRef = useRef<(() => void) | null>(null);
 
@@ -30,6 +32,7 @@ export function TechCube3D() {
 
   useEffect(() => {
     isVisibleRef.current = isVisible;
+
     if (isVisible) {
       resumeLoopRef.current?.();
     }
@@ -37,6 +40,7 @@ export function TechCube3D() {
 
   useEffect(() => {
     const container = containerRef.current;
+
     if (!container) return;
 
     const width = 300;
@@ -44,7 +48,9 @@ export function TechCube3D() {
 
     // 1. WebGL Scene & Camera
     const scene = new Scene();
+
     const camera = new PerspectiveCamera(36, width / height, 0.1, 100);
+
     camera.position.set(0, 0, 5.4);
 
     const renderer = new WebGLRenderer({
@@ -52,6 +58,7 @@ export function TechCube3D() {
       alpha: true,
       powerPreference: 'high-performance',
     });
+
     renderer.setSize(width, height);
     renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
 
@@ -59,6 +66,7 @@ export function TechCube3D() {
     container.appendChild(renderer.domElement);
 
     const sharedBumpMap = createCubeBumpTexture();
+
     const isInitialLight =
       document.documentElement.getAttribute('data-theme') === 'light';
 
@@ -72,19 +80,24 @@ export function TechCube3D() {
 
     const getOrCreateMaterials = (isLight: boolean) => {
       const key = isLight ? 'light' : 'dark';
+
       if (!materialCache[key]) {
         materialCache[key] = buildCubeMaterials(sharedBumpMap, isLight);
       }
+
       return materialCache[key];
     };
 
     // 2. True 3D RoundedBoxGeometry
     const geometry = new RoundedBoxGeometry(2.15, 2.15, 2.15, 8, 0.26);
+
     const cubeMesh = new Mesh(
       geometry,
       getOrCreateMaterials(isInitialLight)
     );
+
     cubeMesh.rotation.set(-0.35, 0.55, 0);
+
     scene.add(cubeMesh);
 
     // 3. Balanced 3-point matte lighting adapted to theme
@@ -92,39 +105,52 @@ export function TechCube3D() {
       0xffffff,
       isInitialLight ? 2.25 : 1.05
     );
+
     scene.add(ambientLight);
 
     const keyLight = new DirectionalLight(
       0xffffff,
       isInitialLight ? 1.25 : 1.65
     );
+
     keyLight.position.set(4, 6, 5);
+
     scene.add(keyLight);
 
     const fillLight = new DirectionalLight(
       0x94a3b8,
       isInitialLight ? 0.75 : 0.55
     );
+
     fillLight.position.set(-5, -3, 2);
+
     scene.add(fillLight);
 
     // 4. Swap cached textures when data-theme changes (builds alternate set at most once)
     let currentThemeAttr =
       document.documentElement.getAttribute('data-theme') || 'dark';
+
     const observer = new MutationObserver(() => {
       const nextThemeAttr =
         document.documentElement.getAttribute('data-theme') || 'dark';
+
       if (nextThemeAttr === currentThemeAttr) return;
+
       currentThemeAttr = nextThemeAttr;
 
       const isLightNow = nextThemeAttr === 'light';
+
       ambientLight.intensity = isLightNow ? 2.25 : 1.05;
+
       keyLight.intensity = isLightNow ? 1.25 : 1.65;
+
       fillLight.intensity = isLightNow ? 0.75 : 0.55;
 
       cubeMesh.material = getOrCreateMaterials(isLightNow);
+
       renderer.render(scene, camera);
     });
+
     observer.observe(document.documentElement, {
       attributes: true,
       attributeFilter: ['data-theme'],
@@ -140,11 +166,13 @@ export function TechCube3D() {
     const animate = () => {
       if (!isVisibleRef.current) {
         isRunning = false;
+
         return;
       }
 
       if (!isDraggingRef.current) {
         const speed = isHoveredRef.current ? 0.0025 : 0.009;
+
         clockTime += speed;
       }
 
@@ -161,31 +189,41 @@ export function TechCube3D() {
       cubeMesh.rotation.x = currentRx;
 
       renderer.render(scene, camera);
+
       frameId = window.requestAnimationFrame(animate);
     };
 
     const startLoop = () => {
       if (!isRunning && isVisibleRef.current) {
         isRunning = true;
+
         frameId = window.requestAnimationFrame(animate);
       }
     };
 
     resumeLoopRef.current = startLoop;
+
     startLoop();
 
     return () => {
       resumeLoopRef.current = null;
+
       observer.disconnect();
+
       window.cancelAnimationFrame(frameId);
+
       geometry.dispose();
+
       sharedBumpMap.dispose();
+
       [materialCache.dark, materialCache.light].forEach((set) => {
         set?.forEach((mat) => {
           mat.map?.dispose();
+
           mat.dispose();
         });
       });
+
       renderer.dispose();
     };
   }, []);
@@ -197,10 +235,13 @@ export function TechCube3D() {
 
   const handlePointerMove = (clientX: number, clientY: number) => {
     if (!isDraggingRef.current) return;
+
     const dx = clientX - lastPointerRef.current.x;
     const dy = clientY - lastPointerRef.current.y;
+
     manualRotationRef.current.ry += dx * 0.011;
     manualRotationRef.current.rx += dy * 0.011;
+
     lastPointerRef.current = { x: clientX, y: clientY };
   };
 

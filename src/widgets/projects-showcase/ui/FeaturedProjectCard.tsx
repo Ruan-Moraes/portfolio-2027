@@ -12,7 +12,9 @@ interface FeaturedProjectCardProps {
 
 function FeaturedProjectCardComponent({ project }: FeaturedProjectCardProps) {
   const t = useTranslations('projects');
+
   const tCommon = useTranslations('common');
+
   const features = t.raw(`items.${project.id}.features`) as string[];
 
   return (

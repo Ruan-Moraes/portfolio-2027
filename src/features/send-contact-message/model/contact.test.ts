@@ -9,6 +9,7 @@ describe('send-contact-message feature schema', () => {
       subject: 'Proposta de Arquitetura Full Stack',
       message: 'Olá Ruan, gostaríamos de conversar sobre um projeto Next.js + Spring Boot.',
     });
+
     expect(valid.success).toBe(true);
 
     const invalid = contactMessageSchema.safeParse({
@@ -17,6 +18,7 @@ describe('send-contact-message feature schema', () => {
       subject: 'Oi',
       message: 'Curto',
     });
+
     expect(invalid.success).toBe(false);
   });
 });

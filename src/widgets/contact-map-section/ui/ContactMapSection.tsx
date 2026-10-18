@@ -34,6 +34,7 @@ const CopyEmailButton = memo(function CopyEmailButtonComponent({
   copyEmailLabel: string;
 }) {
   const [copiedEmail, setCopiedEmail] = useState(false);
+
   const copyTimerRef = useRef<number | null>(null);
 
   useEffect(() => {
@@ -47,12 +48,16 @@ const CopyEmailButton = memo(function CopyEmailButtonComponent({
   const handleCopyEmail = async () => {
     try {
       await navigator.clipboard.writeText(DEVELOPER_PROFILE.email);
+
       setCopiedEmail(true);
+
       if (copyTimerRef.current !== null) {
         window.clearTimeout(copyTimerRef.current);
       }
+
       copyTimerRef.current = window.setTimeout(() => {
         setCopiedEmail(false);
+
         copyTimerRef.current = null;
       }, 2500);
     } catch {

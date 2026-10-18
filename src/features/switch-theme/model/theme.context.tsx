@@ -38,7 +38,9 @@ function readStoredPreferences(): { mode: ThemeMode; accent: AccentColor } {
   }
 
   const params = new URLSearchParams(window.location.search);
+
   const queryTheme = params.get('theme') as ThemeMode | null;
+
   if (queryTheme && THEME_MODES.includes(queryTheme)) {
     setStorageItem(STORAGE_MODE_KEY, queryTheme);
   }
@@ -54,15 +56,19 @@ function readStoredPreferences(): { mode: ThemeMode; accent: AccentColor } {
 
 function applyThemeAttributes(mode: ThemeMode, accent: AccentColor) {
   if (typeof document === 'undefined') return;
+
   const root = document.documentElement;
+
   if (root.getAttribute('data-theme') !== mode) {
     root.setAttribute('data-theme', mode);
   }
+
   if (root.getAttribute('data-accent') !== accent) {
     root.setAttribute('data-accent', accent);
   }
 
   const hexConfig = ACCENT_HEX_MAP[accent];
+
   if (root.style.getPropertyValue('--ui-accent') !== hexConfig.primary) {
     root.style.setProperty('--ui-accent', hexConfig.primary);
     root.style.setProperty('--ui-accent-secondary', hexConfig.secondary);
@@ -72,25 +78,32 @@ function applyThemeAttributes(mode: ThemeMode, accent: AccentColor) {
 
 export function ThemePreferencesProvider({ children }: { children: ReactNode }) {
   const [mode, setModeState] = useState<ThemeMode>('dark');
+
   const [accent, setAccentState] = useState<AccentColor>('green');
+
   const prefsRef = useRef<{ mode: ThemeMode; accent: AccentColor }>({
     mode: 'dark',
     accent: 'green',
   });
 
-  // Synchronize from localStorage on mount and keep <html> attributes locked in memory
   useEffect(() => {
     const initial = readStoredPreferences();
+
     prefsRef.current = initial;
+
     setModeState(initial.mode);
     setAccentState(initial.accent);
+
     applyThemeAttributes(initial.mode, initial.accent);
 
     const root = document.documentElement;
+
     const observer = new MutationObserver(() => {
       const { mode: activeMode, accent: activeAccent } = prefsRef.current;
+
       applyThemeAttributes(activeMode, activeAccent);
     });
+
     observer.observe(root, {
       attributes: true,
       attributeFilter: ['lang', 'class'],
@@ -101,24 +114,31 @@ export function ThemePreferencesProvider({ children }: { children: ReactNode }) 
 
   const setMode = useCallback((nextMode: ThemeMode) => {
     prefsRef.current = { ...prefsRef.current, mode: nextMode };
+
     setStorageItem(STORAGE_MODE_KEY, nextMode);
     setModeState(nextMode);
+
     applyThemeAttributes(nextMode, prefsRef.current.accent);
   }, []);
 
   const toggleMode = useCallback(() => {
     const nextMode: ThemeMode =
       prefsRef.current.mode === 'dark' ? 'light' : 'dark';
+
     prefsRef.current = { ...prefsRef.current, mode: nextMode };
+
     setStorageItem(STORAGE_MODE_KEY, nextMode);
     setModeState(nextMode);
+
     applyThemeAttributes(nextMode, prefsRef.current.accent);
   }, []);
 
   const setAccent = useCallback((nextAccent: AccentColor) => {
     prefsRef.current = { ...prefsRef.current, accent: nextAccent };
+
     setStorageItem(STORAGE_ACCENT_KEY, nextAccent);
     setAccentState(nextAccent);
+
     applyThemeAttributes(prefsRef.current.mode, nextAccent);
   }, []);
 
@@ -134,10 +154,12 @@ export function ThemePreferencesProvider({ children }: { children: ReactNode }) 
 
 export function useThemePreferences(): ThemeContextValue {
   const context = useContext(ThemeContext);
+
   if (!context) {
     throw new Error(
       'useThemePreferences must be used within a ThemePreferencesProvider'
     );
   }
+
   return context;
 }

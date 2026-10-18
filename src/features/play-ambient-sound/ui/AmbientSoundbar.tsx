@@ -53,6 +53,7 @@ function playRhodesNote(
   const osc = context.createOscillator();
   const subOsc = context.createOscillator();
   const filter = context.createBiquadFilter();
+
   const env = context.createGain();
 
   osc.type = 'sine';
@@ -63,6 +64,7 @@ function playRhodesNote(
   subOsc.frequency.setValueAtTime(freq * 2, startTime);
 
   const subGain = context.createGain();
+
   subGain.gain.setValueAtTime(0.12, startTime);
 
   filter.type = 'lowpass';
@@ -85,7 +87,9 @@ function playRhodesNote(
 
   osc.start(startTime);
   subOsc.start(startTime);
+
   const stopAt = startTime + duration + 0.05;
+
   osc.stop(stopAt);
   subOsc.stop(stopAt);
 
@@ -101,35 +105,47 @@ function playRhodesNote(
 
 function AmbientSoundbarComponent() {
   const t = useTranslations('common');
+
   const [isPlaying, setIsPlaying] = useState(false);
+
   const isPlayingRef = useRef(false);
   const synthRef = useRef<SynthNodes | null>(null);
 
   const pauseSynth = useCallback(() => {
     const active = synthRef.current;
+
     if (!active) return;
 
     if (active.schedulerId !== null) {
       window.clearInterval(active.schedulerId);
+
       active.schedulerId = null;
     }
+
     if (active.context.state === 'running') {
       void active.context.suspend();
     }
+
     isPlayingRef.current = false;
+
     setIsPlaying(false);
   }, []);
 
   const destroySynth = useCallback(() => {
     const active = synthRef.current;
+
     if (!active) return;
 
     if (active.schedulerId !== null) {
       window.clearInterval(active.schedulerId);
     }
+
     active.masterGain.disconnect();
+
     void active.context.close();
+
     synthRef.current = null;
+
     isPlayingRef.current = false;
   }, []);
 
@@ -146,7 +162,9 @@ function AmbientSoundbarComponent() {
 
       const context = new AudioCtx();
       const masterGain = context.createGain();
+
       masterGain.gain.setValueAtTime(0.18, context.currentTime);
+
       masterGain.connect(context.destination);
 
       nodes = {
@@ -155,6 +173,7 @@ function AmbientSoundbarComponent() {
         schedulerId: null,
         stepIndex: 0,
       };
+
       synthRef.current = nodes;
     }
 
@@ -164,6 +183,7 @@ function AmbientSoundbarComponent() {
 
     const triggerBar = () => {
       const current = synthRef.current;
+
       if (
         !current ||
         current.context.state !== 'running' ||
@@ -172,8 +192,11 @@ function AmbientSoundbarComponent() {
       ) {
         return;
       }
+
       const now = current.context.currentTime + 0.05;
+
       const step = LOFI_CHORDS[current.stepIndex % LOFI_CHORDS.length];
+
       current.stepIndex += 1;
 
       step.pad.forEach((freq, i) => {
@@ -189,6 +212,7 @@ function AmbientSoundbarComponent() {
 
       step.melody.forEach((noteFreq, beatIdx) => {
         const noteStart = now + beatIdx * 0.78;
+
         playRhodesNote(
           current.context,
           current.masterGain,
@@ -201,12 +225,15 @@ function AmbientSoundbarComponent() {
     };
 
     isPlayingRef.current = true;
+
     setIsPlaying(true);
 
     triggerBar();
+
     if (nodes.schedulerId !== null) {
       window.clearInterval(nodes.schedulerId);
     }
+
     nodes.schedulerId = window.setInterval(triggerBar, 3200);
   }, []);
 
@@ -221,7 +248,9 @@ function AmbientSoundbarComponent() {
   useEffect(() => {
     const handleVisibilityChange = () => {
       const active = synthRef.current;
+
       if (!active || !isPlayingRef.current) return;
+
       if (document.hidden && active.context.state === 'running') {
         void active.context.suspend();
       } else if (!document.hidden && active.context.state === 'suspended') {
@@ -230,8 +259,10 @@ function AmbientSoundbarComponent() {
     };
 
     document.addEventListener('visibilitychange', handleVisibilityChange);
+
     return () => {
       document.removeEventListener('visibilitychange', handleVisibilityChange);
+
       destroySynth();
     };
   }, [destroySynth]);

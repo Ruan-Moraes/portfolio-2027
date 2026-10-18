@@ -40,8 +40,11 @@ const ICON_BOX_CLASS =
 
 export function CommandPaletteDialog() {
   const { closePalette } = useCommandPalette();
+
   const { mode, toggleMode, setAccent } = useThemePreferences();
+
   const { setLocale } = usePortfolioLocale();
+
   const tNav = useTranslations('nav');
   const tCommon = useTranslations('common');
   const tTheme = useTranslations('theme');
@@ -49,11 +52,13 @@ export function CommandPaletteDialog() {
 
   const jumpToSection = (id: PortfolioSectionId) => {
     closePalette();
+
     document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
   };
 
   const switchLocale = (locale: SupportedLocale) => {
     closePalette();
+
     setLocale(locale);
   };
 

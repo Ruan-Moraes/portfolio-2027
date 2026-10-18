@@ -6,13 +6,15 @@ import { DEVELOPER_PROFILE } from '@/entities/developer-profile';
 
 function BeloHorizonteMapComponent() {
   const mapContainerRef = useRef<HTMLDivElement | null>(null);
+
   const [shouldLoadMap, setShouldLoadMap] = useState(false);
 
-  // Lazy-observe so Leaflet and CartoDB tiles only load when user approaches the contact section
   useEffect(() => {
     const el = mapContainerRef.current;
+
     if (!el || typeof IntersectionObserver === 'undefined') {
       setShouldLoadMap(true);
+
       return;
     }
 
@@ -20,6 +22,7 @@ function BeloHorizonteMapComponent() {
       (entries) => {
         if (entries[0]?.isIntersecting) {
           setShouldLoadMap(true);
+
           observer.disconnect();
         }
       },
@@ -27,6 +30,7 @@ function BeloHorizonteMapComponent() {
     );
 
     observer.observe(el);
+
     return () => observer.disconnect();
   }, []);
 
@@ -38,6 +42,7 @@ function BeloHorizonteMapComponent() {
 
     async function initMap() {
       const L = await import('leaflet');
+
       if (isCancelled || !mapContainerRef.current) return;
 
       const [lat, lng] = DEVELOPER_PROFILE.location.coordinates;
@@ -74,6 +79,7 @@ function BeloHorizonteMapComponent() {
 
     return () => {
       isCancelled = true;
+
       if (mapInstance) {
         mapInstance.remove();
       }
