@@ -2,7 +2,7 @@
 
 Portfólio espacial interativo de **Ruan Moraes Santos Barbosa** (Desenvolvedor Full Stack — Java, Spring Boot, C#, .NET, React, Next.js & React Native), projetado sob **Feature-Sliced Design (FSD)** estrito, **Clean Code** e **internacionalização completa (`pt-BR`, `en-US`, `es-ES`)**.
 
-**Produção:** https://portifolio-2027.vercel.app
+**Produção:** https://portifolio-ruan-2027.vercel.app
 
 ---
 
