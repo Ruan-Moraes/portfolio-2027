@@ -15,7 +15,7 @@ Inspirado na direção artística espacial de [metal-oopa/personal-portfolio](ht
 3. **Esfera Fibonacci 3D Interativa (`<InteractiveSkillSphere />`)**: Nuvem 3D interativa (arraste/mouse/toque) sincronizada com o filtro de competências por categoria.
 4. **Command Palette (`Cmd+K` / `Ctrl+K`)**: Navegação instantânea por seções, troca de idioma (`PT / EN / ES`), troca de tema (`Dark / Light` + 5 cores de destaque neon) e download direto do currículo PDF.
 5. **Ambient Space Synth (`<AmbientSoundbar />`)**: Equalizador interativo `<music>` usando **Web Audio API pura** (zero arquivos MP3 pesados no bundle), iniciando pausado por padrão em respeito à UX.
-6. **Cofre de Certificados Verificados (`<CertificatesVault />`)**: 13 certificações verificadas (Java, Spring Boot, React, TypeScript, Arquitetura, Segurança e Inglês) com busca textual, filtro por categoria e modal de inspeção.
+6. **Cofre de Certificados Verificados (`<CertificatesVault />`)**: certificados carregados do db-json, com filtros por instituição, paginação e códigos para validação.
 7. **Mapa Interativo (`<BeloHorizonteMap />`)**: Mapa Leaflet apontando para **Belo Horizonte, MG — Brasil**, carregado sob demanda (`ssr: false`), com tiles do OpenStreetMap ou MapTiler.
 
 ---
@@ -57,7 +57,7 @@ src/
 │   ├── skill/                    # Competências por categoria e faces do cubo 3D
 │   ├── career-entry/             # Histórico profissional e acadêmico
 │   ├── project/                  # Case studies + cliente GitHub API
-│   ├── certificate/              # 13 certificados verificados
+│   ├── certificate/              # API e catálogo de contingência de certificados
 │   └── service-offering/         # Serviços oferecidos
 └── shared/                       # Primitivas reutilizáveis, i18n, tema e utilitários
     ├── config/
@@ -100,6 +100,8 @@ pnpm test
 # Build de produção (Next.js 15 App Router)
 pnpm build
 ```
+
+Os certificados vêm da API pública do db-json, com revalidação a cada 30 minutos e um catálogo local de contingência. A variável `CERTIFICATES_API_URL` permite trocar o endpoint no servidor.
 
 O mapa carrega tiles do OpenStreetMap sem exigir chave. Para usar MapTiler, configure a chave pública `NEXT_PUBLIC_MAPTILER_KEY` em `.env.local` e na Vercel, restrita às origens do projeto. Ambos os provedores exibem a atribuição. O formulário envia mensagens pelo mesmo endpoint público do Formspree utilizado no portfólio de 2026, com possibilidade de alteração por `NEXT_PUBLIC_FORMSPREE_ENDPOINT`.
 

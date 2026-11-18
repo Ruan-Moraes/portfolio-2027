@@ -2,39 +2,24 @@
 
 import { memo, useRef, useState } from 'react';
 import { Award, Calendar, ChevronLeft, ChevronRight, ExternalLink, ShieldCheck } from 'lucide-react';
-import { useLocale, useTranslations } from 'next-intl';
-import {
-  CERTIFICATES_DATA,
-  type CertificateItem,
-  type CertificatePlatform,
-} from '@/entities/certificate';
-import type { SupportedLocale } from '@/shared/config';
+import { useTranslations } from 'next-intl';
+import type { CertificateItem } from '@/entities/certificate';
 import { cn } from '@/shared/lib';
 import { Badge, GlassCard, SectionHeading } from '@/shared/ui';
 
 const PAGE_SIZE = 12;
 
-const CERTIFICATES_BY_PLATFORM: Record<
-  'all' | CertificatePlatform,
-  CertificateItem[]
-> = {
-  all: CERTIFICATES_DATA,
-  Udemy: CERTIFICATES_DATA.filter((c) => c.platform === 'Udemy'),
-  DIO: CERTIFICATES_DATA.filter((c) => c.platform === 'DIO'),
-};
-
 interface CertificateCardProps {
   cert: CertificateItem;
-  locale: SupportedLocale;
+  codeLabel: string;
   verifyLabel: string;
 }
 
 const CertificateCard = memo(function CertificateCardComponent({
   cert,
-  locale,
+  codeLabel,
   verifyLabel,
 }: CertificateCardProps) {
-  const localizedTitle = cert.titles[locale] ?? cert.titles['pt-BR'];
 
   return (
     <GlassCard interactive className="flex flex-col justify-between p-5">
@@ -52,17 +37,15 @@ const CertificateCard = memo(function CertificateCardComponent({
             <Award className="h-5 w-5" />
           </div>
           <h3 className="text-base font-bold text-[var(--ui-text-primary)]">
-            {localizedTitle}
+            {cert.name}
           </h3>
         </div>
 
-        <div className="mt-4 flex flex-wrap gap-1.5">
-          {cert.skills.map((skill) => (
-            <Badge key={skill} variant="default">
-              {skill}
-            </Badge>
-          ))}
-        </div>
+        {cert.credentialId && (
+          <p className="mt-4 text-xs text-[var(--ui-text-muted)]">
+            {codeLabel}: <code className="select-all">{cert.credentialId}</code>
+          </p>
+        )}
       </div>
 
       <div className="mt-5 border-t border-[var(--ui-border)] pt-4">
@@ -80,20 +63,27 @@ const CertificateCard = memo(function CertificateCardComponent({
   );
 });
 
-export function CertificatesVault() {
+export function CertificatesVault({ certificates }: { certificates: CertificateItem[] }) {
   const t = useTranslations('certificates');
 
   const tCommon = useTranslations('common');
 
-  const locale = useLocale() as SupportedLocale;
-
-  const [platformFilter, setPlatformFilter] = useState<
-    'all' | CertificatePlatform
-  >('all');
+  const [platformFilter, setPlatformFilter] = useState<string | null>(null);
 
   const [page, setPage] = useState(1);
   const gridRef = useRef<HTMLDivElement>(null);
-  const filtered = CERTIFICATES_BY_PLATFORM[platformFilter];
+  const byPlatform = new Map<string, CertificateItem[]>();
+  for (const certificate of certificates) {
+    const group = byPlatform.get(certificate.platform);
+    if (group) group.push(certificate);
+    else byPlatform.set(certificate.platform, [certificate]);
+  }
+
+  const filters = [
+    [null, certificates.length] as const,
+    ...Array.from(byPlatform, ([platform, records]) => [platform, records.length] as const),
+  ];
+  const filtered = (platformFilter === null ? certificates : byPlatform.get(platformFilter)) ?? certificates;
   const totalPages = Math.ceil(filtered.length / PAGE_SIZE);
   const visible = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
 
@@ -115,14 +105,12 @@ export function CertificatesVault() {
 
       <div className="mb-8 flex flex-wrap items-center justify-between gap-4">
         <div className="flex flex-wrap gap-2">
-          {(['all', 'Udemy', 'DIO'] as const).map((platform) => {
+          {filters.map(([platform, count]) => {
             const isSelected = platformFilter === platform;
-
-            const count = CERTIFICATES_BY_PLATFORM[platform].length;
 
             return (
               <button
-                key={platform}
+                key={platform ?? 'all'}
                 type="button"
                 aria-pressed={isSelected}
                 onClick={() => {
@@ -136,7 +124,7 @@ export function CertificatesVault() {
                     : 'border border-[var(--ui-border)] bg-[var(--ui-surface)]/80 text-[var(--ui-text-secondary)] hover:border-[var(--ui-accent)]/50'
                 )}
               >
-                {platform === 'all'
+                {platform === null
                   ? t('filterAll', { count })
                   : `${platform} (${count})`}
               </button>
@@ -162,7 +150,7 @@ export function CertificatesVault() {
           <CertificateCard
             key={cert.id}
             cert={cert}
-            locale={locale}
+            codeLabel={t('credentialCode')}
             verifyLabel={verifyLabel}
           />
         ))}

@@ -292,18 +292,19 @@
   "certificates": {
     "tag": "certificados",
     "title": "Licenças & Certificados",
-    "subtitle": "13 certificações verificadas em Engenharia de Software, Java, TypeScript, React e Arquitetura Front/Back",
+    "subtitle": "Certificados de cursos e formações em desenvolvimento de software.",
     "filterAll": "Todos ({count})",
     "conclusionLabel": "Conclusão:",
     "platformLabel": "Instituição:",
-    "linkedinNote": "Sincronizado com o histórico de qualificações e credenciais verificáveis do LinkedIn (linkedin.com/in/ruan-dev).",
+    "linkedinNote": "Credenciais com links para validação junto às instituições emissoras.",
     "pagination": {
       "label": "Paginação de certificados",
       "previous": "Anterior",
       "next": "Próxima",
       "page": "Página {page} de {total}",
       "range": "{start}–{end} de {total} certificados"
-    }
+    },
+    "credentialCode": "Código da credencial"
   },
   "services": {
     "tag": "especialidades",

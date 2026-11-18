@@ -1,3 +1,4 @@
+import type { CertificateItem } from '@/entities/certificate';
 import { AboutSection } from '@/widgets/about-section';
 import { CareerTimeline } from '@/widgets/career-timeline';
 import { CertificatesVault } from '@/widgets/certificates-vault';
@@ -12,7 +13,7 @@ import { SkillsSphereSection } from '@/widgets/skills-sphere-section';
 import { TopUtilityBar } from '@/widgets/top-utility-bar';
 import { StarfieldCanvas } from '@/shared/ui';
 
-export function PortfolioHomeView() {
+export function PortfolioHomeView({ certificates }: { certificates: CertificateItem[] }) {
   return (
     <div className="relative min-h-screen bg-[var(--ui-bg)] text-[var(--ui-text-primary)] selection:bg-[var(--ui-accent)] selection:text-white">
       <StarfieldCanvas />
@@ -26,7 +27,7 @@ export function PortfolioHomeView() {
         <SkillsSphereSection />
         <CareerTimeline />
         <ProjectsShowcase />
-        <CertificatesVault />
+        <CertificatesVault certificates={certificates} />
         <ServicesGrid />
         <ContactMapSection />
         <FooterSection />

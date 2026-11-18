@@ -1,4 +1,5 @@
 import { setRequestLocale } from 'next-intl/server';
+import { getCertificates } from '@/entities/certificate';
 import { PortfolioHomeView } from '@/views/portfolio-home';
 
 export default async function LocaleHomePage({
@@ -10,5 +11,7 @@ export default async function LocaleHomePage({
 
   setRequestLocale(locale);
 
-  return <PortfolioHomeView />;
+  const certificates = await getCertificates();
+
+  return <PortfolioHomeView certificates={certificates} />;
 }
