@@ -64,7 +64,9 @@ const CareerTimelineCard = memo(function CareerTimelineCardComponent({
                 {t(`entries.${entry.id}.period`)}
               </span>
               {entry.isCurrent && (
-                <Badge variant="accent">{t('currentBadge')}</Badge>
+                <Badge variant="accent">
+                  {t(entry.type === 'education' ? 'inProgressBadge' : 'currentBadge')}
+                </Badge>
               )}
             </div>
             <h3 className="mt-1 text-xl font-bold text-[var(--ui-text-primary)] sm:text-2xl">

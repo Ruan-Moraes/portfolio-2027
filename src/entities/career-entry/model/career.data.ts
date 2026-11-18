@@ -1,7 +1,7 @@
 export type CareerEntryType = 'work' | 'education' | 'milestone';
 
 export interface CareerEntryMetadata {
-  id: 'capys' | 'uninter' | 'pcBuild' | 'firstCode' | 'firstContact';
+  id: 'capys' | 'uninter' | 'pcBuild' | 'firstCode';
   type: CareerEntryType;
   yearBadge: string;
   isCurrent?: boolean;
@@ -28,13 +28,12 @@ export const CAREER_ENTRIES: CareerEntryMetadata[] = [
       'Redis',
       'REST APIs',
       'Webhooks',
-      'Microsoft Azure CI/CD',
     ],
   },
   {
     id: 'uninter',
     type: 'education',
-    yearBadge: '2024 – 2027',
+    yearBadge: '2023 – 2027',
     isCurrent: true,
     technologies: [
       'Engenharia de Software',
@@ -62,11 +61,5 @@ export const CAREER_ENTRIES: CareerEntryMetadata[] = [
     type: 'milestone',
     yearBadge: '2018',
     technologies: ['Python', 'Algoritmos', 'Lógica de Programação'],
-  },
-  {
-    id: 'firstContact',
-    type: 'milestone',
-    yearBadge: '2014',
-    technologies: ['Sistemas', 'Redes', 'Curiosidade Tecnológica'],
   },
 ];

@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import {
   Award,
   Briefcase,
@@ -49,15 +50,20 @@ export function SidebarNav() {
         aria-label="Primary Sidebar Navigation"
         className="fixed top-0 left-0 z-40 hidden h-screen w-20 flex-col items-center justify-between border-r border-[var(--ui-border)] bg-[var(--ui-surface)]/90 py-6 backdrop-blur-xl lg:flex"
       >
-        {/* Brand Monogram */}
+        {/* Profile photo */}
         <button
           type="button"
+          aria-label={t('home')}
           onClick={() => scrollToSection('home')}
           className="group flex flex-col items-center focus:outline-none"
         >
-          <div className="flex h-11 w-11 items-center justify-center rounded-2xl border border-[var(--ui-accent)]/50 bg-[var(--ui-accent)]/10 font-mono text-lg font-black text-[var(--ui-accent)] shadow-[0_0_20px_-4px_var(--ui-accent-glow)] transition-transform duration-300 group-hover:scale-105">
-            {DEVELOPER_PROFILE.initials}
-          </div>
+          <Image
+            src={DEVELOPER_PROFILE.photoPath}
+            alt={DEVELOPER_PROFILE.shortName}
+            width={44}
+            height={44}
+            className="h-11 w-11 rounded-2xl border border-[var(--ui-accent)]/50 object-cover shadow-[0_0_20px_-4px_var(--ui-accent-glow)] transition-transform duration-300 group-hover:scale-105"
+          />
         </button>
 
         {/* Section Icons */}

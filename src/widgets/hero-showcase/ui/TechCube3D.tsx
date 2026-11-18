@@ -160,20 +160,26 @@ export function TechCube3D() {
     let frameId = 0;
     let isRunning = false;
     let clockTime = 0;
+    let lastFrameTime = 0;
     let currentRx = -0.32;
     let currentRy = 0.55;
 
-    const animate = () => {
+    const animate = (timestamp: number) => {
       if (!isVisibleRef.current) {
         isRunning = false;
 
         return;
       }
 
-      if (!isDraggingRef.current) {
-        const speed = isHoveredRef.current ? 0.0025 : 0.009;
+      const deltaSeconds = lastFrameTime
+        ? Math.min((timestamp - lastFrameTime) / 1000, 0.05)
+        : 0;
+      lastFrameTime = timestamp;
 
-        clockTime += speed;
+      if (!isDraggingRef.current) {
+        const radiansPerSecond = isHoveredRef.current ? 0.045 : 0.18;
+
+        clockTime += radiansPerSecond * deltaSeconds;
       }
 
       const targetRy = 0.55 + clockTime + manualRotationRef.current.ry;
@@ -196,6 +202,7 @@ export function TechCube3D() {
     const startLoop = () => {
       if (!isRunning && isVisibleRef.current) {
         isRunning = true;
+        lastFrameTime = 0;
 
         frameId = window.requestAnimationFrame(animate);
       }

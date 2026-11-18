@@ -1,7 +1,7 @@
 {
   "seo": {
     "title": "Ruan Moraes | Desenvolvedor de Software Full Stack — Java, Spring Boot, .NET, Next.js & React Native",
-    "description": "Portfólio interativo de Ruan Moraes Santos Barbosa. Desenvolvedor de Software Full Stack na CAPYS especializado em Java, Spring Boot, C#, .NET, React, Next.js, React Native, SQL e Microsoft Azure.",
+    "description": "Portfólio interativo de Ruan Moraes Santos Barbosa. Desenvolvedor de Software Full Stack na CAPYS especializado em Java, Spring Boot, C#, .NET, React, Next.js, React Native, SQL.",
     "keywords": "Ruan Moraes, Desenvolvedor Full Stack, Software Engineer, Java, Spring Boot, C#, .NET, React, Next.js, React Native, TypeScript, Clean Architecture, Feature-Sliced Design, Belo Horizonte"
   },
   "common": {
@@ -24,7 +24,7 @@
     "copyEmail": "Copiar E-mail",
     "openWhatsApp": "Chamar no WhatsApp",
     "locationValue": "Belo Horizonte, MG — Brasil",
-    "availableStatus": "Atuando na CAPYS • Aberto a conexões & projetos"
+    "availableStatus": "Aberto a conexões e oportunidades"
   },
   "nav": {
     "home": "Início",
@@ -39,37 +39,37 @@
   "hero": {
     "greeting": "Olá, eu sou",
     "name": "Ruan Moraes",
-    "role": "Engenheiro de Software Full Stack",
+    "role": "Desenvolvedor Full Stack & Mobile",
     "stackLine": "Java • Spring Boot • C# / .NET • React & Next.js • React Native",
-    "summary": "Desenvolvedor de Software Full Stack com mais de 2 anos de experiência no desenvolvimento, manutenção e sustentação de aplicações web e mobile. Atuando na CAPYS em sistemas CRM, portais web, apps Android/iOS, otimização de consultas SQL Server e pipelines CI/CD no Microsoft Azure.",
+    "summary": "Desenvolvo aplicações web e mobile, integro serviços e melhoro o desempenho de sistemas. Acompanho as entregas da implementação à publicação, com foco na experiência dos usuários e na resolução de problemas em produção.",
     "ctaProjects": "Explorar Projetos",
     "ctaContact": "Entrar em Contato",
     "cubeCaption": "Cubo 3D Interativo — Passe o mouse para inspecionar os pilares da stack",
     "metrics": {
-      "experience": "+2 Anos",
-      "experienceLabel": "Experiência Full Stack",
-      "production": "Web & Mobile",
-      "productionLabel": "Apps Android, iOS & CRM",
-      "architecture": "Clean & FSD",
-      "architectureLabel": "Arquitetura & Testes",
-      "languages": "SQL & Cloud",
-      "languagesLabel": "SQL Server, Postgres & Azure CI/CD"
+      "experience": "2 min → 15–20 s",
+      "experienceLabel": "Otimização de consultas SQL",
+      "production": "Android & iOS",
+      "productionLabel": "Publicação na Google Play e App Store",
+      "architecture": "Cloud",
+      "architectureLabel": "AWS e Microsoft Azure",
+      "languages": "Frameworks",
+      "languagesLabel": "Spring Boot, Next.js e .NET"
     }
   },
   "about": {
     "tag": "sobre-mim",
     "title": "Sobre Mim & Trajetória",
-    "subtitle": "Da curiosidade por hardware aos 8 anos até a engenharia de sistemas críticos em produção",
+    "subtitle": "Da curiosidade por hardware ao desenvolvimento de sistemas em produção",
     "profileTitle": "Resumo Profissional",
-    "profileP1": "Sou Desenvolvedor de Software Full Stack em Belo Horizonte (MG), graduando em Engenharia de Software pela Uninter (conclusão em 2027) e desenvolvedor em tempo integral na CAPYS.",
-    "profileP2": "Atuo ponta a ponta com Java (Spring Boot, Spring Security, Data JPA), C# (.NET / ASP.NET Core / EF Core), TypeScript, React, Next.js e React Native (Expo e Ionic). Tenho forte foco em diagnóstico de causa raiz, otimização de planos de execução em SQL Server, bancos poliglotas (PostgreSQL, MongoDB, Redis), mensageria (RabbitMQ, Kafka) e arquitetura limpa (Clean Architecture, Hexagonal e Feature-Sliced Design).",
+    "profileP1": "Sou Desenvolvedor Full Stack & Mobile em Belo Horizonte (MG), graduando em Engenharia de Software pela Uninter, com conclusão prevista em 2027. Estudo programação desde o fim de 2023 e atuo profissionalmente desde abril de 2025.",
+    "profileP2": "Minha stack reúne Java e Spring Boot, C# e .NET, TypeScript, React, Next.js, Angular e React Native. Trabalho com APIs, bancos relacionais, cache e mensageria, aplicando testes automatizados, análise de logs e otimização de consultas. Também desenvolvo conhecimentos em AWS, redes, escalabilidade e confiabilidade de serviços.",
     "journeyTitle": "Minha História com Tecnologia",
-    "journeyP1": "Minha jornada começou cedo, aos 8 anos, tentando entender como os computadores funcionavam por dentro enquanto explorava jogos e servidores. Aos 12 anos, escrevi minhas primeiras linhas de código em Python com o professor Gustavo Guanabara.",
+    "journeyP1": "Meus primeiros contatos com programação foram com Python, por meio dos cursos do professor Gustavo Guanabara. Desde o fim de 2023, estudo programação de forma contínua.",
     "journeyP2": "Influenciado por amigos, mergulhei no universo de hardware e montei meu próprio computador peça por peça (um Xeon E5-2650v2 com uma GTX 1660Ti). Essa base de baixo nível despertou minha paixão definitiva pela Engenharia de Software e pela criação de sistemas escaláveis e bem arquitetados.",
     "highlights": {
-      "cleanCode": {
-        "title": "Clean Code & FSD",
-        "description": "Código modular com alta coesão, baixo acoplamento e fronteiras arquiteturais auditáveis."
+      "devops": {
+        "title": "DevOps & Cloud",
+        "description": "Automação de entregas com CI/CD, ambientes Docker e conhecimentos em serviços AWS, redes e balanceamento de carga."
       },
       "sqlTuning": {
         "title": "Performance & SQL Tuning",
@@ -79,16 +79,16 @@
         "title": "Entrega Web & Mobile",
         "description": "Do backend e APIs REST/Webhooks até a publicação de aplicativos nas lojas Android e iOS."
       },
-      "devops": {
-        "title": "CI/CD, Docker & Testes",
-        "description": "Pipelines automatizados no Microsoft Azure, ambientes Docker Compose e testes com JUnit, Testcontainers e Vitest."
+      "quality": {
+        "title": "Qualidade & Confiabilidade",
+        "description": "Testes automatizados, análise de logs e diagnóstico de falhas para evoluir aplicações com segurança."
       }
     }
   },
   "skills": {
     "tag": "competencias",
     "title": "Stack & Competências Técnicas",
-    "subtitle": "Interaja com a esfera 3D ou filtre pelas 10 categorias do currículo",
+    "subtitle": "Explore as competências do currículo por categoria",
     "sphereHint": "Arraste ou mova o cursor sobre a esfera 3D para rotacionar as tecnologias",
     "allCategories": "Todas as Áreas",
     "categories": {
@@ -100,14 +100,20 @@
       "databases": "Bancos & Cache",
       "messaging": "Mensageria",
       "testing": "Testes & Qualidade",
-      "devops": "DevOps & Cloud",
-      "architecture": "Arquitetura & IA"
+      "devops": "Build & DevOps",
+      "cloud": "Cloud",
+      "networking": "Redes",
+      "engineering": "Engenharia de Software",
+      "reliability": "Confiabilidade de Serviços",
+      "architecture": "Arquitetura & Práticas",
+      "complementary": "Competências Complementares",
+      "studies": "Estudos"
     }
   },
   "career": {
     "tag": "carreira",
     "title": "Experiência, Formação & Marcos",
-    "subtitle": "Minha atuação profissional na CAPYS, graduação acadêmica e evolução técnica",
+    "subtitle": "Experiência em desenvolvimento web e mobile, formação acadêmica e evolução técnica",
     "tabs": {
       "all": "Linha Completa",
       "work": "Experiência Profissional",
@@ -115,27 +121,26 @@
       "milestone": "Marcos Pessoais"
     },
     "currentBadge": "Atual",
+    "inProgressBadge": "Em andamento",
     "entries": {
       "capys": {
-        "role": "Desenvolvedor de Software Full Stack",
+        "role": "Desenvolvedor de Software Trainee",
         "organization": "CAPYS",
         "period": "Abril de 2025 – Atual",
         "location": "Belo Horizonte, MG • Tempo integral • Presencial",
         "summary": "Atuação no desenvolvimento, evolução e sustentação de sistemas CRM, portais web, aplicações internas e aplicativos móveis para empresas do setor imobiliário.",
         "achievements": [
-          "Desenvolvimento e manutenção de sistemas CRM, portais web, aplicações internas e aplicativos móveis para o setor imobiliário.",
-          "Implementação e evolução de funcionalidades no backend e frontend, alinhando regras de negócio complexas e integrações entre sistemas.",
-          "Investigação e correção de bugs em aplicações web e mobile, desde a análise da causa raiz até a validação e publicação em produção.",
-          "Otimização de consultas, procedures e rotinas em SQL Server via análise de planos de execução, revisão de filtros, joins, índices e estatísticas.",
-          "Desenvolvimento, manutenção e publicação de aplicativos Android e iOS utilizando React Native, Expo, Ionic, AngularJS e SQLite.",
-          "Desenvolvimento de interfaces web com React e TypeScript, além de APIs REST, integrações, Webhooks e cache distribuído com Redis.",
-          "Atuação em pipelines de CI/CD no Microsoft Azure e suporte técnico aos times de N1 e N2 na resolução de incidentes críticos em produção."
+          "Desenvolvimento e manutenção de CRM, portais web e serviços do setor imobiliário, com integrações via API com ERPs, Meta, Twilio e DocuSign.",
+          "Desenvolvimento, manutenção e publicação de aplicativos Android e iOS na Google Play e na App Store.",
+          "Diagnóstico e resolução de falhas críticas em serviços que sustentam operações financeiras, incluindo pagamentos, com análise de logs.",
+          "Redução do tempo de execução de consultas e rotinas de banco de dados de cerca de 2 minutos para 15 a 20 segundos, com análise de planos de execução e ajustes de junções, filtros e índices.",
+          "Colaboração com o suporte N1 e N2 para comunicar diagnósticos, validar soluções e priorizar incidentes conforme o impacto para os clientes."
         ]
       },
       "uninter": {
         "role": "Bacharelado em Engenharia de Software",
         "organization": "Centro Universitário Internacional Uninter",
-        "period": "2024 – Conclusão prevista: 2027",
+        "period": "2023 – Conclusão prevista: 2027",
         "location": "Ensino Superior • Engenharia de Software",
         "summary": "Formação acadêmica focada em arquitetura de software, engenharia de requisitos, estruturas de dados, bancos de dados, qualidade e testes de software.",
         "achievements": [
@@ -156,21 +161,11 @@
       "firstCode": {
         "role": "Início na Programação com Python",
         "organization": "Primeiras Linhas de Código",
-        "period": "2018 (12 anos)",
+        "period": "2018",
         "location": "Estudos Autodidatas",
         "summary": "Primeiro contato prático com lógica de programação e algoritmos em Python através dos cursos do professor Gustavo Guanabara.",
         "achievements": [
           "Desenvolvimento dos primeiros scripts de automação e resolução de desafios de lógica."
-        ]
-      },
-      "firstContact": {
-        "role": "Primeiro Contato com Computadores",
-        "organization": "Despertar Tecnológico",
-        "period": "2014 (8 anos)",
-        "location": "Infância",
-        "summary": "Início da curiosidade sobre como jogos digitais, redes e computadores funcionam nos bastidores.",
-        "achievements": [
-          "Exploração de configurações de sistema, modificações de jogos e funcionamento da internet."
         ]
       }
     }
@@ -204,19 +199,19 @@
     },
     "items": {
       "mangaReader": {
-        "title": "Manga Reader (Toonlira)",
+        "title": "Toonlira (Manga Reader)",
         "subtitle": "Plataforma Poliglota Web & Mobile para Leitura de Mangás",
         "category": "Full Stack & Mobile",
         "year": "2025 – 2026",
         "status": "Em Evolução",
         "company": "Projeto Autoral Principal",
         "architecture": "Clean Architecture (Backend) + Feature-Sliced Design (Web & Mobile) + Persistência Poliglota",
-        "description": "Ecossistema completo de leitura e gerenciamento de mangás, manhwas e manhuas com catálogo, avaliações, comentários, fórum, grupos, assinaturas, loja e 3 microsserviços auxiliares de reconciliação e ranking.",
+        "description": "Plataforma web e mobile de leitura de mangás, com catálogo, biblioteca e comunidade. O mobile oferece leitor imersivo, importação de imagens e retomada offline; a plataforma autenticada e a tradução remota seguem em desenvolvimento.",
         "features": [
-          "Monorepo com API principal e 3 jobs em Java + Spring Boot, frontend React + TypeScript e app mobile React Native + Expo.",
-          "Persistência poliglota utilizando PostgreSQL 17, MongoDB 8, Redis 7, Neo4j 5 e mensageria assíncrona com RabbitMQ 4.",
-          "Internacionalização completa em Português, Inglês e Espanhol tanto na web quanto no mobile e nas mensagens de domínio da API.",
-          "Suíte rigorosa de testes automatizados com JUnit 5, Mockito, Testcontainers, Vitest, Testing Library e MSW."
+          "API Java + Spring Boot com três jobs: agregação de avaliações, reconciliação de dados e rankings de tendências.",
+          "PostgreSQL, MongoDB, Neo4j e Redis, com eventos assíncronos via RabbitMQ e arquitetura em camadas.",
+          "Web React + TypeScript e mobile React Native + Expo; autenticação com rotação de refresh tokens e internacionalização PT/EN/ES.",
+          "Leitor mobile com modos vertical, paginado e duplo, projetos privados e progresso persistido em SQLite. Gateway de tradução em construção; testes com JUnit, Testcontainers, Vitest, Testing Library e MSW."
         ]
       },
       "dbmind": {
@@ -256,12 +251,12 @@
         "year": "2025 – Atual",
         "status": "Em Produção",
         "company": "CAPYS",
-        "architecture": "C# / .NET + React & TypeScript + React Native / Expo / Ionic + SQL Server + Redis + Azure CI/CD",
+        "architecture": "C# / .NET + React & TypeScript + React Native / Expo / Ionic + SQL Server + Redis + CI/CD",
         "description": "Desenvolvimento, sustentação e evolução de sistemas corporativos de missão crítica para construtoras e incorporadoras do setor imobiliário brasileiro.",
         "features": [
           "Otimização de procedures e consultas complexas em SQL Server reduzindo tempo de resposta por meio de análise de planos de execução e índices.",
           "Ciclo completo de publicação e sustentação de aplicativos móveis nas lojas Google Play (Android) e App Store (iOS) com sincronização SQLite.",
-          "Implementação de integrações distribuídas via APIs REST, Webhooks, cache em Redis e deploys automatizados no Microsoft Azure."
+          "Implementação de integrações distribuídas via APIs REST, Webhooks, cache em Redis e deploys automatizados."
         ]
       },
       "studentManagement": {
@@ -301,7 +296,14 @@
     "filterAll": "Todos ({count})",
     "conclusionLabel": "Conclusão:",
     "platformLabel": "Instituição:",
-    "linkedinNote": "Sincronizado com o histórico de qualificações e credenciais verificáveis do LinkedIn (linkedin.com/in/ruan-dev)."
+    "linkedinNote": "Sincronizado com o histórico de qualificações e credenciais verificáveis do LinkedIn (linkedin.com/in/ruan-dev).",
+    "pagination": {
+      "label": "Paginação de certificados",
+      "previous": "Anterior",
+      "next": "Próxima",
+      "page": "Página {page} de {total}",
+      "range": "{start}–{end} de {total} certificados"
+    }
   },
   "services": {
     "tag": "especialidades",
@@ -322,7 +324,7 @@
       },
       "maintenance": {
         "title": "Sustentação, Diagnóstico & CI/CD",
-        "description": "Investigação de bugs complexos em produção, refatoração de código legado aplicando Clean Code/FSD, testes automatizados (JUnit/Testcontainers/Vitest) e pipelines no Microsoft Azure e Docker."
+        "description": "Investigação de bugs complexos em produção, refatoração de código legado aplicando Clean Code/FSD, testes automatizados (JUnit/Testcontainers/Vitest) e pipelines de CI/CD e Docker."
       }
     }
   },
@@ -341,13 +343,17 @@
       "messagePlaceholder": "Conte um pouco sobre o desafio, vaga ou projeto...",
       "submit": "Enviar Mensagem",
       "sending": "Enviando...",
-      "success": "Mensagem preparada/enviada com sucesso! Responderei o mais rápido possível.",
-      "validationError": "Por favor, preencha todos os campos corretamente (mínimo de 10 caracteres na mensagem)."
+      "success": "Mensagem enviada com sucesso! Responderei assim que possível.",
+      "validationError": "Por favor, preencha todos os campos corretamente (mínimo de 10 caracteres na mensagem).",
+      "sendError": "Não foi possível enviar a mensagem. Tente novamente.",
+      "connectionError": "Erro de conexão. Verifique sua internet e tente novamente."
     },
     "map": {
       "badge": "Base Operacional",
       "city": "Belo Horizonte, Minas Gerais — Brasil",
-      "workMode": "Atuação Presencial & Remota Global (UTC-3)"
+      "workMode": "Atuação Presencial & Remota Global (UTC-3)",
+      "fallback": "O mapa interativo está indisponível.",
+      "openMap": "Ver Belo Horizonte no mapa"
     }
   },
   "theme": {
@@ -364,13 +370,16 @@
     }
   },
   "commandPalette": {
-    "placeholder": "Digite um comando ou busque uma seção, idioma ou tema...",
+    "title": "Comandos",
+    "placeholder": "Buscar comandos…",
     "empty": "Nenhum comando encontrado.",
+    "navigate": "Navegar",
+    "select": "Selecionar",
     "groups": {
-      "navigation": "Navegar para Seção",
-      "actions": "Ações Rápidas do Recrutador",
-      "language": "Trocar Idioma (i18n)",
-      "theme": "Trocar Cor de Destaque & Tema"
+      "navigation": "Seções",
+      "actions": "Ações rápidas",
+      "language": "Idioma",
+      "theme": "Aparência"
     }
   }
 }

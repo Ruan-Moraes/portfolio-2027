@@ -1,7 +1,7 @@
 'use client';
 
-import { memo, useState } from 'react';
-import { Award, Calendar, ExternalLink, ShieldCheck } from 'lucide-react';
+import { memo, useRef, useState } from 'react';
+import { Award, Calendar, ChevronLeft, ChevronRight, ExternalLink, ShieldCheck } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 import {
   CERTIFICATES_DATA,
@@ -11,6 +11,8 @@ import {
 import type { SupportedLocale } from '@/shared/config';
 import { cn } from '@/shared/lib';
 import { Badge, GlassCard, SectionHeading } from '@/shared/ui';
+
+const PAGE_SIZE = 12;
 
 const CERTIFICATES_BY_PLATFORM: Record<
   'all' | CertificatePlatform,
@@ -89,7 +91,17 @@ export function CertificatesVault() {
     'all' | CertificatePlatform
   >('all');
 
+  const [page, setPage] = useState(1);
+  const gridRef = useRef<HTMLDivElement>(null);
   const filtered = CERTIFICATES_BY_PLATFORM[platformFilter];
+  const totalPages = Math.ceil(filtered.length / PAGE_SIZE);
+  const visible = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+
+  function goToPage(nextPage: number) {
+    setPage(nextPage);
+    gridRef.current?.focus({ preventScroll: true });
+    gridRef.current?.scrollIntoView({ block: 'start', behavior: 'instant' });
+  }
 
   const verifyLabel = tCommon('verifyCredential');
 
@@ -112,7 +124,11 @@ export function CertificatesVault() {
               <button
                 key={platform}
                 type="button"
-                onClick={() => setPlatformFilter(platform)}
+                aria-pressed={isSelected}
+                onClick={() => {
+                  setPlatformFilter(platform);
+                  setPage(1);
+                }}
                 className={cn(
                   'cursor-pointer rounded-xl px-4 py-2 text-xs font-bold transition-all',
                   isSelected
@@ -134,8 +150,15 @@ export function CertificatesVault() {
         </p>
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {filtered.map((cert) => (
+      <p className="mb-4 text-xs text-[var(--ui-text-muted)]" role="status">
+        {t('pagination.range', {
+          start: filtered.length ? (page - 1) * PAGE_SIZE + 1 : 0,
+          end: Math.min(page * PAGE_SIZE, filtered.length),
+          total: filtered.length,
+        })}
+      </p>
+      <div ref={gridRef} tabIndex={-1} className="grid scroll-mt-24 gap-4 outline-none sm:grid-cols-2 lg:grid-cols-3">
+        {visible.map((cert) => (
           <CertificateCard
             key={cert.id}
             cert={cert}
@@ -144,6 +167,19 @@ export function CertificatesVault() {
           />
         ))}
       </div>
+      {totalPages > 1 && (
+        <nav aria-label={t('pagination.label')} className="mt-6 flex flex-wrap items-center justify-center gap-3">
+          <button type="button" disabled={page === 1} onClick={() => goToPage(page - 1)}
+            className="inline-flex items-center gap-2 rounded-xl border border-[var(--ui-border)] px-4 py-2 text-sm text-[var(--ui-text-primary)] hover:border-[var(--ui-accent)] disabled:cursor-not-allowed disabled:opacity-40">
+            <ChevronLeft aria-hidden="true" className="h-4 w-4" />{t('pagination.previous')}
+          </button>
+          <span className="text-sm text-[var(--ui-text-secondary)]">{t('pagination.page', { page, total: totalPages })}</span>
+          <button type="button" disabled={page === totalPages} onClick={() => goToPage(page + 1)}
+            className="inline-flex items-center gap-2 rounded-xl border border-[var(--ui-border)] px-4 py-2 text-sm text-[var(--ui-text-primary)] hover:border-[var(--ui-accent)] disabled:cursor-not-allowed disabled:opacity-40">
+            {t('pagination.next')}<ChevronRight aria-hidden="true" className="h-4 w-4" />
+          </button>
+        </nav>
+      )}
     </section>
   );
 }

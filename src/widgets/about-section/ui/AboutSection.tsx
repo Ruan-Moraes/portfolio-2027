@@ -1,20 +1,21 @@
 'use client';
 
 import Image from 'next/image';
-import { Cpu, Database, Layers, Smartphone } from 'lucide-react';
+import { Database, FlaskConical, Smartphone, Workflow } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { DEVELOPER_PROFILE } from '@/entities/developer-profile';
 import { GlassCard, SectionHeading } from '@/shared/ui';
 
 export function AboutSection() {
   const t = useTranslations('about');
+  const tHero = useTranslations('hero');
 
   const highlights = [
     {
-      key: 'cleanCode',
-      icon: Layers,
-      title: t('highlights.cleanCode.title'),
-      description: t('highlights.cleanCode.description'),
+      key: 'devops',
+      icon: Workflow,
+      title: t('highlights.devops.title'),
+      description: t('highlights.devops.description'),
     },
     {
       key: 'sqlTuning',
@@ -29,10 +30,10 @@ export function AboutSection() {
       description: t('highlights.mobileWeb.description'),
     },
     {
-      key: 'devops',
-      icon: Cpu,
-      title: t('highlights.devops.title'),
-      description: t('highlights.devops.description'),
+      key: 'quality',
+      icon: FlaskConical,
+      title: t('highlights.quality.title'),
+      description: t('highlights.quality.description'),
     },
   ];
 
@@ -62,7 +63,7 @@ export function AboutSection() {
                 {DEVELOPER_PROFILE.fullName}
               </h3>
               <p className="font-mono text-xs text-[var(--ui-accent)]">
-                Full Stack Software Developer @ CAPYS
+                {tHero('role')}
               </p>
               <p className="mt-1 text-xs text-[var(--ui-text-muted)]">
                 {DEVELOPER_PROFILE.location.city},{' '}

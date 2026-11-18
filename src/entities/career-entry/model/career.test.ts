@@ -9,8 +9,9 @@ describe('career-entry entity', () => {
 
     expect(workEntries.length).toBeGreaterThanOrEqual(1);
     expect(educationEntries.length).toBeGreaterThanOrEqual(1);
-    expect(milestoneEntries.length).toBeGreaterThanOrEqual(3);
+    expect(milestoneEntries.length).toBeGreaterThanOrEqual(2);
     expect(CAREER_ENTRIES.some((e) => e.id === 'capys')).toBe(true);
     expect(CAREER_ENTRIES.some((e) => e.id === 'uninter')).toBe(true);
+    expect(CAREER_ENTRIES.find((e) => e.id === 'uninter')?.yearBadge).toBe('2023 – 2027');
   });
 });

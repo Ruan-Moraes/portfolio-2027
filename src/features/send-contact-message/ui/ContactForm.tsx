@@ -3,7 +3,6 @@
 import { memo, useState, type FormEvent } from 'react';
 import { CheckCircle2, AlertCircle, Send } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import { DEVELOPER_PROFILE } from '@/entities/developer-profile';
 import { Button } from '@/shared/ui';
 import { contactMessageSchema } from '../model/contact.schema';
 
@@ -16,9 +15,11 @@ function ContactFormComponent() {
   const [status, setStatus] = useState<
     'idle' | 'submitting' | 'success' | 'error'
   >('idle');
+  const [errorMessage, setErrorMessage] = useState('');
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    if (status === 'submitting') return;
 
     const form = event.currentTarget;
 
@@ -32,6 +33,7 @@ function ContactFormComponent() {
     });
 
     if (!parsed.success) {
+      setErrorMessage(t('validationError'));
       setStatus('error');
 
       return;
@@ -39,50 +41,33 @@ function ContactFormComponent() {
 
     setStatus('submitting');
 
-    const endpoint = process.env.NEXT_PUBLIC_FORMSPREE_ENDPOINT;
+    const endpoint =
+      process.env.NEXT_PUBLIC_FORMSPREE_ENDPOINT?.trim() ||
+      'https://formspree.io/f/mojnaybn';
 
-    if (endpoint) {
-      try {
-        const res = await fetch(endpoint, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            Accept: 'application/json',
-          },
-          body: JSON.stringify(parsed.data),
-        });
+    try {
+      const res = await fetch(endpoint, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Accept: 'application/json',
+        },
+        body: JSON.stringify(parsed.data),
+      });
 
-        if (res.ok) {
-          setStatus('success');
+      if (res.ok) {
+        setStatus('success');
 
-          form.reset();
+        form.reset();
 
-          return;
-        }
-      } catch {
-        // Fallback to mailto below if Formspree is unreachable
+        return;
       }
+      setErrorMessage(t('sendError'));
+    } catch {
+      setErrorMessage(t('connectionError'));
     }
 
-    // Fallback seguro e imediato via mailto
-    const mailtoBody = encodeURIComponent(
-      `Nome: ${parsed.data.name}\nE-mail: ${parsed.data.email}\n\n${parsed.data.message}`
-    );
-
-    const mailtoSubject = encodeURIComponent(
-      `[Portfólio 2027] ${parsed.data.subject}`
-    );
-
-    if (typeof window !== 'undefined') {
-      window.open(
-        `mailto:${DEVELOPER_PROFILE.email}?subject=${mailtoSubject}&body=${mailtoBody}`,
-        '_self'
-      );
-    }
-
-    setStatus('success');
-
-    form.reset();
+    setStatus('error');
   };
 
   return (
@@ -107,6 +92,7 @@ function ContactFormComponent() {
             placeholder={t('namePlaceholder')}
             className={INPUT_CLASSES}
             required
+            maxLength={100}
           />
         </div>
 
@@ -162,6 +148,7 @@ function ContactFormComponent() {
           placeholder={t('messagePlaceholder')}
           className={`${INPUT_CLASSES} min-h-[8.5rem] flex-1 resize-none`}
           required
+          maxLength={5000}
         />
       </div>
 
@@ -171,7 +158,7 @@ function ContactFormComponent() {
           className="flex items-center gap-2 rounded-xl border border-rose-500/40 bg-rose-500/10 px-4 py-3 text-xs text-rose-300"
         >
           <AlertCircle className="h-4 w-4 shrink-0" />
-          <span>{t('validationError')}</span>
+          <span>{errorMessage}</span>
         </div>
       )}
 

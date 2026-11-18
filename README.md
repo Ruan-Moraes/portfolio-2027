@@ -11,12 +11,12 @@ Portfólio espacial interativo de **Ruan Moraes Santos Barbosa** (Desenvolvedor 
 Inspirado na direção artística espacial de [metal-oopa/personal-portfolio](https://github.com/metal-oopa/personal-portfolio), porém reconstruído do zero em uma arquitetura moderna e livre das dívidas técnicas do template original:
 
 1. **Starfield HTML5 `<canvas>` 60fps (`<StarfieldCanvas />`)**: Substitui os `2.000+ box-shadows` estáticos em CSS por renderização acelerada via GPU com efeito parallax suave e respeito automático a `prefers-reduced-motion`.
-2. **Cubo 3D CSS (`<TechCube3D />`)**: Cubo 3D em rotação contínua destacando os 6 pilares principais da stack: **Java & Spring**, **C# & .NET**, **React & Next.js**, **React Native**, **SQL & NoSQL** e **Azure & Docker**.
-3. **Esfera Fibonacci 3D Interativa (`<InteractiveSkillSphere />`)**: Nuvem 3D interativa (arraste/mouse/toque) sincronizada com filtro pelas **10 categorias oficiais do currículo**.
+2. **Cubo 3D CSS (`<TechCube3D />`)**: Cubo 3D em rotação contínua destacando os 6 pilares principais da stack: **Java & Spring**, **C# & .NET**, **React & Next.js**, **React Native**, **SQL & NoSQL** e **AWS & Docker**.
+3. **Esfera Fibonacci 3D Interativa (`<InteractiveSkillSphere />`)**: Nuvem 3D interativa (arraste/mouse/toque) sincronizada com o filtro de competências por categoria.
 4. **Command Palette (`Cmd+K` / `Ctrl+K`)**: Navegação instantânea por seções, troca de idioma (`PT / EN / ES`), troca de tema (`Dark / Light` + 5 cores de destaque neon) e download direto do currículo PDF.
 5. **Ambient Space Synth (`<AmbientSoundbar />`)**: Equalizador interativo `<music>` usando **Web Audio API pura** (zero arquivos MP3 pesados no bundle), iniciando pausado por padrão em respeito à UX.
 6. **Cofre de Certificados Verificados (`<CertificatesVault />`)**: 13 certificações verificadas (Java, Spring Boot, React, TypeScript, Arquitetura, Segurança e Inglês) com busca textual, filtro por categoria e modal de inspeção.
-7. **Mapa Interativo Dark (`<BeloHorizonteMap />`)**: Mapa Leaflet dark customizado apontando para **Belo Horizonte, MG — Brasil**, carregado sob demanda (`ssr: false`).
+7. **Mapa Interativo (`<BeloHorizonteMap />`)**: Mapa Leaflet apontando para **Belo Horizonte, MG — Brasil**, carregado sob demanda (`ssr: false`), com tiles do OpenStreetMap ou MapTiler.
 
 ---
 
@@ -50,11 +50,11 @@ src/
 │   ├── switch-theme/             # Dark/Light + 5 cores de destaque (Green, Purple, Blue, Orange, Red)
 │   ├── switch-language/          # Seletor PT-BR / EN-US / ES-ES
 │   ├── play-ambient-sound/       # Sintetizador espacial Web Audio API
-│   ├── send-contact-message/     # Formulário com validação Zod + envio/fallback mailto
+│   ├── send-contact-message/     # Formulário com validação Zod + envio Formspree
 │   └── open-command-palette/     # Contexto e atalho global Cmd+K / Ctrl+K
 ├── entities/                     # Modelos de domínio e Single Sources of Truth (SSOT)
 │   ├── developer-profile/        # Dados de perfil, contatos, redes e localização
-│   ├── skill/                    # 10 categorias de skills e faces do cubo 3D
+│   ├── skill/                    # Competências por categoria e faces do cubo 3D
 │   ├── career-entry/             # Histórico profissional e acadêmico
 │   ├── project/                  # Case studies + cliente GitHub API
 │   ├── certificate/              # 13 certificados verificados
@@ -100,6 +100,8 @@ pnpm test
 # Build de produção (Next.js 15 App Router)
 pnpm build
 ```
+
+O mapa carrega tiles do OpenStreetMap sem exigir chave. Para usar MapTiler, configure a chave pública `NEXT_PUBLIC_MAPTILER_KEY` em `.env.local` e na Vercel, restrita às origens do projeto. Ambos os provedores exibem a atribuição. O formulário envia mensagens pelo mesmo endpoint público do Formspree utilizado no portfólio de 2026, com possibilidade de alteração por `NEXT_PUBLIC_FORMSPREE_ENDPOINT`.
 
 ---
 
