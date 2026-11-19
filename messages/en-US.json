@@ -1,7 +1,7 @@
 {
   "seo": {
     "title": "Ruan Moraes | Full Stack Software Engineer — Java, Spring Boot, .NET, Next.js & React Native",
-    "description": "Interactive portfolio of Ruan Moraes Santos Barbosa. Full Stack Software Developer at CAPYS specializing in Java, Spring Boot, C#, .NET, React, Next.js, React Native, and SQL.",
+    "description": "Interactive portfolio of Ruan Moraes Santos Barbosa. Full Stack Software Developer specializing in Java, Spring Boot, C#, .NET, React, Next.js, React Native, and SQL.",
     "keywords": "Ruan Moraes, Full Stack Developer, Software Engineer, Java, Spring Boot, C#, .NET, React, Next.js, React Native, TypeScript, Clean Architecture, Feature-Sliced Design, Brazil"
   },
   "common": {
@@ -126,11 +126,11 @@
       "capys": {
         "role": "Trainee Software Developer",
         "organization": "CAPYS",
-        "period": "April 2025 – Present",
+        "period": "April 2025 – November 2026",
         "location": "Belo Horizonte, MG • Full-time • On-site",
         "summary": "Developing, evolving, and maintaining CRM systems, web portals, internal applications, and mobile apps for real estate enterprises.",
         "achievements": [
-          "Develop and maintain CRM systems, web portals, and services for the real estate sector, including API integrations with ERPs, Meta, Twilio, and DocuSign.",
+          "Developed and maintained CRM systems, web portals, and services for the real estate sector. Integrated ERP systems such as UAU, TOTVS, Informakon, and Sienge, communication platforms (Meta and Twilio), and electronic signature services via APIs.",
           "Develop, maintain, and publish Android and iOS apps on Google Play and the App Store.",
           "Diagnose and resolve critical failures in services supporting financial operations, including payments, by analyzing logs.",
           "Reduced database query and routine execution time from about 2 minutes to 15–20 seconds by analyzing execution plans and tuning joins, filters, and indexes.",
@@ -248,7 +248,7 @@
         "title": "Real Estate CRM Ecosystem & Mobile Apps",
         "subtitle": "Web Portals, REST APIs, SQL Server Tuning & Android/iOS Apps",
         "category": "Corporate (CAPYS)",
-        "year": "2025 – Present",
+        "year": "2025 – 2026",
         "status": "In Production",
         "company": "CAPYS",
         "architecture": "C# / .NET + React & TypeScript + React Native / Expo / Ionic + SQL Server + Redis + CI/CD",

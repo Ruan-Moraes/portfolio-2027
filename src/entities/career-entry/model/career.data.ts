@@ -13,8 +13,7 @@ export const CAREER_ENTRIES: CareerEntryMetadata[] = [
   {
     id: 'capys',
     type: 'work',
-    yearBadge: '2025 – Atual',
-    isCurrent: true,
+    yearBadge: '2025 – 2026',
     technologies: [
       'C# / .NET',
       'React',

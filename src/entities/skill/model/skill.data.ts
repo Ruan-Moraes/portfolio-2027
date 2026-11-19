@@ -146,7 +146,6 @@ export const SKILLS_DATA: SkillItem[] = [
   { name: 'xUnit', category: 'testing' },
   { name: 'Moq', category: 'testing' },
   { name: 'Playwright', category: 'testing' },
-  { name: 'Web Accessibility', category: 'testing' },
 
   // DevOps & Cloud
   { name: 'Maven', category: 'devops' },
